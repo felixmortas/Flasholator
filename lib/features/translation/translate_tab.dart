@@ -1,7 +1,7 @@
 // Translate tab widget with a language selector, a text field for the word to translate, a text label to display the translation and a button to translate the word.
 import 'package:flutter/material.dart';
 import '../../core/services/flashcards/flashcards_collection.dart';
-import '../../core/services/translator/deepl_translator.dart'; // version traduction locale
+import '../../core/services/translator/deepl_translator.dart';
 import '../shared/utils/language_selection.dart';
 import '../../config/constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,14 +9,14 @@ import '../shared/dialogs/cancel_dialog.dart';
 
 class TranslateTab extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
-  final DeeplTranslator deeplTranslator; // Version traduction locale
+  final DeeplTranslator deeplTranslator;
   final Function(Map<dynamic, dynamic>) addRow;
   final Function() updateQuestionText;
 
   const TranslateTab({
     Key? key,
     required this.flashcardsCollection,
-    required this.deeplTranslator, // Version traduction locale
+    required this.deeplTranslator,
     required this.addRow,
     required this.updateQuestionText,
   }) : super(key: key);

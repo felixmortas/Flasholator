@@ -1,23 +1,25 @@
 // HomePage widget with 3 tabs : Traduire, Réviser and Paquet
 import 'dart:io';
 
-import '../core/services/translator/deepl_translator.dart'; // version précédente
+import '../core/services/translator/deepl_translator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../core/services/flashcards/flashcards_collection.dart';
 import 'translation/translate_tab.dart';
 import 'review/review_tab.dart';
 import 'data/data_table_tab.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
-  final DeeplTranslator deeplTranslator; // version précédente
+  final DeeplTranslator deeplTranslator;
 
   const HomePage({
     Key? key,
     required this.flashcardsCollection,
-    required this.deeplTranslator, // version précédente
+    required this.deeplTranslator,
   }) : super(key: key);
 
   @override
@@ -39,6 +41,7 @@ class _HomePageState extends State<HomePage> {
     if (Platform.isAndroid) {
       requestPermissions(); // Call the requestPermissions() method here
     }
+    _handleTextIntent();
   }
 
   @override
@@ -59,6 +62,44 @@ class _HomePageState extends State<HomePage> {
     // Fonction appelée lors du changement d'onglet pour synchroniser l'état du switch
     dataTableTabKey.currentState?.updateSwitchState(isAllLanguagesToggledNotifier.value);
     reviewTabKey.currentState?.updateSwitchState(isAllLanguagesToggledNotifier.value);
+  }
+
+  static const MethodChannel _platform = MethodChannel('com.felinx18.flasholator.translate_and_add_card');
+
+  Future<void> _handleTextIntent() async {
+    try {
+      // Récupérer le texte sélectionné
+      String? wordToTranslate = await _platform.invokeMethod<String>('getText');
+      if (wordToTranslate != null) {
+        // Appeler la fonction de traduction
+        String translatedWord = await widget.deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
+        
+        if (wordToTranslate != '' &&
+            translatedWord != '' &&
+            translatedWord != 'Erreur de connexion' &&
+            !await widget.flashcardsCollection.checkIfFlashcardExists(wordToTranslate, translatedWord)) {
+          wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() + wordToTranslate.toLowerCase().substring(1);
+          translatedWord = translatedWord.toLowerCase()[0].toUpperCase() + translatedWord.toLowerCase().substring(1);
+        }
+
+        Future<bool> isCardAdded = widget.flashcardsCollection.addFlashcard(
+            wordToTranslate, translatedWord, "EN", "FR");
+
+          // Confirm that the card was added
+        Fluttertoast.showToast(
+          msg: await isCardAdded ? "Carte ajoutée" : "Carte déjà ajoutée",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+
+    } on PlatformException catch (e) {
+      print("Failed to get text: '${e.message}'.");
+    }
   }
 
   void dataTableTabFunction(Map<dynamic, dynamic> row) {

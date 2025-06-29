@@ -51,6 +51,7 @@ dependencies:
   url_launcher: ^6.3.1
   url_launcher_ios: ^6.3.3
   fluttertoast: ^8.2.12
+  shared_preferences: ^2.5.3 # To trigger an actio from selected text in other apps
 
   # Debug
   http_interceptor: ^2.0.0

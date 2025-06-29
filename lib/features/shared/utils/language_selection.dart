@@ -2,8 +2,8 @@
 class LanguageSelection {
   static final LanguageSelection _instance = LanguageSelection._internal();
 
-  String sourceLanguage = 'FR';
-  String targetLanguage = 'EN';
+  String sourceLanguage = 'EN';
+  String targetLanguage = 'FR';
 
   factory LanguageSelection() {
     return _instance;

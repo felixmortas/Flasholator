@@ -1,6 +1,6 @@
 // constants.dart
-const String INITIAL_SOURCE_LANGUAGE = 'FR';
-const String INITIAL_TARGET_LANGUAGE = 'EN';
+const String INITIAL_SOURCE_LANGUAGE = 'EN';
+const String INITIAL_TARGET_LANGUAGE = 'FR';
 
 const Map<String, String> LANGUAGES = {
   'BG': 'Bulgare',
