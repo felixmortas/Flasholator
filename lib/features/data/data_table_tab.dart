@@ -161,6 +161,10 @@ class DataTableTabState extends State<DataTableTab> {
           ),
           actions: [
             TextButton(
+              onPressed: Navigator.of(context).pop,
+              child: const Text('Annuler'),
+            ),
+            TextButton(
               onPressed: () {
                 if (front != null &&
                     back != null &&
@@ -171,10 +175,6 @@ class DataTableTabState extends State<DataTableTab> {
                 }
               },
               child: const Text('Ajouter'),
-            ),
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: const Text('Annuler'),
             ),
           ],
         );

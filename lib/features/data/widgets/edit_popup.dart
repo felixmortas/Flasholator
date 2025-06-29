@@ -41,7 +41,6 @@ class _EditPopupState extends State<EditPopup> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildInputRow(
-            'Langue source',
             _sourceLanguage,
             (value) => _sourceLanguage = value!,
             _word,
@@ -49,7 +48,6 @@ class _EditPopupState extends State<EditPopup> {
             widget.languageDropdownEnabled,
           ),
           _buildInputRow(
-            'Langue cible',
             _targetLanguage,
             (value) => _targetLanguage = value!,
             _translation,
@@ -59,6 +57,13 @@ class _EditPopupState extends State<EditPopup> {
         ],
       ),
       actions: [
+        TextButton(
+          onPressed: () {
+            widget.onDelete(widget.row);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Supprimer'),
+        ),
         TextButton(
           onPressed: () {
             widget.onEdit({
@@ -71,53 +76,56 @@ class _EditPopupState extends State<EditPopup> {
           },
           child: const Text('Modifier'),
         ),
-        TextButton(
-          onPressed: () {
-            widget.onDelete(widget.row);
-            Navigator.of(context).pop();
-          },
-          child: const Text('Supprimer'),
-        ),
       ],
     );
   }
 
   Widget _buildInputRow(
-    String languageLabel,
     String languageValue,
     Function(String?) onLanguageChanged,
     String textValue,
     Function(String) onTextChanged,
     bool languageDropdownEnabled,
   ) {
-    return Row(
-      children: [
-        Text('$languageLabel: '),
-        DropdownButton<String>(
-          value: languageValue,
-          onChanged: languageDropdownEnabled ? (String? newValue) {
-            if (newValue != null) {
-              onLanguageChanged(newValue);
-              // Mettre à jour l'interface utilisateur
-              setState(() {
-                languageValue = newValue;
-              });
-            }
-          } : null,
-          items: LANGUAGES.keys.map((String key) { // Utilisez les clés de LANGUAGES
-            return DropdownMenuItem<String>(
-              value: key, // La valeur passée est la clé (code à deux lettres)
-              child: Text(LANGUAGES[key]!), // Affichez le nom complet de la langue
-            );
-          }).toList(),
-        ),
-        Expanded(
-          child: TextField(
-            controller: TextEditingController(text: textValue),
-            onChanged: onTextChanged,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          const SizedBox(width: 8.0),
+          Flexible(
+            flex: 2,
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: languageValue,
+              onChanged: languageDropdownEnabled
+                  ? (String? newValue) {
+                      if (newValue != null) {
+                        onLanguageChanged(newValue);
+                        setState(() {
+                          languageValue = newValue;
+                        });
+                      }
+                    }
+                  : null,
+              items: LANGUAGES.keys.map((String key) {
+                return DropdownMenuItem<String>(
+                  value: key,
+                  child: Text(LANGUAGES[key]!),
+                );
+              }).toList(),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 8.0),
+          Flexible(
+            flex: 3,
+            child: TextField(
+              controller: TextEditingController(text: textValue),
+              onChanged: onTextChanged,
+            ),
+          ),
+        ],
+      ),
     );
   }
+
 }
