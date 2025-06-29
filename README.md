@@ -26,10 +26,9 @@ __[Ajouter captures d'écran et tuto]__
 ### Fonctionnalités :
 - Statistiques de traduction et de révision
 - Choix de la langue de l'app
-- Choix du trouple de langue au premier lancement 
+- Choix du couple de langue au premier lancement 
 - Option écrire le mot pour le vérifier.
 - Une ou deux langues fun translator
-- Android native traduire avec Flasholator et ajouter une carte depuis une autre appliation
 - Notifications de rappel cartes à réviser
 - Plusieurs résultats lors de la traduction.
 - Prononciation
@@ -44,6 +43,7 @@ __[Ajouter captures d'écran et tuto]__
 - Import/Export des données de l'utilisateur.
 
 ### Expérience utilisateur :
+- Optimiser fonction Android native traduire avec Flasholator et ajouter une carte depuis une autre appliation
 - Réduction au maximum le nombre de clics nécessaires pour utiliser l'application.
 - Mettre tous les boutons dans la thumb zone
 - Ajout d'un Call To Action (titre, texte, image animée, bouton) pour ajouter de nouveaux mots quand plus de mots à réviser
@@ -64,7 +64,6 @@ __[Ajouter captures d'écran et tuto]__
 - Ajouter des sons et animations à forte intensité (style Candy Crush)
 - Choisir une couleur accent qui sera celle du logo et des boutons d'action
 
-
 ## Contribution
 
 Les contributions sont les bienvenues ! Pour contribuer, veuillez suivre ces étapes :
@@ -74,6 +73,10 @@ Les contributions sont les bienvenues ! Pour contribuer, veuillez suivre ces ét
 3. Committer vos modifications (`git commit -am 'Ajout de la nouvelle fonctionnalité'`).
 4. Pousser la branche (`git push origin feature/NouvelleFonctionnalité`).
 5. Ouvrir une Pull Request.
+
+### Configuration
+
+Version de flutter : 3.32.5
 
 ## Licence
 
