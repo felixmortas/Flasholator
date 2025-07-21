@@ -1,13 +1,14 @@
 // HomePage widget with 3 tabs : Traduire, Réviser and Paquet
 import 'dart:io';
 
-import '../core/services/translator/deepl_translator.dart';
+import '../core/services/deepl_translator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../core/services/flashcards/flashcards_collection.dart';
+import '../core/services/flashcards_collection.dart';
 import 'translation/translate_tab.dart';
 import 'review/review_tab.dart';
 import 'data/data_table_tab.dart';
+import 'stats/stats_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -29,9 +30,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final dataTableTabKey = GlobalKey<DataTableTabState>();
   final reviewTabKey = GlobalKey<ReviewTabState>();
-  final ValueNotifier<bool> isAllLanguagesToggledNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> isAllLanguagesToggledNotifier =
+      ValueNotifier<bool>(false);
   late TabController _tabController;
-
 
   @override
   void initState() {
@@ -60,11 +61,14 @@ class _HomePageState extends State<HomePage> {
 
   void _synchronizeSwitchState() {
     // Fonction appelée lors du changement d'onglet pour synchroniser l'état du switch
-    dataTableTabKey.currentState?.updateSwitchState(isAllLanguagesToggledNotifier.value);
-    reviewTabKey.currentState?.updateSwitchState(isAllLanguagesToggledNotifier.value);
+    dataTableTabKey.currentState
+        ?.updateSwitchState(isAllLanguagesToggledNotifier.value);
+    reviewTabKey.currentState
+        ?.updateSwitchState(isAllLanguagesToggledNotifier.value);
   }
 
-  static const MethodChannel _platform = MethodChannel('com.felinx18.flasholator.translate_and_add_card');
+  static const MethodChannel _platform =
+      MethodChannel('com.felinx18.flasholator.translate_and_add_card');
 
   Future<void> _handleTextIntent() async {
     try {
@@ -72,20 +76,24 @@ class _HomePageState extends State<HomePage> {
       String? wordToTranslate = await _platform.invokeMethod<String>('getText');
       if (wordToTranslate != null) {
         // Appeler la fonction de traduction
-        String translatedWord = await widget.deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
-        
+        String translatedWord =
+            await widget.deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
+
         if (wordToTranslate != '' &&
             translatedWord != '' &&
             translatedWord != 'Erreur de connexion' &&
-            !await widget.flashcardsCollection.checkIfFlashcardExists(wordToTranslate, translatedWord)) {
-          wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() + wordToTranslate.toLowerCase().substring(1);
-          translatedWord = translatedWord.toLowerCase()[0].toUpperCase() + translatedWord.toLowerCase().substring(1);
+            !await widget.flashcardsCollection
+                .checkIfFlashcardExists(wordToTranslate, translatedWord)) {
+          wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
+              wordToTranslate.toLowerCase().substring(1);
+          translatedWord = translatedWord.toLowerCase()[0].toUpperCase() +
+              translatedWord.toLowerCase().substring(1);
         }
 
-        Future<bool> isCardAdded = widget.flashcardsCollection.addFlashcard(
-            wordToTranslate, translatedWord, "EN", "FR");
+        Future<bool> isCardAdded = widget.flashcardsCollection
+            .addFlashcard(wordToTranslate, translatedWord, "EN", "FR");
 
-          // Confirm that the card was added
+        // Confirm that the card was added
         Fluttertoast.showToast(
           msg: await isCardAdded ? "Carte ajoutée" : "Carte déjà ajoutée",
           toastLength: Toast.LENGTH_SHORT,
@@ -96,7 +104,6 @@ class _HomePageState extends State<HomePage> {
           fontSize: 16.0,
         );
       }
-
     } on PlatformException catch (e) {
       print("Failed to get text: '${e.message}'.");
     }
@@ -107,7 +114,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void reviewTabFunction() {
-    reviewTabKey.currentState?.updateQuestionText(isAllLanguagesToggledNotifier.value);
+    reviewTabKey.currentState
+        ?.updateQuestionText(isAllLanguagesToggledNotifier.value);
   }
 
   Future<void> requestPermissions() async {
@@ -183,7 +191,13 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/stats');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StatsPage(
+                          flashcardsCollection: widget.flashcardsCollection),
+                    ),
+                  );
                 },
                 child: const Text('Statistiques'),
               ),
@@ -224,15 +238,15 @@ class _HomePageState extends State<HomePage> {
         body: TabBarView(
           children: [
             TranslateTab(
-                flashcardsCollection: widget.flashcardsCollection,
-                deeplTranslator: widget.deeplTranslator, // version précédente
-                addRow: dataTableTabFunction,
-                updateQuestionText: reviewTabFunction,
+              flashcardsCollection: widget.flashcardsCollection,
+              deeplTranslator: widget.deeplTranslator, // version précédente
+              addRow: dataTableTabFunction,
+              updateQuestionText: reviewTabFunction,
             ),
             ReviewTab(
-                flashcardsCollection: widget.flashcardsCollection,
-                key: reviewTabKey,
-                isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
+              flashcardsCollection: widget.flashcardsCollection,
+              key: reviewTabKey,
+              isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
             ),
             DataTableTab(
               flashcardsCollection: widget.flashcardsCollection,

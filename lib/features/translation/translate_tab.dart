@@ -1,7 +1,7 @@
 // Translate tab widget with a language selector, a text field for the word to translate, a text label to display the translation and a button to translate the word.
 import 'package:flutter/material.dart';
-import '../../core/services/flashcards/flashcards_collection.dart';
-import '../../core/services/translator/deepl_translator.dart';
+import '../../core/services/flashcards_collection.dart';
+import '../../core/services/deepl_translator.dart';
 import '../shared/utils/language_selection.dart';
 import '../../config/constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -120,7 +120,9 @@ class _TranslateTabState extends State<TranslateTab> {
           _wordToTranslate, _translatedWord, _sourceLanguage, _targetLanguage);
 
       widget.updateQuestionText();
-      setState(() {isAddButtonDisabled = true;});
+      setState(() {
+        isAddButtonDisabled = true;
+      });
 
       // Confirm that the card was added
       Fluttertoast.showToast(
@@ -138,7 +140,8 @@ class _TranslateTabState extends State<TranslateTab> {
     CancelDialog.show(
       context,
       onCancel: () {
-        widget.flashcardsCollection.removeFlashcard(_wordToTranslate, _translatedWord);
+        widget.flashcardsCollection
+            .removeFlashcard(_wordToTranslate, _translatedWord);
         // close the dialog
         Navigator.of(context).pop();
         setState(() {

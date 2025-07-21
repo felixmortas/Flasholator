@@ -37,12 +37,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   permission_handler: ^11.3.1
-  # provider: ^6.0.5 # Added from a youtube video : https://www.youtube.com/watch?v=SghsImxwGxE
-  # file_picker: ^7.0.2 # Added fom a youtube video : https://www.youtube.com/watch?v=GHkq5bQI140
-  # path: ^1.8.3 # Added fom a youtube video : https://www.youtube.com/watch?v=sC_qC0QrQ90
   sqlite3_flutter_libs: ^0.5.24 # https://stackoverflow.com/questions/65551415/failed-to-load-dynamic-library-in-flutter-app
-  # flutter_dotenv: ^5.1.0
-  sqflite: ^2.3.3+1
 
   http: ^1.2.2
   intl: ^0.19.0
@@ -51,7 +46,8 @@ dependencies:
   url_launcher: ^6.3.1
   url_launcher_ios: ^6.3.3
   fluttertoast: ^8.2.12
-  shared_preferences: ^2.5.3 # To trigger an actio from selected text in other apps
+  shared_preferences: ^2.5.3      # To trigger an action from selected text in other apps
+  fl_chart: ^1.0.0                # For stats plots
 
   # Debug
   http_interceptor: ^2.0.0

@@ -2,8 +2,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import '../../models/flashcard.dart';
-import 'package:sqflite/sqflite.dart';
+import '../models/flashcard.dart';
 
 class FlashcardsCollection {
   static const String _dbName = 'flashcards.db';
@@ -18,9 +17,10 @@ class FlashcardsCollection {
 
   Future<void> _initDatabase() async {
     // Initialize the database
-if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isAndroid || Platform.isIOS) {
       // Use the default SQLite implementation for mobile platforms
-      String dbPath = join((await getApplicationDocumentsDirectory()).path, _dbName);
+      String dbPath =
+          join((await getApplicationDocumentsDirectory()).path, _dbName);
       _database = await openDatabase(
         dbPath,
         version: _dbVersion,
@@ -30,7 +30,9 @@ if (Platform.isAndroid || Platform.isIOS) {
       // Use FFI for desktop platforms
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
-      String dbPath = Platform.isLinux ? _dbName : join((await getApplicationDocumentsDirectory()).path, _dbName);
+      String dbPath = Platform.isLinux
+          ? _dbName
+          : join((await getApplicationDocumentsDirectory()).path, _dbName);
       _database = await databaseFactoryFfi.openDatabase(
         dbPath,
         options: OpenDatabaseOptions(
@@ -39,7 +41,8 @@ if (Platform.isAndroid || Platform.isIOS) {
         ),
       );
     }
-    print('Database initialized at: ${_database.path}');  }
+    print('Database initialized at: ${_database.path}');
+  }
 
   Future<void> _createDatabase(Database db, int version) async {
     // Create the database if it doesn't exist
@@ -70,6 +73,10 @@ if (Platform.isAndroid || Platform.isIOS) {
     }).toList();
 
     return flashcards;
+  }
+
+  Future<List<Flashcard>> loadAllFlashcards() async {
+    return await _loadFlashcards();
   }
 
   Future<bool> addFlashcard(
@@ -136,8 +143,7 @@ if (Platform.isAndroid || Platform.isIOS) {
           'sourceLang': newSourceLang,
           'targetLang': newTargetLang,
         },
-        where:
-            'front = ? AND back = ? AND sourceLang = ? AND targetLang = ?',
+        where: 'front = ? AND back = ? AND sourceLang = ? AND targetLang = ?',
         whereArgs: [front, back, sourceLang, targetLang],
       );
       await txn.update(
@@ -148,8 +154,7 @@ if (Platform.isAndroid || Platform.isIOS) {
           'sourceLang': newTargetLang,
           'targetLang': newSourceLang,
         },
-        where:
-            'front = ? AND back = ? AND sourceLang = ? AND targetLang = ?',
+        where: 'front = ? AND back = ? AND sourceLang = ? AND targetLang = ?',
         whereArgs: [back, front, targetLang, sourceLang],
       );
     });

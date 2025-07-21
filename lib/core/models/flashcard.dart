@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import '../services/review/sm_two.dart';
+import '../services/sm_two.dart';
 
 class Flashcard {
   int? id;
@@ -30,7 +30,9 @@ class Flashcard {
     this.lastReviewDate,
     this.nextReviewDate,
     String? addedDate,
-  })  : addedDate = addedDate ?? DateFormat('yyyy-MM-dd').format(DateTime.now()); // Assign default value here because the value assigned is the result of multiple commands
+  }) : addedDate = addedDate ??
+            DateFormat('yyyy-MM-dd').format(DateTime
+                .now()); // Assign default value here because the value assigned is the result of multiple commands
 
   factory Flashcard.fromMap(Map<String, dynamic> map) {
     // Convert a map to a Flashcard object
@@ -77,9 +79,9 @@ class Flashcard {
     final smTwo = repetitions == 0
         ? SMTwo.firstReview(quality)
         : SMTwo(
-            easiness: easiness,
-            interval: interval,
-            repetitions: repetitions)
+                easiness: easiness,
+                interval: interval,
+                repetitions: repetitions)
             .review(quality);
 
     easiness = smTwo.easiness;
@@ -89,13 +91,14 @@ class Flashcard {
     lastReviewDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     nextReviewDate = quality != 2
         ? DateFormat('yyyy-MM-dd').format(smTwo.reviewDate)
-        : DateFormat('yyyy-MM-dd').format(smTwo.reviewDate.subtract(const Duration(days: 1)));
+        : DateFormat('yyyy-MM-dd')
+            .format(smTwo.reviewDate.subtract(const Duration(days: 1)));
   }
 
   bool isDue() {
     // Check if a flashcard is due for review
     return lastReviewDate == null ||
-      DateTime.now().isAfter(DateTime.parse(nextReviewDate!)) ||
-      DateTime.now().isAtSameMomentAs(DateTime.parse(nextReviewDate!));
+        DateTime.now().isAfter(DateTime.parse(nextReviewDate!)) ||
+        DateTime.now().isAtSameMomentAs(DateTime.parse(nextReviewDate!));
   }
 }

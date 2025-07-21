@@ -1,18 +1,17 @@
 // DataTableTab widget
 import 'package:flutter/material.dart';
-import '../../core/services/flashcards/flashcards_collection.dart';
+import '../../core/services/flashcards_collection.dart';
 import '../shared/utils/language_selection.dart';
 import '../../config/constants.dart';
 import 'widgets/all_languages_table.dart';
 import 'widgets/couple_languages_table.dart';
-import 'widgets/edit_popup.dart'; 
+import 'widgets/edit_popup.dart';
 
 // Add doc comments
 class DataTableTab extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
   final Function() updateQuestionText;
   final ValueNotifier<bool> isAllLanguagesToggledNotifier;
-
 
   const DataTableTab({
     Key? key,
@@ -51,13 +50,15 @@ class DataTableTabState extends State<DataTableTab> {
         await widget.flashcardsCollection.loadData();
     setState(() {
       if (isAllLanguagesToggled) {
-        data = fetchedData.where((row) => fetchedData.indexOf(row) % 2 == 0).toList();
+        data = fetchedData
+            .where((row) => fetchedData.indexOf(row) % 2 == 0)
+            .toList();
       } else {
         data = fetchedData
-          .where((row) =>
-              row['sourceLang'] == languageSelection.sourceLanguage &&
-              row['targetLang'] == languageSelection.targetLanguage)
-          .toList();
+            .where((row) =>
+                row['sourceLang'] == languageSelection.sourceLanguage &&
+                row['targetLang'] == languageSelection.targetLanguage)
+            .toList();
       }
     });
   }
@@ -190,39 +191,43 @@ class DataTableTabState extends State<DataTableTab> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-              ValueListenableBuilder<bool>(
+            ValueListenableBuilder<bool>(
+              valueListenable: widget.isAllLanguagesToggledNotifier,
+              builder: (context, value, child) {
+                return Switch(
+                  value: value,
+                  onChanged: (bool newValue) {
+                    widget.isAllLanguagesToggledNotifier.value = newValue;
+                    _fetchData(newValue);
+                  },
+                );
+              },
+            ),
+            Expanded(
+              child: ValueListenableBuilder<bool>(
                 valueListenable: widget.isAllLanguagesToggledNotifier,
-                builder: (context, value, child) {
-                  return Switch(
-                    value: value,
-                    onChanged: (bool newValue) {
-                      widget.isAllLanguagesToggledNotifier.value = newValue;
-                      _fetchData(newValue);
-                    },
-                  );
+                builder: (context, isAllLanguagesToggled, child) {
+                  if (isAllLanguagesToggled) {
+                    return AllLanguagesTable(
+                      data: data,
+                      onCellTap:
+                          _openEditPopup, // Modified to pass only rowData
+                      languages: LANGUAGES,
+                    );
+                  } else {
+                    return CoupleLanguagesTable(
+                      data: data,
+                      sourceLanguage:
+                          LANGUAGES[languageSelection.sourceLanguage]!,
+                      targetLanguage:
+                          LANGUAGES[languageSelection.targetLanguage]!,
+                      onCellTap:
+                          _openEditPopup, // Modified to pass only rowData
+                    );
+                  }
                 },
               ),
-            Expanded(
-  child: ValueListenableBuilder<bool>(
-    valueListenable: widget.isAllLanguagesToggledNotifier,
-    builder: (context, isAllLanguagesToggled, child) {
-      if (isAllLanguagesToggled) {
-        return AllLanguagesTable(
-          data: data,
-          onCellTap: _openEditPopup, // Modified to pass only rowData
-          languages: LANGUAGES,
-        );
-      } else {
-        return CoupleLanguagesTable(
-          data: data,
-          sourceLanguage: LANGUAGES[languageSelection.sourceLanguage]!,
-          targetLanguage: LANGUAGES[languageSelection.targetLanguage]!,
-          onCellTap: _openEditPopup, // Modified to pass only rowData
-        );
-      }
-    },
-  ),
-),
+            ),
             ElevatedButton(
               onPressed: _openAddPopup,
               style: ElevatedButton.styleFrom(

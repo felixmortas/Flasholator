@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/models/flashcard.dart';
-import '../../core/services/flashcards/flashcards_collection.dart';
+import '../../core/services/flashcards_collection.dart';
 import '../shared/utils/language_selection.dart';
 
 class ReviewTab extends StatefulWidget {
@@ -9,7 +9,7 @@ class ReviewTab extends StatefulWidget {
   final ValueNotifier<bool> isAllLanguagesToggledNotifier;
 
   const ReviewTab({
-    Key? key, 
+    Key? key,
     required this.flashcardsCollection,
     required this.isAllLanguagesToggledNotifier,
   }) : super(key: key);
@@ -57,14 +57,14 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
       if (isAllLanguagesToggledNotifier) {
         dueFlashcards = dueFlashcards.toList();
       } else {
-      dueFlashcards = dueFlashcards
-          .where((flashcard) =>
-              (flashcard.sourceLang == languageSelection.sourceLanguage &&
-                  flashcard.targetLang == languageSelection.targetLanguage) ||
-              (flashcard.sourceLang == languageSelection.targetLanguage &&
-                  flashcard.targetLang == languageSelection.sourceLanguage))
-          .toList();
-    }
+        dueFlashcards = dueFlashcards
+            .where((flashcard) =>
+                (flashcard.sourceLang == languageSelection.sourceLanguage &&
+                    flashcard.targetLang == languageSelection.targetLanguage) ||
+                (flashcard.sourceLang == languageSelection.targetLanguage &&
+                    flashcard.targetLang == languageSelection.sourceLanguage))
+            .toList();
+      }
 
       if (dueFlashcards.isNotEmpty) {
         _currentFlashcard = dueFlashcards[0];
@@ -123,7 +123,8 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                   value: value,
                   onChanged: (bool newValue) {
                     widget.isAllLanguagesToggledNotifier.value = newValue;
-                    updateQuestionText(widget.isAllLanguagesToggledNotifier.value);
+                    updateQuestionText(
+                        widget.isAllLanguagesToggledNotifier.value);
                   },
                 );
               },

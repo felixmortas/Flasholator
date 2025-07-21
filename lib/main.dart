@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'features/home_page.dart';
-import 'core/services/flashcards/flashcards_collection.dart';
-import 'core/services/translator/deepl_translator.dart'; // version précédente
-import 'package:flutter/widgets.dart';
-
+import 'core/services/flashcards_collection.dart';
+import 'core/services/deepl_translator.dart'; // version précédente
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding
@@ -14,8 +12,10 @@ void main() {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final flashcardsCollection = FlashcardsCollection(); // Create an instance of FlashcardDao
-  final deeplTranslator = DeeplTranslator(); // Create an instance of DeeplTranslator // version précédente
+  final flashcardsCollection =
+      FlashcardsCollection(); // Create an instance of FlashcardDao
+  final deeplTranslator =
+      DeeplTranslator(); // Create an instance of DeeplTranslator // version précédente
 
   // This widget is the root of your application.
   @override
@@ -27,9 +27,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: HomePage(
-          flashcardsCollection: flashcardsCollection,
-          deeplTranslator: deeplTranslator, // version précédente
-          ),
+        flashcardsCollection: flashcardsCollection,
+        deeplTranslator: deeplTranslator, // version précédente
+      ),
     );
   }
 }
