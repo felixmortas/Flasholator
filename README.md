@@ -24,7 +24,6 @@ __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
-- Statistiques de traduction et de révision
 - Choix de la langue de l'app
 - Choix du couple de langue au premier lancement 
 - Option écrire le mot pour le vérifier.
@@ -43,7 +42,6 @@ __[Ajouter captures d'écran et tuto]__
 - Import/Export des données de l'utilisateur.
 
 ### Expérience utilisateur :
-- Optimiser fonction Android native traduire avec Flasholator et ajouter une carte depuis une autre appliation
 - Réduction au maximum le nombre de clics nécessaires pour utiliser l'application.
 - Mettre tous les boutons dans la thumb zone
 - Ajout d'un Call To Action (titre, texte, image animée, bouton) pour ajouter de nouveaux mots quand plus de mots à réviser
@@ -53,6 +51,7 @@ __[Ajouter captures d'écran et tuto]__
 - Ajout barre de progression pour les cartes à réviser aujourd'hui
 - Ajout indicateur carte nouvelle ou déjà révisée
 - Tutoriel long et engageant pour l'utilisateur
+- Ajouter popup fonction Android native traduire avec Flasholator et ajouter une carte depuis une autre appliation
 
 ### Interface utilisateur :
 - Utiliser des thèmes familiers aux utilisateurs, inspirés de Google, DeepL ou Duolingo. Ou bien, utiliser un thème bouche pour corréler avec le nom de l'application "Polylingus"
