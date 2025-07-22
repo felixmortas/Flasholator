@@ -45,6 +45,10 @@ class TimeSeriesChart extends StatelessWidget {
                         },
                       ),
                     ),
+                    topTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
                   borderData: FlBorderData(show: true),
                   lineBarsData: [
