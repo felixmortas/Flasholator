@@ -8,23 +8,34 @@ class StatsService {
 
   StatsService(this.collection);
 
-  Future<StatsData> calculateStats() async {
+  Future<StatsData> calculateStats(
+      {DateTime? startDate, DateTime? endDate}) async {
     final flashcards = await collection.loadAllFlashcards();
-    final pairs = _extractLanguagePairs(flashcards);
-    final series = _calculateTimeSeries(flashcards);
-    final averages = _calculateAverages(flashcards, series);
+
+    // Filtrage selon la période définie
+    final filtered = flashcards.where((fc) {
+      final created = DateTime.parse(fc.addedDate);
+
+      if (startDate != null && created.isBefore(startDate)) return false;
+      if (endDate != null && created.isAfter(endDate)) return false;
+      return true;
+    }).toList();
+
+    final pairs = _extractLanguagePairs(filtered);
+    final series = _calculateTimeSeries(filtered);
+    final averages = _calculateAverages(filtered, series);
 
     return StatsData(
-      totalWords: flashcards.length ~/ 2,
+      totalWords: filtered.length ~/ 2,
       totalPairs: pairs.length,
       dailyAverage: averages['day'] ?? 0,
       weeklyAverage: averages['week'] ?? 0,
       monthlyAverage: averages['month'] ?? 0,
       yearlyAverage: averages['year'] ?? 0,
       dailySeries: series,
-      mostReviewed: _getRanking(flashcards, 'timesReviewed', 5),
-      mostSuccessful: _getRanking(flashcards, 'repetitions', 5),
-      easiest: _getRanking(flashcards, 'easiness', 5),
+      mostReviewed: _getRanking(filtered, 'timesReviewed', 5),
+      mostSuccessful: _getRanking(filtered, 'repetitions', 5),
+      easiest: _getRanking(filtered, 'easiness', 5),
     );
   }
 
