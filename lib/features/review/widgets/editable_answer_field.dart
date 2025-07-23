@@ -1,3 +1,6 @@
+import 'package:flasholator/l10n/app_localizations_en.dart';
+
+import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class EditableAnswerField extends StatelessWidget {
@@ -20,8 +23,8 @@ class EditableAnswerField extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'Votre réponse...',
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.writeYourResponseHere,
                 border: OutlineInputBorder(),
               ),
             ),

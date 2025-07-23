@@ -9,105 +9,6 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get lang_ar => 'Arabe';
-
-  @override
-  String get lang_bg => 'Bulgare';
-
-  @override
-  String get lang_cs => 'Tchèque';
-
-  @override
-  String get lang_da => 'Danois';
-
-  @override
-  String get lang_de => 'Allemand';
-
-  @override
-  String get lang_el => 'Grec';
-
-  @override
-  String get lang_en => 'Anglais';
-
-  @override
-  String get lang_es => 'Espagnol';
-
-  @override
-  String get lang_et => 'Estonien';
-
-  @override
-  String get lang_fi => 'Finnois';
-
-  @override
-  String get lang_fr => 'Français';
-
-  @override
-  String get lang_he => 'Hébreu';
-
-  @override
-  String get lang_hu => 'Hongrois';
-
-  @override
-  String get lang_id => 'Indonésien';
-
-  @override
-  String get lang_it => 'Italien';
-
-  @override
-  String get lang_ja => 'Japonais';
-
-  @override
-  String get lang_ko => 'Coréen';
-
-  @override
-  String get lang_lt => 'Lituanien';
-
-  @override
-  String get lang_lv => 'Letton';
-
-  @override
-  String get lang_nb => 'Norvégien (Bokmål)';
-
-  @override
-  String get lang_nl => 'Néerlandais';
-
-  @override
-  String get lang_pl => 'Polonais';
-
-  @override
-  String get lang_pt => 'Portugais';
-
-  @override
-  String get lang_ro => 'Roumain';
-
-  @override
-  String get lang_ru => 'Russe';
-
-  @override
-  String get lang_sk => 'Slovaque';
-
-  @override
-  String get lang_sl => 'Slovène';
-
-  @override
-  String get lang_sv => 'Suédois';
-
-  @override
-  String get lang_th => 'Thaï';
-
-  @override
-  String get lang_tr => 'Turc';
-
-  @override
-  String get lang_uk => 'Ukrainien';
-
-  @override
-  String get lang_vi => 'Vietnamien';
-
-  @override
-  String get lang_zh => 'Chinois';
-
-  @override
   String get addAWord => 'Ajouter un mot';
 
   @override
@@ -226,7 +127,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get writeOrPasteYourTextHereForTranslation =>
-      'Ecrivez ou collez votre texte ici pour le traduire';
+      'Ecrivez ou collez votre texte ici pour le traduire ...';
 
   @override
   String get translate => 'Traduire';
@@ -239,4 +140,106 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get help => 'Aide';
+
+  @override
+  String get writeYourResponseHere => 'Ecrivez votre réponse ici ...';
+
+  @override
+  String get lang_ar => 'Arabe';
+
+  @override
+  String get lang_bg => 'Bulgare';
+
+  @override
+  String get lang_cs => 'Tchèque';
+
+  @override
+  String get lang_da => 'Danois';
+
+  @override
+  String get lang_de => 'Allemand';
+
+  @override
+  String get lang_el => 'Grec';
+
+  @override
+  String get lang_en => 'Anglais';
+
+  @override
+  String get lang_es => 'Espagnol';
+
+  @override
+  String get lang_et => 'Estonien';
+
+  @override
+  String get lang_fi => 'Finnois';
+
+  @override
+  String get lang_fr => 'Français';
+
+  @override
+  String get lang_he => 'Hébreu';
+
+  @override
+  String get lang_hu => 'Hongrois';
+
+  @override
+  String get lang_id => 'Indonésien';
+
+  @override
+  String get lang_it => 'Italien';
+
+  @override
+  String get lang_ja => 'Japonais';
+
+  @override
+  String get lang_ko => 'Coréen';
+
+  @override
+  String get lang_lt => 'Lituanien';
+
+  @override
+  String get lang_lv => 'Letton';
+
+  @override
+  String get lang_nb => 'Norvégien (Bokmål)';
+
+  @override
+  String get lang_nl => 'Néerlandais';
+
+  @override
+  String get lang_pl => 'Polonais';
+
+  @override
+  String get lang_pt => 'Portugais';
+
+  @override
+  String get lang_ro => 'Roumain';
+
+  @override
+  String get lang_ru => 'Russe';
+
+  @override
+  String get lang_sk => 'Slovaque';
+
+  @override
+  String get lang_sl => 'Slovène';
+
+  @override
+  String get lang_sv => 'Suédois';
+
+  @override
+  String get lang_th => 'Thaï';
+
+  @override
+  String get lang_tr => 'Turc';
+
+  @override
+  String get lang_uk => 'Ukrainien';
+
+  @override
+  String get lang_vi => 'Vietnamien';
+
+  @override
+  String get lang_zh => 'Chinois';
 }

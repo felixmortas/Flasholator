@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 
-import 'package:flutter/material.dart';
-
 class ReviewControls extends StatelessWidget {
   final bool isResponseHidden;
   final bool isDue;
@@ -30,14 +28,44 @@ class ReviewControls extends StatelessWidget {
             onPressed: onDisplayAnswer,
             child: Text(AppLocalizations.of(context)!.displayAnswer),
           ),
+
+        // This is the modified section
         if (overrideDisplayWithResult && overrideQuality != null)
-          ElevatedButton(
-            onPressed: () => onQualityPress(overrideQuality!),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _getColorForQuality(overrideQuality!),
+          // Case: Written answer is incorrect
+          if (overrideQuality == 2)
+            ElevatedButton(
+              onPressed: () => onQualityPress(overrideQuality!),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _getColorForQuality(overrideQuality!),
+              ),
+              child: Text(_getLabelForQuality(context, overrideQuality!)),
+            )
+          // Case: Written answer is correct
+          else if (overrideQuality == 4)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildQualityButton(
+                  context,
+                  AppLocalizations.of(context)!.hard,
+                  Colors.grey,
+                  () => onQualityPress(3), // Quality 3 for 'hard'
+                ),
+                _buildQualityButton(
+                  context,
+                  AppLocalizations.of(context)!.correct,
+                  Colors.green,
+                  () => onQualityPress(4), // Quality 4 for 'correct'
+                ),
+                _buildQualityButton(
+                  context,
+                  AppLocalizations.of(context)!.easy,
+                  Colors.blue,
+                  () => onQualityPress(5), // Quality 5 for 'easy'
+                ),
+              ],
             ),
-            child: Text(_getLabelForQuality(context, overrideQuality!)),
-          ),
+
         if (!isResponseHidden && !overrideDisplayWithResult)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -79,15 +107,18 @@ class ReviewControls extends StatelessWidget {
     VoidCallback onPressed,
   ) {
     return Expanded(
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(backgroundColor: color),
-        child: Text(
-          label,
-          style: const TextStyle(color: Colors.white),
-          softWrap: false,
-          overflow: TextOverflow.visible,
-          maxLines: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(backgroundColor: color),
+          child: Text(
+            label,
+            style: const TextStyle(color: Colors.white),
+            softWrap: false,
+            overflow: TextOverflow.visible,
+            maxLines: 1,
+          ),
         ),
       ),
     );
