@@ -1,4 +1,4 @@
-// HomePage widget with 3 tabs : Traduire, Réviser and Paquet
+import '../l10n/app_localizations.dart';
 import 'dart:io';
 
 import '../core/services/deepl_translator.dart';
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
 
         if (wordToTranslate != '' &&
             translatedWord != '' &&
-            translatedWord != 'Erreur de connexion' &&
+            translatedWord != AppLocalizations.of(context)!.connectionError &&
             !await widget.flashcardsCollection
                 .checkIfFlashcardExists(wordToTranslate, translatedWord)) {
           wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
@@ -95,7 +95,9 @@ class _HomePageState extends State<HomePage> {
 
         // Confirm that the card was added
         Fluttertoast.showToast(
-          msg: await isCardAdded ? "Carte ajoutée" : "Carte déjà ajoutée",
+          msg: await isCardAdded
+              ? AppLocalizations.of(context)!.cardAdded
+              : AppLocalizations.of(context)!.cardAlreadyAdded,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -150,7 +152,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Paramètres'),
+          title: Text(AppLocalizations.of(context)!.settings),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -171,11 +173,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                   elevation: 5, // Effet de relief
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.feedback, size: 18), // Icône pertinente
                     SizedBox(width: 8), // Espace entre l'icône et le texte
-                    Text('Donner un feedback'), // Texte clair
+                    Text(AppLocalizations.of(context)!
+                        .giveAFeedback), // Texte clair
                   ],
                 ),
               ),
@@ -185,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/settings');
                 },
-                child: const Text('Langues'),
+                child: Text(AppLocalizations.of(context)!.language),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
@@ -199,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-                child: const Text('Statistiques'),
+                child: Text(AppLocalizations.of(context)!.statistics),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
@@ -207,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/help');
                 },
-                child: const Text('Aide'),
+                child: Text(AppLocalizations.of(context)!.help),
               ),
             ],
           ),

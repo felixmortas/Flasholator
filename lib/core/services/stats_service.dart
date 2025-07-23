@@ -1,4 +1,3 @@
-// services/stats_service.dart
 import '../models/flashcard.dart';
 import '../models/stats_model.dart';
 import 'flashcards_collection.dart';
@@ -59,7 +58,7 @@ class StatsService {
         // Compte chaque paire de flashcards (d'où le ~/ 2 plus bas)
         dailyCount[date] = (dailyCount[date] ?? 0) + 1;
       } catch (e) {
-        print('Erreur de parsing pour la carte ${card.id}: ${card.addedDate}');
+        print('Parsing error for card ${card.id}: ${card.addedDate}');
         continue;
       }
     }

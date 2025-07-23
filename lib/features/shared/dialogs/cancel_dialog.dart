@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class CancelDialog extends StatelessWidget {
@@ -33,16 +34,6 @@ class CancelDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Cancel?',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: onCancel,
                 style: ElevatedButton.styleFrom(
@@ -52,7 +43,7 @@ class CancelDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
-                child: const Text('Yes'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
             ],
           ),
@@ -79,4 +70,3 @@ class CancelDialog extends StatelessWidget {
     );
   }
 }
-

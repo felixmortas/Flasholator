@@ -1,4 +1,4 @@
-// DataTableTab widget
+import '../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../core/services/flashcards_collection.dart';
 import '../shared/utils/language_selection.dart';
@@ -130,7 +130,7 @@ class DataTableTabState extends State<DataTableTab> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Ajouter un mot'),
+          title: Text(AppLocalizations.of(context)!.addAWord),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -163,7 +163,7 @@ class DataTableTabState extends State<DataTableTab> {
           actions: [
             TextButton(
               onPressed: Navigator.of(context).pop,
-              child: const Text('Annuler'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
@@ -175,7 +175,7 @@ class DataTableTabState extends State<DataTableTab> {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Ajouter'),
+              child: Text(AppLocalizations.of(context)!.add),
             ),
           ],
         );
@@ -233,7 +233,7 @@ class DataTableTabState extends State<DataTableTab> {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text('Ajouter un mot'),
+              child: Text(AppLocalizations.of(context)!.addAWord),
             ),
           ],
         ),

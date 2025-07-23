@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/models/stats_model.dart';
@@ -37,8 +38,8 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ajout de mots',
+            Text(
+              AppLocalizations.of(context)!.addedWords,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
@@ -54,19 +55,19 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
                   _selectedGranularity = TimeGranularity.values[index];
                 });
               },
-              children: const [
+              children: [
                 Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text("Jour")),
+                    child: Text(AppLocalizations.of(context)!.day)),
                 Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text("Semaine")),
+                    child: Text(AppLocalizations.of(context)!.week)),
                 Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text("Mois")),
+                    child: Text(AppLocalizations.of(context)!.month)),
                 Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text("Année")),
+                    child: Text(AppLocalizations.of(context)!.year)),
               ],
             ),
             const SizedBox(height: 16),

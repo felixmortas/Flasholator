@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../core/models/stats_model.dart';
 
@@ -14,16 +15,18 @@ class SummarySection extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildSummaryItem('Mots ajoutés', data.totalWords),
-            _buildSummaryItem('Paires de langues', data.totalPairs),
             _buildSummaryItem(
-                'Moyenne/jour', data.dailyAverage.toStringAsFixed(2)),
+                AppLocalizations.of(context)!.addedWords, data.totalWords),
             _buildSummaryItem(
-                'Moyenne/semaine', data.weeklyAverage.toStringAsFixed(2)),
-            _buildSummaryItem(
-                'Moyenne/mois', data.monthlyAverage.toStringAsFixed(2)),
-            _buildSummaryItem(
-                'Moyenne/an', data.yearlyAverage.toStringAsFixed(2)),
+                AppLocalizations.of(context)!.languagePairs, data.totalPairs),
+            _buildSummaryItem(AppLocalizations.of(context)!.averagePerDay,
+                data.dailyAverage.toStringAsFixed(2)),
+            _buildSummaryItem(AppLocalizations.of(context)!.averagePerWeek,
+                data.weeklyAverage.toStringAsFixed(2)),
+            _buildSummaryItem(AppLocalizations.of(context)!.averagePerMonth,
+                data.monthlyAverage.toStringAsFixed(2)),
+            _buildSummaryItem(AppLocalizations.of(context)!.averagePerYear,
+                data.yearlyAverage.toStringAsFixed(2)),
           ],
         ),
       ),

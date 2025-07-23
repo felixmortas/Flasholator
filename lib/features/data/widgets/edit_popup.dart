@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../../config/constants.dart';
 
@@ -36,7 +37,7 @@ class _EditPopupState extends State<EditPopup> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Modifier la ligne'),
+      title: Text(AppLocalizations.of(context)!.editTheRow),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -62,7 +63,7 @@ class _EditPopupState extends State<EditPopup> {
             widget.onDelete(widget.row);
             Navigator.of(context).pop();
           },
-          child: const Text('Supprimer'),
+          child: Text(AppLocalizations.of(context)!.remove),
         ),
         TextButton(
           onPressed: () {
@@ -127,5 +128,4 @@ class _EditPopupState extends State<EditPopup> {
       ),
     );
   }
-
 }

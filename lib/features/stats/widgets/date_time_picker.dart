@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -36,7 +37,7 @@ class DateRangePickerRow extends StatelessWidget {
     final formatter = DateFormat('dd/MM/yyyy');
     return Row(
       children: [
-        const Text('Du'),
+        Text(AppLocalizations.of(context)!.from),
         const SizedBox(width: 8),
         Expanded(
           child: OutlinedButton(
@@ -45,7 +46,7 @@ class DateRangePickerRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        const Text('au'),
+        Text(AppLocalizations.of(context)!.to),
         const SizedBox(width: 8),
         Expanded(
           child: OutlinedButton(

@@ -1,8 +1,8 @@
-// constants.dart
 const String INITIAL_SOURCE_LANGUAGE = 'EN';
 const String INITIAL_TARGET_LANGUAGE = 'FR';
 
 const Map<String, String> LANGUAGES = {
+  'AR': 'Arabe',
   'BG': 'Bulgare',
   'CS': 'Tchèque',
   'DA': 'Danois',
@@ -13,6 +13,7 @@ const Map<String, String> LANGUAGES = {
   'ET': 'Estonien',
   'FI': 'Finnois',
   'FR': 'Français',
+  'HE': 'Hébreux',
   'HU': 'Hongrois',
   'ID': 'Indonésien',
   'IT': 'Italien',
@@ -29,7 +30,9 @@ const Map<String, String> LANGUAGES = {
   'SK': 'Slovaque',
   'SL': 'Slovène',
   'SV': 'Suédois',
+  'TH': 'Thaï',
   'TR': 'Turc',
   'UK': 'Ukrainien',
-  'ZH': 'Chinois (simplifié)',
+  'VI': 'Vietnamien',
+  'ZH': 'Chinois (tous)',
 };

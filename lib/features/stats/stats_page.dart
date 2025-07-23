@@ -1,3 +1,4 @@
+import '../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../core/models/stats_model.dart';
 import '../../core/services/flashcards_collection.dart';
@@ -76,7 +77,7 @@ class _StatsPageState extends State<StatsPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Statistiques')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.statistics)),
       body: Column(
         children: [
           Padding(
@@ -96,7 +97,9 @@ class _StatsPageState extends State<StatsPage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('Erreur: ${snapshot.error}'));
+                  return Center(
+                      child: Text(
+                          '${AppLocalizations.of(context)!.error}: ${snapshot.error}'));
                 }
                 final data = snapshot.data!;
                 return _StatsView(data: data);

@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../core/models/stats_model.dart';
 
@@ -11,16 +12,22 @@ class RankingSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildRankingCard('Plus révisés', data.mostReviewed),
+        _buildRankingCard(context, AppLocalizations.of(context)!.mostReviewed,
+            data.mostReviewed),
         const SizedBox(height: 16),
-        _buildRankingCard('Succès consécutifs', data.mostSuccessful),
+        _buildRankingCard(
+            context,
+            AppLocalizations.of(context)!.consecutiveSuccesses,
+            data.mostSuccessful),
         const SizedBox(height: 16),
-        _buildRankingCard('Mots les plus faciles', data.easiest),
+        _buildRankingCard(
+            context, AppLocalizations.of(context)!.easiestWords, data.easiest),
       ],
     );
   }
 
-  Widget _buildRankingCard(String title, List<RankingItem> items) {
+  Widget _buildRankingCard(
+      BuildContext context, String title, List<RankingItem> items) {
     return Card(
       elevation: 4,
       child: Padding(
@@ -39,21 +46,21 @@ class RankingSection extends StatelessWidget {
                 2: FlexColumnWidth(2),
               },
               children: [
-                const TableRow(
+                TableRow(
                   children: [
                     Padding(
                       padding: EdgeInsets.only(bottom: 8),
-                      child: Text('Mot',
+                      child: Text(AppLocalizations.of(context)!.word,
                           style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 8),
-                      child: Text('Valeur',
+                      child: Text(AppLocalizations.of(context)!.value,
                           style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 8),
-                      child: Text('Langues',
+                      child: Text(AppLocalizations.of(context)!.languages,
                           style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],

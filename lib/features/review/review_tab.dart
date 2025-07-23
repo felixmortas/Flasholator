@@ -1,3 +1,4 @@
+import '../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../core/models/flashcard.dart';
 import '../../core/services/flashcards_collection.dart';
@@ -78,7 +79,7 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
         });
       } else {
         setState(() {
-          _questionText = "Pas de carte à réviser aujourd'hui";
+          _questionText = AppLocalizations.of(context)!.noCardToReviewToday;
           _questionLang = "";
           isResponseHidden = true;
           isDue = false;
@@ -86,7 +87,7 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
       }
     } else {
       setState(() {
-        _questionText = "Pas de carte à réviser aujourd'hui";
+        _questionText = AppLocalizations.of(context)!.noCardToReviewToday;
         _questionLang = "";
         isResponseHidden = true;
         isDue = false;
@@ -200,7 +201,7 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                 onPressed: () async {
                   _displayAnswer();
                 },
-                child: const Text('Afficher la réponse'),
+                child: Text(AppLocalizations.of(context)!.displayAnswer),
               ),
             ),
             Visibility(
@@ -213,8 +214,8 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                       onPressed: () {
                         _onQualityButtonPress(2);
                       },
-                      child: const Text(
-                        "Encore",
+                      child: Text(
+                        AppLocalizations.of(context)!.again,
                         style: TextStyle(color: Colors.white),
                         softWrap: false,
                         overflow: TextOverflow.visible,
@@ -230,8 +231,8 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                       onPressed: () {
                         _onQualityButtonPress(3);
                       },
-                      child: const Text(
-                        "Difficile",
+                      child: Text(
+                        AppLocalizations.of(context)!.hard,
                         style: TextStyle(color: Colors.white),
                         softWrap: false,
                         overflow: TextOverflow.visible,
@@ -247,8 +248,8 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                       onPressed: () {
                         _onQualityButtonPress(4);
                       },
-                      child: const Text(
-                        "Correct",
+                      child: Text(
+                        AppLocalizations.of(context)!.correct,
                         style: TextStyle(color: Colors.white),
                         softWrap: false,
                         overflow: TextOverflow.visible,
@@ -264,8 +265,8 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                       onPressed: () {
                         _onQualityButtonPress(5);
                       },
-                      child: const Text(
-                        "Facile",
+                      child: Text(
+                        AppLocalizations.of(context)!.easy,
                         style: TextStyle(color: Colors.white),
                         softWrap: false,
                         overflow: TextOverflow.visible,

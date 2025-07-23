@@ -1,4 +1,4 @@
-// Translate tab widget with a language selector, a text field for the word to translate, a text label to display the translation and a button to translate the word.
+import '../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../core/services/flashcards_collection.dart';
 import '../../core/services/deepl_translator.dart';
@@ -63,7 +63,6 @@ class _TranslateTabState extends State<TranslateTab> {
       _lastTranslatedWord = '';
       isAddButtonDisabled = true;
       _updateButtonState();
-      // languageSelection.targetLanguage = newValue;
     });
   }
 
@@ -79,7 +78,6 @@ class _TranslateTabState extends State<TranslateTab> {
     isTranslateButtonDisabled = true;
     try {
       String translation = await widget.deeplTranslator.translate(
-        // Version traduction locale
         _wordToTranslate,
         languageSelection.targetLanguage,
         languageSelection.sourceLanguage,
@@ -102,7 +100,7 @@ class _TranslateTabState extends State<TranslateTab> {
   Future<void> _addFlashcard() async {
     if (_wordToTranslate != '' &&
         _translatedWord != '' &&
-        _translatedWord != 'Erreur de connexion' &&
+        _translatedWord != AppLocalizations.of(context)!.connectionError &&
         !await widget.flashcardsCollection
             .checkIfFlashcardExists(_wordToTranslate, _translatedWord)) {
       _wordToTranslate = _wordToTranslate.toLowerCase()[0].toUpperCase() +
@@ -126,7 +124,9 @@ class _TranslateTabState extends State<TranslateTab> {
 
       // Confirm that the card was added
       Fluttertoast.showToast(
-        msg: await isCardAdded ? "Carte ajoutée" : "Carte déjà ajoutée",
+        msg: await isCardAdded
+            ? AppLocalizations.of(context)!.cardAdded
+            : AppLocalizations.of(context)!.cardAlreadyAdded,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
@@ -280,8 +280,8 @@ class _TranslateTabState extends State<TranslateTab> {
                   textAlign: TextAlign.left,
                   controller: _controller,
                   decoration: InputDecoration(
-                    hintText:
-                        'Écrivez ou collez votre texte ici pour le traduire',
+                    hintText: AppLocalizations.of(context)!
+                        .writeOrPasteYourTextHereForTranslation,
                     border: OutlineInputBorder(),
                     counterText: "",
                     hintStyle: TextStyle(
@@ -332,13 +332,13 @@ class _TranslateTabState extends State<TranslateTab> {
                       : () async {
                           _translate();
                         },
-                  child: const Text('Traduire'),
+                  child: Text(AppLocalizations.of(context)!.translate),
                 )),
                 const SizedBox(width: 16.0),
                 Expanded(
                     child: ElevatedButton(
                   onPressed: isAddButtonDisabled ? null : _addFlashcard,
-                  child: const Text('Ajouter'),
+                  child: Text(AppLocalizations.of(context)!.add),
                 )),
               ],
             ),
