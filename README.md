@@ -24,14 +24,14 @@ __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
-- Choix du couple de langue au premier lancement 
 - Option écrire le mot pour le vérifier.
 - Une ou deux langues fun translator
-- Notifications de rappel cartes à réviser
-- Plusieurs résultats lors de la traduction.
-- Prononciation
 - Publicités
 - Compte utilisateur
+- Notifications de rappel cartes à réviser
+- Choix du couple de langue au premier lancement 
+- Plusieurs résultats lors de la traduction.
+- Prononciation
 
 ### Fonctionnalités premium 
 - Abonnement 
