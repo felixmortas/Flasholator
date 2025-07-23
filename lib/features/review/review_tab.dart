@@ -6,6 +6,7 @@ import '../shared/utils/language_selection.dart';
 import 'widgets/all_languages_switch.dart';
 import 'widgets/response_buttons.dart';
 import 'widgets/words_display.dart';
+import 'widgets/editable_answer_field.dart';
 
 class ReviewTab extends StatefulWidget {
   // The ReviewTab widget is a StatefulWidget because it needs to be able to update its state
@@ -27,6 +28,10 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
   List<Flashcard> dueFlashcards = [];
   late Flashcard _currentFlashcard;
   bool isResponseHidden = true;
+  bool isEditing = false;
+  TextEditingController editingController = TextEditingController();
+  int? overrideQuality; // null = normal behavior
+
   LanguageSelection languageSelection = LanguageSelection.getInstance();
   bool isDue = false;
   String _questionText = "";
@@ -98,18 +103,40 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
     }
   }
 
-  void _displayAnswer() {
-    // Display the answer to the question
-    setState(() {
-      isResponseHidden = false;
-    });
-  }
-
   void _onQualityButtonPress(int quality) async {
     // Update the flashcard with the quality in the database then update the question text
     await widget.flashcardsCollection
         .review(_currentFlashcard.front, _currentFlashcard.back, quality);
     updateQuestionText(widget.isAllLanguagesToggledNotifier.value);
+  }
+
+  void _evaluateWrittenAnswer() {
+    final userAnswer = editingController.text.trim().toLowerCase();
+    final correctAnswer = _responseText.trim().toLowerCase();
+
+    if (userAnswer == correctAnswer) {
+      // Suggérer qualité selon préférences, ou demander à l'utilisateur ?
+      setState(() {
+        overrideQuality = 4; // default to 'correct'
+      });
+    } else {
+      setState(() {
+        overrideQuality = 2; // 'again'
+      });
+    }
+  }
+
+  void _displayAnswer() {
+    if (!isEditing) {
+      setState(() {
+        isResponseHidden = false;
+      });
+    } else {
+      _evaluateWrittenAnswer();
+      setState(() {
+        isResponseHidden = false;
+      });
+    }
   }
 
   @override
@@ -137,11 +164,35 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
               isDue: isDue,
             ),
             const Spacer(),
-            ResponseButtons(
+            EditableAnswerField(
+              isEditing: isEditing,
+              onToggleEditing: () {
+                setState(() {
+                  isEditing = !isEditing;
+                  if (!isEditing) {
+                    overrideQuality = null;
+                    editingController.clear();
+                  }
+                });
+              },
+              controller: editingController,
+            ),
+            const SizedBox(height: 12),
+            ReviewControls(
               isResponseHidden: isResponseHidden,
               isDue: isDue,
               onDisplayAnswer: _displayAnswer,
-              onQualityPress: _onQualityButtonPress,
+              onQualityPress: (q) {
+                _onQualityButtonPress(q);
+                setState(() {
+                  overrideQuality = null;
+                  editingController.clear();
+                  isEditing = false;
+                });
+              },
+              overrideDisplayWithResult:
+                  isEditing && !isResponseHidden && overrideQuality != null,
+              overrideQuality: overrideQuality,
             ),
           ],
         ),
