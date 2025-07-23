@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../core/models/flashcard.dart';
 import '../../core/services/flashcards_collection.dart';
 import '../shared/utils/language_selection.dart';
+import 'widgets/all_languages_switch.dart';
+import 'widgets/response_buttons.dart';
+import 'widgets/words_display.dart';
 
 class ReviewTab extends StatefulWidget {
   // The ReviewTab widget is a StatefulWidget because it needs to be able to update its state
@@ -117,168 +120,28 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ValueListenableBuilder<bool>(
-              valueListenable: widget.isAllLanguagesToggledNotifier,
-              builder: (context, value, child) {
-                return Switch(
-                  value: value,
-                  onChanged: (bool newValue) {
-                    widget.isAllLanguagesToggledNotifier.value = newValue;
-                    updateQuestionText(
-                        widget.isAllLanguagesToggledNotifier.value);
-                  },
-                );
+            AllLanguagesSwitch(
+              isAllLanguagesToggledNotifier:
+                  widget.isAllLanguagesToggledNotifier,
+              onToggle: (newValue) {
+                updateSwitchState(newValue);
+                updateQuestionText(newValue);
               },
             ),
-            Row(
-              children: [
-                Text(
-                  _questionLang,
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Arial',
-                    color: Color.fromARGB(255, 238, 220, 245),
-                  ),
-                ),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      _questionText,
-                      style: const TextStyle(fontSize: 18.0),
-                    ),
-                  ),
-                ),
-              ],
+            WordsDisplay(
+              questionLang: _questionLang,
+              questionText: _questionText,
+              responseLang: _responseLang,
+              responseText: _responseText,
+              isResponseHidden: isResponseHidden,
+              isDue: isDue,
             ),
-            const SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  height: 1.0,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 16.0),
-                Row(
-                  children: [
-                    Visibility(
-                      visible: isDue,
-                      child: Text(
-                        _responseLang,
-                        style: const TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Arial',
-                          color: Color.fromARGB(255, 238, 220, 245),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: Center(
-                        child: Visibility(
-                          visible: !isResponseHidden,
-                          child: Text(
-                            _responseText,
-                            style: const TextStyle(fontSize: 18.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Expanded(
-              child: Container(),
-            ),
-            const SizedBox(height: 16.0),
-            Visibility(
-              visible: isResponseHidden && isDue,
-              child: ElevatedButton(
-                onPressed: () async {
-                  _displayAnswer();
-                },
-                child: Text(AppLocalizations.of(context)!.displayAnswer),
-              ),
-            ),
-            Visibility(
-              visible: !isResponseHidden,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _onQualityButtonPress(2);
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.again,
-                        style: TextStyle(color: Colors.white),
-                        softWrap: false,
-                        overflow: TextOverflow.visible,
-                        maxLines: 1,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red, // Change the color here
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _onQualityButtonPress(3);
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.hard,
-                        style: TextStyle(color: Colors.white),
-                        softWrap: false,
-                        overflow: TextOverflow.visible,
-                        maxLines: 1,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey, // Change the color here
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _onQualityButtonPress(4);
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.correct,
-                        style: TextStyle(color: Colors.white),
-                        softWrap: false,
-                        overflow: TextOverflow.visible,
-                        maxLines: 1,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green, // Change the color here
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _onQualityButtonPress(5);
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.easy,
-                        style: TextStyle(color: Colors.white),
-                        softWrap: false,
-                        overflow: TextOverflow.visible,
-                        maxLines: 1,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // Change the color here
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            const Spacer(),
+            ResponseButtons(
+              isResponseHidden: isResponseHidden,
+              isDue: isDue,
+              onDisplayAnswer: _displayAnswer,
+              onQualityPress: _onQualityButtonPress,
             ),
           ],
         ),
