@@ -6,7 +6,8 @@ import '../../config/constants.dart';
 import '../shared/utils/app_localizations_helper.dart';
 import 'widgets/all_languages_table.dart';
 import 'widgets/couple_languages_table.dart';
-import 'widgets/edit_popup.dart';
+import 'widgets/edit_flashcard_popup.dart';
+import 'widgets/add_flashcard_popup.dart';
 
 // Add doc comments
 class DataTableTab extends StatefulWidget {
@@ -103,11 +104,11 @@ class DataTableTabState extends State<DataTableTab> {
     }
   }
 
-  void _openEditPopup(Map<dynamic, dynamic> row) {
+  void _openEditFlashcardPopup(Map<dynamic, dynamic> row) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return EditPopup(
+        return EditFlashcardPopup(
           row: row,
           onEdit: editRow,
           onDelete: removeRow,
@@ -123,66 +124,14 @@ class DataTableTabState extends State<DataTableTab> {
     addRow({'front': front, 'back': back});
   }
 
-  void _openAddPopup() {
-    String? front;
-    String? back;
-    final localizedLanguageMap = LANGUAGE_KEYS.map(
-      (code, key) => MapEntry(
-          code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
-    );
-
+  void _openAddFlashcardPopup() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.addAWord),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Text(localizedLanguageMap[languageSelection.sourceLanguage]!),
-                  Expanded(
-                    child: TextField(
-                      onChanged: (String value) {
-                        front = value;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text(localizedLanguageMap[languageSelection.targetLanguage]!),
-                  Expanded(
-                    child: TextField(
-                      onChanged: (String value) {
-                        back = value;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                if (front != null &&
-                    back != null &&
-                    front!.isNotEmpty &&
-                    back!.isNotEmpty) {
-                  _addFlashcard(front!, back!);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text(AppLocalizations.of(context)!.add),
-            ),
-          ],
+        return AddFlashcardPopup(
+          onAdd: (String front, String back) {
+            _addFlashcard(front, back);
+          },
         );
       },
     );
@@ -221,7 +170,7 @@ class DataTableTabState extends State<DataTableTab> {
                     return AllLanguagesTable(
                       data: data,
                       onCellTap:
-                          _openEditPopup, // Modified to pass only rowData
+                          _openEditFlashcardPopup, // Modified to pass only rowData
                       languages: localizedLanguageMap,
                     );
                   } else {
@@ -233,14 +182,14 @@ class DataTableTabState extends State<DataTableTab> {
                           languageSelection.targetLanguage]!,
 
                       onCellTap:
-                          _openEditPopup, // Modified to pass only rowData
+                          _openEditFlashcardPopup, // Modified to pass only rowData
                     );
                   }
                 },
               ),
             ),
             ElevatedButton(
-              onPressed: _openAddPopup,
+              onPressed: _openAddFlashcardPopup,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),

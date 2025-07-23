@@ -2,13 +2,13 @@ import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../../config/constants.dart';
 
-class EditPopup extends StatefulWidget {
+class EditFlashcardPopup extends StatefulWidget {
   final Map<dynamic, dynamic> row;
   final Function(Map<String, String>, Map<dynamic, dynamic>) onEdit;
   final Function(Map<dynamic, dynamic>) onDelete;
   final bool languageDropdownEnabled;
 
-  EditPopup({
+  EditFlashcardPopup({
     required this.row,
     required this.onEdit,
     required this.onDelete,
@@ -16,10 +16,10 @@ class EditPopup extends StatefulWidget {
   });
 
   @override
-  _EditPopupState createState() => _EditPopupState();
+  _EditFlashcardPopupState createState() => _EditFlashcardPopupState();
 }
 
-class _EditPopupState extends State<EditPopup> {
+class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
   late String _sourceLanguage;
   late String _word;
   late String _translation;

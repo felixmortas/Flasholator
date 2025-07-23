@@ -24,7 +24,6 @@ __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
-- Choix de la langue de l'app
 - Choix du couple de langue au premier lancement 
 - Option écrire le mot pour le vérifier.
 - Une ou deux langues fun translator

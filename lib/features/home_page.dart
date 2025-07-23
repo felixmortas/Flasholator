@@ -186,14 +186,6 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/settings');
-                },
-                child: Text(AppLocalizations.of(context)!.language),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
