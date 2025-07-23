@@ -4,6 +4,7 @@ import '../../core/services/flashcards_collection.dart';
 import '../../core/services/deepl_translator.dart';
 import '../shared/utils/language_selection.dart';
 import '../../config/constants.dart';
+import '../shared/utils/app_localizations_helper.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../shared/dialogs/cancel_dialog.dart';
 
@@ -177,7 +178,7 @@ class _TranslateTabState extends State<TranslateTab> {
                         },
                         isExpanded: true,
                         isDense: true,
-                        items: LANGUAGES.entries
+                        items: LANGUAGE_KEYS.entries
                             .map((MapEntry<String, String> entry) {
                           return DropdownMenuItem<String>(
                             value: entry.key,
@@ -195,7 +196,8 @@ class _TranslateTabState extends State<TranslateTab> {
                             enabled:
                                 languageSelection.targetLanguage != entry.key,
                             child: Text(
-                              entry.value,
+                              AppLocalizations.of(context)!
+                                  .getTranslatedLanguageName(entry.key),
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 18.0,
@@ -237,7 +239,7 @@ class _TranslateTabState extends State<TranslateTab> {
                         },
                         isExpanded: true,
                         isDense: true,
-                        items: LANGUAGES.entries
+                        items: LANGUAGE_KEYS.entries
                             .map((MapEntry<String, String> entry) {
                           return DropdownMenuItem<String>(
                             value: entry.key,
@@ -255,7 +257,8 @@ class _TranslateTabState extends State<TranslateTab> {
                             enabled:
                                 languageSelection.sourceLanguage != entry.key,
                             child: Text(
-                              entry.value,
+                              AppLocalizations.of(context)!
+                                  .getTranslatedLanguageName(entry.key),
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 18.0,

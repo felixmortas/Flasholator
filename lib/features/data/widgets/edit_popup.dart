@@ -108,10 +108,10 @@ class _EditPopupState extends State<EditPopup> {
                       }
                     }
                   : null,
-              items: LANGUAGES.keys.map((String key) {
+              items: LANGUAGE_KEYS.keys.map((String key) {
                 return DropdownMenuItem<String>(
                   value: key,
-                  child: Text(LANGUAGES[key]!),
+                  child: Text(LANGUAGE_KEYS[key]!),
                 );
               }).toList(),
             ),

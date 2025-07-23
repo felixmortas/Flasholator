@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/services/flashcards_collection.dart';
 import '../shared/utils/language_selection.dart';
 import '../../config/constants.dart';
+import '../shared/utils/app_localizations_helper.dart';
 import 'widgets/all_languages_table.dart';
 import 'widgets/couple_languages_table.dart';
 import 'widgets/edit_popup.dart';
@@ -125,6 +126,10 @@ class DataTableTabState extends State<DataTableTab> {
   void _openAddPopup() {
     String? front;
     String? back;
+    final localizedLanguageMap = LANGUAGE_KEYS.map(
+      (code, key) => MapEntry(
+          code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
+    );
 
     showDialog(
       context: context,
@@ -136,7 +141,7 @@ class DataTableTabState extends State<DataTableTab> {
             children: [
               Row(
                 children: [
-                  Text(LANGUAGES[languageSelection.sourceLanguage]!),
+                  Text(localizedLanguageMap[languageSelection.sourceLanguage]!),
                   Expanded(
                     child: TextField(
                       onChanged: (String value) {
@@ -148,7 +153,7 @@ class DataTableTabState extends State<DataTableTab> {
               ),
               Row(
                 children: [
-                  Text(LANGUAGES[languageSelection.targetLanguage]!),
+                  Text(localizedLanguageMap[languageSelection.targetLanguage]!),
                   Expanded(
                     child: TextField(
                       onChanged: (String value) {
@@ -185,6 +190,11 @@ class DataTableTabState extends State<DataTableTab> {
 
   @override
   Widget build(BuildContext context) {
+    final localizedLanguageMap = LANGUAGE_KEYS.map(
+      (code, key) => MapEntry(
+          code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
+    );
+
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       return Scaffold(
@@ -212,15 +222,16 @@ class DataTableTabState extends State<DataTableTab> {
                       data: data,
                       onCellTap:
                           _openEditPopup, // Modified to pass only rowData
-                      languages: LANGUAGES,
+                      languages: localizedLanguageMap,
                     );
                   } else {
                     return CoupleLanguagesTable(
                       data: data,
-                      sourceLanguage:
-                          LANGUAGES[languageSelection.sourceLanguage]!,
-                      targetLanguage:
-                          LANGUAGES[languageSelection.targetLanguage]!,
+                      sourceLanguage: localizedLanguageMap[
+                          languageSelection.sourceLanguage]!,
+                      targetLanguage: localizedLanguageMap[
+                          languageSelection.targetLanguage]!,
+
                       onCellTap:
                           _openEditPopup, // Modified to pass only rowData
                     );

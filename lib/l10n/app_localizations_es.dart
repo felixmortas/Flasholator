@@ -9,6 +9,105 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get lang_ar => 'Árabe';
+
+  @override
+  String get lang_bg => 'Búlgaro';
+
+  @override
+  String get lang_cs => 'Checo';
+
+  @override
+  String get lang_da => 'Danés';
+
+  @override
+  String get lang_de => 'Alemán';
+
+  @override
+  String get lang_el => 'Griego';
+
+  @override
+  String get lang_en => 'Inglés';
+
+  @override
+  String get lang_es => 'Español';
+
+  @override
+  String get lang_et => 'Estonio';
+
+  @override
+  String get lang_fi => 'Finlandés';
+
+  @override
+  String get lang_fr => 'Francés';
+
+  @override
+  String get lang_he => 'Hebreo';
+
+  @override
+  String get lang_hu => 'Húngaro';
+
+  @override
+  String get lang_id => 'Indonesio';
+
+  @override
+  String get lang_it => 'Italiano';
+
+  @override
+  String get lang_ja => 'Japonés';
+
+  @override
+  String get lang_ko => 'Coreano';
+
+  @override
+  String get lang_lt => 'Lituano';
+
+  @override
+  String get lang_lv => 'Letón';
+
+  @override
+  String get lang_nb => 'Noruego Bokmål';
+
+  @override
+  String get lang_nl => 'Neerlandés';
+
+  @override
+  String get lang_pl => 'Polaco';
+
+  @override
+  String get lang_pt => 'Portugués';
+
+  @override
+  String get lang_ro => 'Rumano';
+
+  @override
+  String get lang_ru => 'Ruso';
+
+  @override
+  String get lang_sk => 'Eslovaco';
+
+  @override
+  String get lang_sl => 'Esloveno';
+
+  @override
+  String get lang_sv => 'Sueco';
+
+  @override
+  String get lang_th => 'Tailandés';
+
+  @override
+  String get lang_tr => 'Turco';
+
+  @override
+  String get lang_uk => 'Ucraniano';
+
+  @override
+  String get lang_vi => 'Vietnamita';
+
+  @override
+  String get lang_zh => 'Chino';
+
+  @override
   String get addAWord => 'Añadir una palabra';
 
   @override
