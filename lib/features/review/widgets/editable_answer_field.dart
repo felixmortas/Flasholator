@@ -16,24 +16,27 @@ class EditableAnswerField extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        if (isEditing)
-          Expanded(
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.writeYourResponseHere,
-                border: OutlineInputBorder(),
-              ),
+Widget build(BuildContext context) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      if (isEditing)
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context)!.writeYourResponseHere,
+              border: OutlineInputBorder(),
             ),
           ),
-        IconButton(
-          icon: Icon(isEditing ? Icons.close : Icons.edit),
-          onPressed: onToggleEditing,
         ),
-      ],
-    );
-  }
+
+      IconButton(
+        icon: Icon(isEditing ? Icons.close : Icons.edit),
+        onPressed: onToggleEditing,
+      ),
+    ],
+  );
+}
+
 }
