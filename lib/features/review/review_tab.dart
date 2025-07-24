@@ -165,6 +165,7 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
             ),
             const Spacer(),
             EditableAnswerField(
+              isDue: isDue,
               isEditing: isEditing,
               onToggleEditing: () {
                 setState(() {
