@@ -39,7 +39,7 @@ jobs:
         STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
       run: |
         flutter build appbundle --release \
-          --build-number=${{ github.run_number }} \
+          --build-number=9 \
           --build-name=0.3.0
         
     - name: Create Release
