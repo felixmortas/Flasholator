@@ -9,6 +9,7 @@ import 'translation/translate_tab.dart';
 import 'review/review_tab.dart';
 import 'data/data_table_tab.dart';
 import 'stats/stats_page.dart';
+import 'shared/widgets/settings_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -147,67 +148,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _openSettings() {
-    // Open the settings dialog box with lang selecter button and stats button
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.settings),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _launchEmail();
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, // Couleur du texte
-                  backgroundColor:
-                      Colors.orange, // Couleur vive pour attirer l'attention
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8), // Taille appropriée
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(8), // Bordures arrondies
-                  ),
-                  elevation: 5, // Effet de relief
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.feedback, size: 18), // Icône pertinente
-                    SizedBox(width: 8), // Espace entre l'icône et le texte
-                    Text(AppLocalizations.of(context)!
-                        .giveAFeedback), // Texte clair
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => StatsPage(
-                          flashcardsCollection: widget.flashcardsCollection),
-                    ),
-                  );
-                },
-                child: Text(AppLocalizations.of(context)!.statistics),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/help');
-                },
-                child: Text(AppLocalizations.of(context)!.help),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (context) => SettingsDialog(
+        launchEmail: _launchEmail,
+        flashcardsCollection: widget.flashcardsCollection,
+      ),
     );
   }
 
