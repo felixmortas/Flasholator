@@ -157,24 +157,42 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  bool checkUserLoggedIn() {
+    // Exemple simple (à remplacer par une vraie logique)
+    return false;
+  }
+
+
+  void _handleUserButton(BuildContext context) {
+    final isConnected = checkUserLoggedIn(); // à adapter selon ta logique d'authentification
+
+    if (isConnected) {
+      Navigator.pushNamed(context, '/profile'); // ou Navigator.push(...)
+    } else {
+      Navigator.pushNamed(context, '/login'); // ou page d'inscription
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Row(
-            children: [
-              const Text('Flasholator'),
-              const SizedBox(width: 8),
-              IconButton(
+          title: const Text('Flasholator'),
+          actions: [
+            IconButton(
                 icon: Icon(Icons.settings),
                 onPressed: () {
                   _openSettings();
                 },
               ),
-            ],
-          ),
+            IconButton(
+              icon: const Icon(Icons.account_circle),
+              onPressed: () => _handleUserButton(context),
+            ),
+          ],
         ),
         body: TabBarView(
           children: [
