@@ -40,15 +40,15 @@ jobs:
       run: |
         flutter build appbundle --release \
           --build-number=${{ github.run_number }} \
-          --build-name=0.2.${{ github.run_number }}
+          --build-name=0.3.0
         
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/app/outputs/bundle/release/app-release.aab"
-        tag: v0.2.${{ github.run_number }}
-        name: Release v0.2.${{ github.run_number }}
-        body: New release for version 0.2.${{ github.run_number }}
+        tag: v0.3.0
+        name: Release v0.3.0
+        body: New release for version 0.3.0
         token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Deploy to Google Play
@@ -57,5 +57,5 @@ jobs:
         serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
         packageName: com.felinx18.flasholator
         releaseFiles: build/app/outputs/bundle/release/app-release.aab
-        track: alpha
+        track: production
         status: completed
