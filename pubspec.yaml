@@ -37,7 +37,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   permission_handler: ^11.3.1
-  sqlite3_flutter_libs: ^0.5.24 # https://stackoverflow.com/questions/65551415/failed-to-load-dynamic-library-in-flutter-app
+  # sqlite3_flutter_libs: ^0.5.24 # https://stackoverflow.com/questions/65551415/failed-to-load-dynamic-library-in-flutter-app
 
   http: ^1.2.2
   intl: any
