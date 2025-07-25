@@ -1,3 +1,7 @@
+// This code is a transcription of the Python package supermemo2 (version 2.0.0)
+// Author: alankan886
+// URL: https://pypi.org/project/supermemo2/2.0.0/
+
 class SMTwo {
   // SuperMemo 2 algorithm
   num easiness;
