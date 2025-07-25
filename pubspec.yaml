@@ -37,12 +37,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   permission_handler: ^11.3.1
-  # sqlite3_flutter_libs: ^0.5.24 # https://stackoverflow.com/questions/65551415/failed-to-load-dynamic-library-in-flutter-app
 
   http: ^1.2.2
   intl: any
-  sqflite: ^2.4.2
-  sqflite_common_ffi: ^2.3.6
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
   path_provider: ^2.1.5
   url_launcher: ^6.3.1
   url_launcher_ios: ^6.3.3
@@ -70,6 +69,9 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
+  hive_generator: ^2.0.1
+  build_runner: ^2.5.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

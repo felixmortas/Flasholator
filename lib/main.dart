@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart'; // Import Hive
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'l10n/app_localizations.dart';
 import 'features/home_page.dart';
 import 'core/services/flashcards_collection.dart';
 import 'core/services/deepl_translator.dart'; // version précédente
+import 'core/models/flashcard_adapter.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding
+  await Hive.initFlutter(); // Initialiser Hive avec Flutter
+  // Enregistrer l'adapter personnalisé pour Flashcard (si utilisé)
+  Hive.registerAdapter(FlashcardAdapter());
 
   runApp(MyApp());
 }
@@ -17,7 +23,7 @@ class MyApp extends StatelessWidget {
   final flashcardsCollection =
       FlashcardsCollection(); // Create an instance of FlashcardDao
   final deeplTranslator =
-      DeeplTranslator(); // Create an instance of DeeplTranslator // version précédente
+      DeeplTranslator(); // Create an instance of DeeplTranslator
 
   // This widget is the root of your application.
   @override
