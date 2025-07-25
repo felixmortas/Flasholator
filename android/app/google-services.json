@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "811395658930",
+    "project_id": "flasholator-cf84b",
+    "storage_bucket": "flasholator-cf84b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811395658930:android:8d622c45f5bf92722205ab",
+        "android_client_info": {
+          "package_name": "com.felinx18.flasholator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDM9EIeNYTuOz25zTzMS-ZmYBAhvh81APQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart'; // Import Hive
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'l10n/app_localizations.dart';
 import 'features/home_page.dart';
@@ -10,6 +12,11 @@ import 'core/models/flashcard_adapter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   await Hive.initFlutter(); // Initialiser Hive avec Flutter
   // Enregistrer l'adapter personnalisé pour Flashcard (si utilisé)
   Hive.registerAdapter(FlashcardAdapter());

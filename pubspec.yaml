@@ -51,6 +51,7 @@ dependencies:
   flutter_localizations:              # For multi lang UI 
     sdk: flutter
   flutter_launcher_icons: ^0.14.4     # To add app icone
+  firebase_core: ^3.15.2
   # firebase_core: ^3.15.2            # Not working with XCode <=15.2 :https://github.com/firebase/flutterfire/issues/17496
 
 
