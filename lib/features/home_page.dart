@@ -15,6 +15,7 @@ import 'translation/translate_tab.dart';
 import 'review/review_tab.dart';
 import 'data/data_table_tab.dart';
 import 'shared/widgets/settings_dialog.dart';
+import 'authentication/profil_page.dart';
 
 class HomePage extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
@@ -165,18 +166,6 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-
-  void _handleUser(BuildContext context) {
-    final isConnected = checkUserLoggedIn(); // à adapter selon ta logique d'authentification
-
-    if (isConnected) {
-      Navigator.pushNamed(context, '/profile'); // ou Navigator.push(...)
-    } else {
-      Navigator.pushNamed(context, '/login'); // ou page d'inscription
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -188,25 +177,28 @@ class _HomePageState extends State<HomePage> {
           title: const Text('Flasholator'),
           actions: [
             IconButton(
+              icon: const Icon(Icons.account_circle),
+              onPressed: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfilePage()),
+                )
+              },
+            ),
+
+            IconButton(
                 icon: Icon(Icons.settings),
                 onPressed: () {
                   _openSettings();
                 },
               ),
-            IconButton(
-              icon: const Icon(Icons.account_circle),
-              onPressed: () => {
-                FirebaseAuth.instance.signOut(),
-                _handleUser(context),
-              },
-            ),
           ],
         ),
         body: TabBarView(
           children: [
             TranslateTab(
               flashcardsCollection: widget.flashcardsCollection,
-              deeplTranslator: widget.deeplTranslator, // version précédente
+              deeplTranslator: widget.deeplTranslator,
               addRow: dataTableTabFunction,
               updateQuestionText: reviewTabFunction,
             ),
