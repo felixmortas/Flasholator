@@ -5,14 +5,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'l10n/app_localizations.dart';
-import 'features/home_page.dart';
 import 'core/services/flashcards_collection.dart';
-import 'core/services/deepl_translator.dart'; // version précédente
+import 'core/services/deepl_translator.dart'; 
 import 'core/models/flashcard_adapter.dart';
+import 'core/services/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding
-  
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -53,9 +53,9 @@ class MyApp extends StatelessWidget {
         Locale('fr'), // French
         Locale('es'), // Spanish
       ],
-      home: HomePage(
+      home: AuthGate(
         flashcardsCollection: flashcardsCollection,
-        deeplTranslator: deeplTranslator, // version précédente
+        deeplTranslator: deeplTranslator,
       ),
     );
   }

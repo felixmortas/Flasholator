@@ -6,13 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 import '../core/services/deepl_translator.dart';
 import '../core/services/flashcards_collection.dart';
 import 'translation/translate_tab.dart';
 import 'review/review_tab.dart';
 import 'data/data_table_tab.dart';
-import 'stats/stats_page.dart';
 import 'shared/widgets/settings_dialog.dart';
 
 class HomePage extends StatefulWidget {
@@ -165,7 +166,7 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  void _handleUserButton(BuildContext context) {
+  void _handleUser(BuildContext context) {
     final isConnected = checkUserLoggedIn(); // à adapter selon ta logique d'authentification
 
     if (isConnected) {
@@ -178,6 +179,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -192,7 +195,10 @@ class _HomePageState extends State<HomePage> {
               ),
             IconButton(
               icon: const Icon(Icons.account_circle),
-              onPressed: () => _handleUserButton(context),
+              onPressed: () => {
+                FirebaseAuth.instance.signOut(),
+                _handleUser(context),
+              },
             ),
           ],
         ),
