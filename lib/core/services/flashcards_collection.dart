@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 import '../models/flashcard.dart';
 
 class FlashcardsCollection {
@@ -18,6 +20,12 @@ class FlashcardsCollection {
 
   Future<void> _initDatabase() async {
     // Initialize the database
+    if (kIsWeb) {
+      // Pas de support Web actuellement
+      print('Web platform not supported for local database.');
+      return;
+    }
+
     if (Platform.isAndroid || Platform.isIOS) {
       // Use the default SQLite implementation for mobile platforms
       String dbPath =

@@ -1,18 +1,19 @@
 import '../l10n/app_localizations.dart';
 import 'dart:io';
-
-import '../core/services/deepl_translator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../core/services/deepl_translator.dart';
 import '../core/services/flashcards_collection.dart';
 import 'translation/translate_tab.dart';
 import 'review/review_tab.dart';
 import 'data/data_table_tab.dart';
 import 'stats/stats_page.dart';
 import 'shared/widgets/settings_dialog.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
@@ -40,10 +41,11 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
-    if (Platform.isAndroid) {
-      requestPermissions(); // Call the requestPermissions() method here
+
+    if (!kIsWeb && Platform.isAndroid) {
+      requestPermissions();
+      _handleTextIntent();
     }
-    _handleTextIntent();
   }
 
   @override
