@@ -20,11 +20,13 @@ import 'authentication/profil_page.dart';
 class HomePage extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
   final DeeplTranslator deeplTranslator;
+  final bool isSubscribed;
 
   const HomePage({
     Key? key,
     required this.flashcardsCollection,
     required this.deeplTranslator,
+    required this.isSubscribed,
   }) : super(key: key);
 
   @override
@@ -168,8 +170,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
     return DefaultTabController(
       length: 3,
       child: Scaffold(

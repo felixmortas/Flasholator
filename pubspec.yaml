@@ -53,6 +53,7 @@ dependencies:
   flutter_launcher_icons: ^0.14.4     # To add app icone
   firebase_core: ^3.15.2              # Not working with XCode <=15.2 :https://github.com/firebase/flutterfire/issues/17496
   firebase_auth: ^5.7.0
+  cloud_firestore: ^5.6.12
 
 
 flutter_launcher_icons:

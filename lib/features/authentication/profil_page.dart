@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'widgets/change_password_dialog.dart';
+import '../../core/services/subscription_service.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -132,46 +134,73 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Mon Profil')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _infoRow('Pseudo', user?.displayName ?? 'Non défini'),
-            const SizedBox(height: 16),
-            _infoRow('Mot de passe', '********', action: () => _changePassword(context)),
-            const Divider(height: 32),
-            _infoRow('Abonnement', 'Gratuit', action: () {
-              // Placeholder - ajouter logique abonnement ici
-            }),
-            _infoRow('Renouvellement', 'N/A', action: null),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {
-                // Placeholder : annuler / activer abonnement
-              },
-              child: const Text('Annuler / Activer abonnement'),
-            ),
-            const Spacer(),
-            ElevatedButton.icon(
-              onPressed: () => _signOut(context),
-              icon: const Icon(Icons.logout),
-              label: const Text('Se déconnecter'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: () => _deleteAccount(context),
-              icon: const Icon(Icons.delete_forever),
-              label: const Text('Supprimer mon compte'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            ),
-          ],
+    return FutureBuilder<DocumentSnapshot>(
+    future: FirebaseFirestore.instance.collection('subscribedUsers').doc(user!.uid).get(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
+
+      final isSubscribed = snapshot.hasData && snapshot.data!.exists;
+      final subscriptionData = snapshot.data?.data() as Map<String, dynamic>?;
+
+      String abonnementLabel = isSubscribed ? 'Premium' : 'Gratuit';
+      String renouvellementLabel = 'N/A';
+
+      if (isSubscribed) {
+        final endDate = subscriptionData?['subscriptionEndDate'];
+        if (endDate == null) {
+          renouvellementLabel = 'Renouvellement automatique';
+        } else {
+          final date = (endDate as Timestamp).toDate();
+          if (date.isAfter(DateTime.now())) {
+            renouvellementLabel = 'Résilié (jusqu’au $date)';
+          } else {
+            renouvellementLabel = 'Abonnement expiré';
+          }
+        }
+      }
+
+      return Scaffold(
+        appBar: AppBar(title: const Text('Mon Profil')),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _infoRow('Pseudo', user.displayName ?? 'Non défini'),
+              const SizedBox(height: 16),
+              _infoRow('Mot de passe', '********', action: () => _changePassword(context)),
+              const Divider(height: 32),
+              _infoRow('Abonnement', abonnementLabel),
+              _infoRow('Renouvellement', renouvellementLabel),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  // Logique d’abonnement / annulation à venir ici
+                },
+                child: Text(isSubscribed ? 'Annuler abonnement' : 'Activer abonnement'),
+              ),
+              const Spacer(),
+              ElevatedButton.icon(
+                onPressed: () => _signOut(context),
+                icon: const Icon(Icons.logout),
+                label: const Text('Se déconnecter'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () => _deleteAccount(context),
+                icon: const Icon(Icons.delete_forever),
+                label: const Text('Supprimer mon compte'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    },
+  );
   }
 
   Widget _infoRow(String label, String value, {VoidCallback? action}) {

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../features/authentication/login_page.dart';
 import '../../features/home_page.dart';
 import '../../features/authentication/email_verification_pending_page.dart';
+import 'subscription_service.dart';
 
 class AuthGate extends StatelessWidget {
   final dynamic flashcardsCollection;
@@ -23,12 +24,25 @@ class AuthGate extends StatelessWidget {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
-        if (snapshot.hasData && snapshot.data!.emailVerified) {
-          return HomePage(
-            flashcardsCollection: flashcardsCollection,
-            deeplTranslator: deeplTranslator,
-          );
-        } else if (snapshot.hasData && !snapshot.data!.emailVerified) {
+        final user = snapshot.data;
+
+        if (user != null && user.emailVerified) {
+          return FutureBuilder<bool>(
+            future: SubscriptionService().isUserSubscribed(user.uid),
+            builder: (context, subSnapshot) {
+              if (subSnapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+
+              final isSubscribed = subSnapshot.data ?? false;
+
+              return HomePage(
+                flashcardsCollection: flashcardsCollection,
+                deeplTranslator: deeplTranslator,
+                isSubscribed: isSubscribed,
+              );
+            },
+          );        } else if (user != null && !user.emailVerified) {
           return const EmailVerificationPendingPage();
         }
 
