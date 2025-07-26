@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'widgets/change_password_dialog.dart';
 import '../../core/services/subscription_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (!isSubscribed) {
       await service.markUserAsSubscribed(uid);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Abonnement activé.')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
       );
     } else {
       final rawEndDate = subscriptionData?['subscriptionEndDate'];
@@ -44,22 +45,22 @@ class _ProfilePageState extends State<ProfilePage> {
       if (rawEndDate == null || DateTime.tryParse(rawEndDate)?.isAfter(now) == true) {
         final confirm = await _showConfirmationDialog(
           context,
-          title: 'Annuler abonnement',
+          title: AppLocalizations.of(context)!.cancelSubscription,
           content:
-              'Souhaitez-vous résilier votre abonnement ? Vous garderez l\'accès jusqu\'à la fin de la période.',
+              AppLocalizations.of(context)!.confirmCancelSubscription,
         );
         if (confirm) {
           final endDate = now.add(const Duration(days: 30));
           await service.cancelSubscription(uid, endDate);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Abonnement résilié. Valable jusqu\'au ${_formatDate(endDate)}.')),
+            SnackBar(content: Text('$AppLocalizations.of(context)!.subscriptionCancelled + ${_formatDate(endDate)}')),
           );
         }
       } else {
         // Abonnement expiré → réactivation
         await service.markUserAsSubscribed(uid);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Abonnement réactivé.')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionReactivated)),
         );
       }
     }
@@ -70,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<DocumentSnapshot> _loadSubscription() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) throw Exception('Utilisateur non connecté');
+    if (uid == null) throw Exception(AppLocalizations.of(context)!.userNotConnected);
     return FirebaseFirestore.instance.collection('subscribedUsers').doc(uid).get();
   }
 
@@ -87,15 +88,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String _formatDateString(String dateString) {
     final date = DateTime.tryParse(dateString);
-    if (date == null) return 'Date invalide';
+    if (date == null) return AppLocalizations.of(context)!.invalidDate;
     return _formatDate(date);
   }
 
   Future<void> _signOut(BuildContext context) async {
     final confirmed = await _showConfirmationDialog(
       context,
-      title: 'Déconnexion',
-      content: 'Voulez-vous vraiment vous déconnecter ?',
+      title: AppLocalizations.of(context)!.logOut,
+      content: AppLocalizations.of(context)!.confirmLogout,
     );
     if (confirmed) {
       await FirebaseAuth.instance.signOut();
@@ -138,11 +139,11 @@ class _ProfilePageState extends State<ProfilePage> {
           await user.updatePassword(newPassword);
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mot de passe mis à jour avec succès.')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.passwordUpdated)),
           );
         } on FirebaseAuthException catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur : ${e.message}')),
+            SnackBar(content: Text('${AppLocalizations.of(context)!.error} + ${e.message}')),
           );
         }
       },
@@ -161,8 +162,8 @@ class _ProfilePageState extends State<ProfilePage> {
             title: Text(title),
             content: Text(content),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
-              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Confirmer')),
+              TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLocalizations.of(context)!.cancel)),
+              TextButton(onPressed: () => Navigator.pop(context, true), child: Text(AppLocalizations.of(context)!.confirm)),
             ],
           ),
         ) ??
@@ -175,20 +176,20 @@ class _ProfilePageState extends State<ProfilePage> {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Suppression du compte'),
+            title: Text(AppLocalizations.of(context)!.deleteAccount),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Saisissez votre mot de passe pour confirmer la suppression.'),
+                Text(AppLocalizations.of(context)!.confirmDeleteAccount),
                 TextField(
                   controller: controller,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Mot de passe'),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password),
                 ),
               ],
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
+              TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLocalizations.of(context)!.cancel)),
               TextButton(
                 onPressed: () async {
                   try {
@@ -201,11 +202,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.pop(context, true);
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Mot de passe incorrect.')),
+                      SnackBar(content: Text(AppLocalizations.of(context)!.incorrectPassword)),
                     );
                   }
                 },
-                child: const Text('Confirmer'),
+                child: Text(AppLocalizations.of(context)!.confirm),
               ),
             ],
           ),
@@ -227,56 +228,56 @@ class _ProfilePageState extends State<ProfilePage> {
       final isSubscribed = snapshot.hasData && snapshot.data!.exists;
       final subscriptionData = snapshot.data?.data() as Map<String, dynamic>?;
 
-      String abonnementLabel = isSubscribed ? 'Premium' : 'Gratuit';
+      String abonnementLabel = isSubscribed ? AppLocalizations.of(context)!.premium : AppLocalizations.of(context)!.free;
       String renouvellementLabel = 'N/A';
 
       if (isSubscribed) {
         final endDate = subscriptionData?['subscriptionEndDate'];
         if (endDate == null) {
-          renouvellementLabel = 'Renouvellement automatique';
+          renouvellementLabel = AppLocalizations.of(context)!.autoRenewal;
         } else {
           final date = (endDate as Timestamp).toDate();
           if (date.isAfter(DateTime.now())) {
-            renouvellementLabel = 'Résilié (jusqu’au $date)';
+            renouvellementLabel = '${AppLocalizations.of(context)!.cancelledUntil} + $date';
           } else {
-            renouvellementLabel = 'Abonnement expiré';
+            renouvellementLabel = AppLocalizations.of(context)!.subscriptionExpired;
           }
         }
       }
 
       return Scaffold(
-        appBar: AppBar(title: const Text('Mon Profil')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile)),
         body: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _infoRow('Pseudo', user.displayName ?? 'Non défini'),
+              _infoRow(AppLocalizations.of(context)!.username, user.displayName ?? AppLocalizations.of(context)!.undefined),
               const SizedBox(height: 16),
-              _infoRow('Mot de passe', '********', action: () => _changePassword(context)),
+              _infoRow(AppLocalizations.of(context)!.password, '********', action: () => _changePassword(context)),
               const Divider(height: 32),
-              _infoRow('Abonnement', abonnementLabel),
-              _infoRow('Renouvellement', renouvellementLabel),
+              _infoRow(AppLocalizations.of(context)!.subscription, abonnementLabel),
+              _infoRow(AppLocalizations.of(context)!.renewal, renouvellementLabel),
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: () => _handleSubscriptionAction(
                   isSubscribed: isSubscribed,
                   subscriptionData: subscriptionData,
                 ),
-                child: Text(isSubscribed ? 'Annuler abonnement' : 'Activer abonnement'),
+                child: Text(isSubscribed ? AppLocalizations.of(context)!.cancelSubscription : AppLocalizations.of(context)!.activateSubscription),
               ),              
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () => _signOut(context),
                 icon: const Icon(Icons.logout),
-                label: const Text('Se déconnecter'),
+                label: Text(AppLocalizations.of(context)!.logOut),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
               ),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () => _deleteAccount(context),
                 icon: const Icon(Icons.delete_forever),
-                label: const Text('Supprimer mon compte'),
+                label: Text(AppLocalizations.of(context)!.deleteMyAccount),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               ),
             ],

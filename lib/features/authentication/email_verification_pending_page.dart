@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class EmailVerificationPendingPage extends StatefulWidget {
   const EmailVerificationPendingPage({super.key});
 
@@ -23,9 +25,9 @@ class _EmailVerificationPendingPageState extends State<EmailVerificationPendingP
       final user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
 
-      setState(() => message = "Email de vérification renvoyé !");
+      setState(() => message = AppLocalizations.of(context)!.verificationEmailSent);
     } catch (e) {
-      setState(() => message = "Erreur lors de l'envoi de l'email.");
+      setState(() => message = AppLocalizations.of(context)!.error);
     } finally {
       setState(() => isSending = false);
     }
@@ -47,10 +49,10 @@ class _EmailVerificationPendingPageState extends State<EmailVerificationPendingP
           Navigator.pushReplacementNamed(context, "/"); // Retour vers AuthGate
         }
       } else {
-        setState(() => message = "Votre adresse n'est toujours pas vérifiée.");
+        setState(() => message = AppLocalizations.of(context)!.yourAddressHasNotYetBeenVerified);
       }
     } catch (e) {
-      setState(() => message = "Erreur lors de la vérification.");
+      setState(() => message = AppLocalizations.of(context)!.error);
     } finally {
       setState(() => isChecking = false);
     }
@@ -58,16 +60,16 @@ class _EmailVerificationPendingPageState extends State<EmailVerificationPendingP
 
   @override
   Widget build(BuildContext context) {
-    final userEmail = FirebaseAuth.instance.currentUser?.email ?? "Votre email";
+    final userEmail = FirebaseAuth.instance.currentUser?.email ?? AppLocalizations.of(context)!.yourEmail;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Vérification de l'email")),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.emailVerification)),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Un email de vérification a été envoyé à :",
+            Text(AppLocalizations.of(context)!.aVerificationEmailHasBeenSentTo,
                 style: Theme.of(context).textTheme.bodyMedium),
             Text(userEmail,
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -76,7 +78,7 @@ class _EmailVerificationPendingPageState extends State<EmailVerificationPendingP
               Text(
                 message!,
                 style: TextStyle(
-                  color: message!.contains("Erreur") ? Colors.red : Colors.green,
+                  color: message!.contains(AppLocalizations.of(context)!.error) ? Colors.red : Colors.green,
                 ),
               ),
             const SizedBox(height: 20),
@@ -84,19 +86,19 @@ class _EmailVerificationPendingPageState extends State<EmailVerificationPendingP
               onPressed: isSending ? null : resendVerificationEmail,
               child: isSending
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text("Renvoyer l'email"),
+                  : Text(AppLocalizations.of(context)!.resendEmail),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: isChecking ? null : checkVerificationStatus,
               child: isChecking
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text("J'ai confirmé mon email"),
+                  : Text(AppLocalizations.of(context)!.iHaveConfirmedMyEmail),
             ),
             const SizedBox(height: 30),
             TextButton(
               onPressed: () => FirebaseAuth.instance.signOut(),
-              child: const Text("Se déconnecter"),
+              child: Text(AppLocalizations.of(context)!.logOut),
             ),
           ],
         ),

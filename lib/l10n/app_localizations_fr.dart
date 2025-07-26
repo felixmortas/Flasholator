@@ -9,6 +9,124 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get subscriptionActivated => 'Abonnement activé.';
+
+  @override
+  String get cancelSubscription => 'Annuler abonnement';
+
+  @override
+  String get confirmCancelSubscription =>
+      'Souhaitez-vous résilier votre abonnement ? Vous garderez l\'accès jusqu\'à la fin de la période.';
+
+  @override
+  String get subscriptionCancelled => 'Abonnement résilié. Valable jusqu\'au';
+
+  @override
+  String get subscriptionReactivated => 'Abonnement réactivé.';
+
+  @override
+  String get userNotConnected => 'Utilisateur non connecté';
+
+  @override
+  String get invalidDate => 'Date invalide';
+
+  @override
+  String get confirmLogout => 'Voulez-vous vraiment vous déconnecter ?';
+
+  @override
+  String get passwordUpdated => 'Mot de passe mis à jour avec succès.';
+
+  @override
+  String get confirm => 'Confirmer';
+
+  @override
+  String get deleteAccount => 'Suppression du compte';
+
+  @override
+  String get confirmDeleteAccount =>
+      'Saisissez votre mot de passe pour confirmer la suppression.';
+
+  @override
+  String get incorrectPassword => 'Mot de passe incorrect.';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get free => 'Gratuit';
+
+  @override
+  String get autoRenewal => 'Renouvellement automatique';
+
+  @override
+  String get cancelledUntil => 'Résilié (jusqu’au';
+
+  @override
+  String get subscriptionExpired => 'Abonnement expiré';
+
+  @override
+  String get myProfile => 'Mon Profil';
+
+  @override
+  String get username => 'Pseudo';
+
+  @override
+  String get undefined => 'Non défini';
+
+  @override
+  String get subscription => 'Abonnement';
+
+  @override
+  String get renewal => 'Renouvellement';
+
+  @override
+  String get activateSubscription => 'Activer abonnement';
+
+  @override
+  String get deleteMyAccount => 'Supprimer mon compte';
+
+  @override
+  String get forgotYourPassword => 'Mot de passe oublié ?';
+
+  @override
+  String get signIn => 'Créer un compte';
+
+  @override
+  String get logIn => 'Se connecter';
+
+  @override
+  String get password => 'Mot de passe';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get logOut => 'Se déconnecter';
+
+  @override
+  String get iHaveConfirmedMyEmail => 'J\'ai confirmé mon email';
+
+  @override
+  String get resendEmail => 'Renvoyer l\'email';
+
+  @override
+  String get aVerificationEmailHasBeenSentTo =>
+      'Un email de vérification a été envoyé à :';
+
+  @override
+  String get emailVerification => 'Vérification de l\'email';
+
+  @override
+  String get yourEmail => 'Votre email';
+
+  @override
+  String get yourAddressHasNotYetBeenVerified =>
+      'Votre adresse n\'est toujours pas vérifiée.';
+
+  @override
+  String get verificationEmailSent => 'Email de vérification renvoyé !';
+
+  @override
   String get addAWord => 'Ajouter un mot';
 
   @override

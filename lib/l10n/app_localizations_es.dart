@@ -9,6 +9,125 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get subscriptionActivated => 'Suscripción activada.';
+
+  @override
+  String get cancelSubscription => 'Cancelar suscripción';
+
+  @override
+  String get confirmCancelSubscription =>
+      '¿Desea cancelar su suscripción? Conservará el acceso hasta el final del período.';
+
+  @override
+  String get subscriptionCancelled => 'Suscripción cancelada. Válida hasta';
+
+  @override
+  String get subscriptionReactivated => 'Suscripción reactivada.';
+
+  @override
+  String get userNotConnected => 'Usuario no conectado';
+
+  @override
+  String get invalidDate => 'Fecha inválida';
+
+  @override
+  String get confirmLogout => '¿Realmente desea cerrar sesión?';
+
+  @override
+  String get passwordUpdated => 'Contraseña actualizada con éxito.';
+
+  @override
+  String get confirm => 'Confirmar';
+
+  @override
+  String get deleteAccount => 'Eliminar cuenta';
+
+  @override
+  String get confirmDeleteAccount =>
+      'Ingrese su contraseña para confirmar la eliminación.';
+
+  @override
+  String get incorrectPassword => 'Contraseña incorrecta.';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get free => 'Gratis';
+
+  @override
+  String get autoRenewal => 'Renovación automática';
+
+  @override
+  String get cancelledUntil => 'Cancelado (hasta';
+
+  @override
+  String get subscriptionExpired => 'Suscripción expirada';
+
+  @override
+  String get myProfile => 'Mi Perfil';
+
+  @override
+  String get username => 'Nombre de usuario';
+
+  @override
+  String get undefined => 'No definido';
+
+  @override
+  String get subscription => 'Suscripción';
+
+  @override
+  String get renewal => 'Renovación';
+
+  @override
+  String get activateSubscription => 'Activar suscripción';
+
+  @override
+  String get deleteMyAccount => 'Eliminar mi cuenta';
+
+  @override
+  String get forgotYourPassword => '¿Olvidaste tu contraseña?';
+
+  @override
+  String get signIn => 'Registrarse';
+
+  @override
+  String get logIn => 'Iniciar sesión';
+
+  @override
+  String get password => 'Contraseña';
+
+  @override
+  String get email => 'Correo electrónico';
+
+  @override
+  String get logOut => 'Desconectarse';
+
+  @override
+  String get iHaveConfirmedMyEmail => 'He confirmado mi correo electrónico.';
+
+  @override
+  String get resendEmail => 'Reenviar el correo electrónico';
+
+  @override
+  String get aVerificationEmailHasBeenSentTo =>
+      'Se ha enviado un correo electrónico de verificación a:';
+
+  @override
+  String get emailVerification => 'Verificación del correo electrónico';
+
+  @override
+  String get yourEmail => 'Tu correo electrónico';
+
+  @override
+  String get yourAddressHasNotYetBeenVerified =>
+      'Su dirección aún no ha sido verificada.';
+
+  @override
+  String get verificationEmailSent =>
+      '¡Se ha enviado el correo electrónico de verificación!';
+
+  @override
   String get addAWord => 'Añadir una palabra';
 
   @override

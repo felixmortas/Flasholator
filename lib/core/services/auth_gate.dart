@@ -35,14 +35,14 @@ class AuthGate extends StatelessWidget {
               }
 
               final isSubscribed = subSnapshot.data ?? false;
-
               return HomePage(
                 flashcardsCollection: flashcardsCollection,
                 deeplTranslator: deeplTranslator,
                 isSubscribed: isSubscribed,
               );
             },
-          );        } else if (user != null && !user.emailVerified) {
+          );        
+        } else if (user != null && !user.emailVerified) {
           return const EmailVerificationPendingPage();
         }
 

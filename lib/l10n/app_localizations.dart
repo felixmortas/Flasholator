@@ -100,6 +100,234 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @subscriptionActivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription activated.'**
+  String get subscriptionActivated;
+
+  /// No description provided for @cancelSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel subscription'**
+  String get cancelSubscription;
+
+  /// No description provided for @confirmCancelSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to cancel your subscription? You will keep access until the end of the period.'**
+  String get confirmCancelSubscription;
+
+  /// No description provided for @subscriptionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription cancelled. Valid until'**
+  String get subscriptionCancelled;
+
+  /// No description provided for @subscriptionReactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription reactivated.'**
+  String get subscriptionReactivated;
+
+  /// No description provided for @userNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'User not connected'**
+  String get userNotConnected;
+
+  /// No description provided for @invalidDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid date'**
+  String get invalidDate;
+
+  /// No description provided for @confirmLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to log out?'**
+  String get confirmLogout;
+
+  /// No description provided for @passwordUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated successfully.'**
+  String get passwordUpdated;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccount;
+
+  /// No description provided for @confirmDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password to confirm deletion.'**
+  String get confirmDeleteAccount;
+
+  /// No description provided for @incorrectPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password.'**
+  String get incorrectPassword;
+
+  /// No description provided for @premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premium;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// No description provided for @autoRenewal.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto renewal'**
+  String get autoRenewal;
+
+  /// No description provided for @cancelledUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled (until'**
+  String get cancelledUntil;
+
+  /// No description provided for @subscriptionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription expired'**
+  String get subscriptionExpired;
+
+  /// No description provided for @myProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get myProfile;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @undefined.
+  ///
+  /// In en, this message translates to:
+  /// **'Undefined'**
+  String get undefined;
+
+  /// No description provided for @subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get subscription;
+
+  /// No description provided for @renewal.
+  ///
+  /// In en, this message translates to:
+  /// **'Renewal'**
+  String get renewal;
+
+  /// No description provided for @activateSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate subscription'**
+  String get activateSubscription;
+
+  /// No description provided for @deleteMyAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get deleteMyAccount;
+
+  /// No description provided for @forgotYourPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot your password?'**
+  String get forgotYourPassword;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signIn;
+
+  /// No description provided for @logIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get logIn;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @logOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get logOut;
+
+  /// No description provided for @iHaveConfirmedMyEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'I have confirmed my email address.'**
+  String get iHaveConfirmedMyEmail;
+
+  /// No description provided for @resendEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend the email'**
+  String get resendEmail;
+
+  /// No description provided for @aVerificationEmailHasBeenSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'A verification email has been sent to:'**
+  String get aVerificationEmailHasBeenSentTo;
+
+  /// No description provided for @emailVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Email verification'**
+  String get emailVerification;
+
+  /// No description provided for @yourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Your email'**
+  String get yourEmail;
+
+  /// No description provided for @yourAddressHasNotYetBeenVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Your address has not yet been verified.'**
+  String get yourAddressHasNotYetBeenVerified;
+
+  /// No description provided for @verificationEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification email sent!'**
+  String get verificationEmailSent;
+
   /// No description provided for @addAWord.
   ///
   /// In en, this message translates to:
