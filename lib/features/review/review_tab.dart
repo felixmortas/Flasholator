@@ -84,6 +84,9 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
           isDue = true;
           _responseText = _currentFlashcard.back;
           _responseLang = _currentFlashcard.targetLang;
+          overrideQuality = null;
+          editingController.clear();
+
         });
       } else {
         setState(() {
@@ -91,6 +94,7 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
           _questionLang = "";
           isResponseHidden = true;
           isDue = false;
+          overrideQuality = null;
         });
       }
     } else {
@@ -99,6 +103,7 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
         _questionLang = "";
         isResponseHidden = true;
         isDue = false;
+        overrideQuality = null;
       });
     }
   }
@@ -184,11 +189,6 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
               onDisplayAnswer: _displayAnswer,
               onQualityPress: (q) {
                 _onQualityButtonPress(q);
-                setState(() {
-                  overrideQuality = null;
-                  editingController.clear();
-                  // isEditing = false;
-                });
               },
               overrideDisplayWithResult:
                   isEditing && !isResponseHidden && overrideQuality != null,
