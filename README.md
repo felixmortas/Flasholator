@@ -24,10 +24,8 @@ __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
-- Option écrire le mot pour le vérifier.
 - Une ou deux langues fun translator
 - Publicités
-- Compte utilisateur
 - Notifications de rappel cartes à réviser
 - Choix du couple de langue au premier lancement 
 - Plusieurs résultats lors de la traduction.
