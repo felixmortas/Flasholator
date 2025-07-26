@@ -172,7 +172,6 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                   isEditing = !isEditing;
                   if (!isEditing) {
                     overrideQuality = null;
-                    editingController.clear();
                   }
                 });
               },
@@ -188,7 +187,7 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
                 setState(() {
                   overrideQuality = null;
                   editingController.clear();
-                  isEditing = false;
+                  // isEditing = false;
                 });
               },
               overrideDisplayWithResult:
