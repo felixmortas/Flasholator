@@ -20,23 +20,28 @@ Avec Flasholator, vous pouvez traduire les mots que vous ne connaissez pas et le
 3. Ajoutez les traductions à votre jeu de cartes virtuelles.
 4. Réviser les mots tous les jours pour améliorer votre mémoire.
 
+## Fonctionnalités premium 
+- Pas de publicités
+- Pas de limite de traduction (vs 100 max)
+- Pas de limite d'ajout de cartes (vs 20 max)
+- Tous les couples de langues disponibles (vs 1 max)
+- Réviser en vérifiant la réponse à l'écrit (vs dans sa tête)
+- Créer des groupes de mots pour les révisions (ex. : vacances, bureau, cuisine).
+- Import/Export des données de l'utilisateur.
+- Synchronisation régulière des données de l'utilisateur sur son Google Drive
+
 __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
-- Une ou deux langues fun translator
 - Publicités
+- Différenciations fonctionnalités premium
+- Facturation abonnement 
+- Une ou deux langues fun translator
 - Notifications de rappel cartes à réviser
 - Choix du couple de langue au premier lancement 
 - Plusieurs résultats lors de la traduction.
 - Prononciation
-
-### Fonctionnalités premium 
-- Abonnement 
-- Filter fonctionnalités premium
-- Créer des groupes de mots pour les révisions (ex. : vacances, bureau, cuisine).
-- Sauvegarder les données directement sur le téléphone (comme WhatsApp).
-- Import/Export des données de l'utilisateur.
 
 ### Expérience utilisateur :
 - Réduction au maximum le nombre de clics nécessaires pour utiliser l'application.
