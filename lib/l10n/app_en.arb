@@ -1,4 +1,5 @@
 {
+    "modifyPrivacyPreferences": "Modify privacy preferences",
     "subscriptionActivated": "Subscription activated.",
     "cancelSubscription": "Cancel subscription",
     "confirmCancelSubscription": "Do you want to cancel your subscription? You will keep access until the end of the period.",

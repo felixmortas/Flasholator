@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:user_messaging_platform/user_messaging_platform.dart';
 
 import 'widgets/change_password_dialog.dart';
 import '../../core/services/subscription_service.dart';
@@ -214,6 +215,17 @@ class _ProfilePageState extends State<ProfilePage> {
         false;
   }
 
+  void updateConsent() async {
+    // Make sure to continue with the latest consent info.
+    var info = await UserMessagingPlatform.instance.requestConsentInfoUpdate();
+
+    // Show the consent form if consent is required.
+    if (info.consentStatus == ConsentStatus.required) {
+      // `showConsentForm` returns the latest consent info, after the consent from has been closed.
+      info = await UserMessagingPlatform.instance.showConsentForm();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -265,7 +277,25 @@ class _ProfilePageState extends State<ProfilePage> {
                   subscriptionData: subscriptionData,
                 ),
                 child: Text(isSubscribed ? AppLocalizations.of(context)!.cancelSubscription : AppLocalizations.of(context)!.activateSubscription),
-              ),              
+              ),       
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => updateConsent(),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size(0, 30),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  alignment: Alignment.centerLeft,
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.modifyPrivacyPreferences,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () => _signOut(context),

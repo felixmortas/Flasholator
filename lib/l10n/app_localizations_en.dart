@@ -9,6 +9,9 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get modifyPrivacyPreferences => 'Modify privacy preferences';
+
+  @override
   String get subscriptionActivated => 'Subscription activated.';
 
   @override

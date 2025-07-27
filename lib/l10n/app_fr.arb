@@ -1,4 +1,5 @@
 {   
+    "modifyPrivacyPreferences": "Modifier mes préférences de confidentialité",
     "subscriptionActivated": "Abonnement activé.",
     "cancelSubscription": "Annuler abonnement",
     "confirmCancelSubscription": "Souhaitez-vous résilier votre abonnement ? Vous garderez l'accès jusqu'à la fin de la période.",

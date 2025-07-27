@@ -9,6 +9,10 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get modifyPrivacyPreferences =>
+      'Modificar mis preferencias de privacidad';
+
+  @override
   String get subscriptionActivated => 'Suscripción activada.';
 
   @override

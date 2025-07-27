@@ -100,6 +100,12 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @modifyPrivacyPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify privacy preferences'**
+  String get modifyPrivacyPreferences;
+
   /// No description provided for @subscriptionActivated.
   ///
   /// In en, this message translates to:
