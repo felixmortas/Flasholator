@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
             TextButton(
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterPage())),
-              child: Text(AppLocalizations.of(context)!.signIn),
+              child: Text(AppLocalizations.of(context)!.signUp),
             ),
             TextButton(
               onPressed: () => FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim()),

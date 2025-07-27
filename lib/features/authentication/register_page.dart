@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -24,7 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final confirmPassword = confirmPasswordController.text;
 
     if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      setState(() => errorMessage = "Tous les champs sont obligatoires.");
+      setState(() => errorMessage = AppLocalizations.of(context)!.allFieldsRequired);
       return;
     }
 
@@ -56,8 +58,8 @@ class _RegisterPageState extends State<RegisterPage> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text("Compte créé"),
-            content: const Text("Un email de vérification vous a été envoyé. Veuillez confirmer votre adresse avant de vous connecter."),
+            title: Text(AppLocalizations.of(context)!.accountCreated),
+            content: Text(AppLocalizations.of(context)!.verificationEmailSent),
             actions: [
               TextButton(
                 onPressed: () {
@@ -90,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inscription')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.signUp)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -99,21 +101,21 @@ class _RegisterPageState extends State<RegisterPage> {
               Text(errorMessage!, style: const TextStyle(color: Colors.red)),
             TextField(
               controller: usernameController,
-              decoration: const InputDecoration(labelText: 'Nom d\'utilisateur'),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)!.username),
             ),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: 'Adresse email'),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email),
               keyboardType: TextInputType.emailAddress,
             ),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Mot de passe'),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password),
               obscureText: true,
             ),
             TextField(
               controller: confirmPasswordController,
-              decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)!.confirmPassword),
               obscureText: true,
             ),
             const SizedBox(height: 20),
@@ -121,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: register,
-                    child: const Text("S'inscrire"),
+                    child: Text(AppLocalizations.of(context)!.signUp),
                   ),
           ],
         ),

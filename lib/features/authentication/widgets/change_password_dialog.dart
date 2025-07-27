@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 class ChangePasswordDialog extends StatefulWidget {
   final Function(String currentPassword, String newPassword) onConfirm;
 
@@ -22,12 +24,12 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     final confirm = _confirmPasswordController.text;
 
     if (newPass != confirm) {
-      setState(() => _error = "Les mots de passe ne correspondent pas.");
+      setState(() => _error = AppLocalizations.of(context)!.passwordsDoNotMatch);
       return;
     }
 
     if (newPass.length < 6) {
-      setState(() => _error = "Le mot de passe doit contenir au moins 6 caractères.");
+      setState(() => _error = AppLocalizations.of(context)!.passwordRequirements);
       return;
     }
 
@@ -38,7 +40,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Changer le mot de passe'),
+      title: Text(AppLocalizations.of(context)!.changePassword),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -47,28 +49,28 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
           TextField(
             controller: _currentPasswordController,
             obscureText: true,
-            decoration: const InputDecoration(labelText: 'Mot de passe actuel'),
+            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.currentPassword),
           ),
           TextField(
             controller: _newPasswordController,
             obscureText: true,
-            decoration: const InputDecoration(labelText: 'Nouveau mot de passe'),
+            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.newPassword),
           ),
           TextField(
             controller: _confirmPasswordController,
             obscureText: true,
-            decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
+            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.confirmPassword),
           ),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
           onPressed: _validateAndSubmit,
-          child: const Text('Confirmer'),
+          child: Text(AppLocalizations.of(context)!.confirm),
         ),
       ],
     );

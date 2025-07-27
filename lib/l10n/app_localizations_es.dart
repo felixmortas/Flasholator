@@ -9,6 +9,34 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get allFieldsRequired => 'Todos los campos son obligatorios.';
+
+  @override
+  String get passwordsDoNotMatch => 'Las contraseñas no coinciden.';
+
+  @override
+  String get accountCreated => 'Cuenta creada';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get confirmPassword => 'Confirmar contraseña';
+
+  @override
+  String get passwordRequirements =>
+      'La contraseña debe contener al menos 6 caracteres, 1 mayúscula, 1 minúscula y 1 carácter especial.';
+
+  @override
+  String get changePassword => 'Cambiar contraseña';
+
+  @override
+  String get currentPassword => 'Contraseña actual';
+
+  @override
+  String get newPassword => 'Nueva contraseña';
+
+  @override
   String get modifyPrivacyPreferences =>
       'Modificar mis preferencias de privacidad';
 
@@ -93,7 +121,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get forgotYourPassword => '¿Olvidaste tu contraseña?';
 
   @override
-  String get signIn => 'Registrarse';
+  String get signUp => 'Registrarse';
 
   @override
   String get logIn => 'Iniciar sesión';

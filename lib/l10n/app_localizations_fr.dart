@@ -9,6 +9,34 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get allFieldsRequired => 'Tous les champs sont obligatoires.';
+
+  @override
+  String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas.';
+
+  @override
+  String get accountCreated => 'Compte créé';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get confirmPassword => 'Confirmer le mot de passe';
+
+  @override
+  String get passwordRequirements =>
+      'Le mot de passe doit contenir au moins 6 caractères, 1 majuscule, 1 minuscule et 1 caractère spécial.';
+
+  @override
+  String get changePassword => 'Changer le mot de passe';
+
+  @override
+  String get currentPassword => 'Mot de passe actuel';
+
+  @override
+  String get newPassword => 'Nouveau mot de passe';
+
+  @override
   String get modifyPrivacyPreferences =>
       'Modifier mes préférences de confidentialité';
 
@@ -93,7 +121,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get forgotYourPassword => 'Mot de passe oublié ?';
 
   @override
-  String get signIn => 'Créer un compte';
+  String get signUp => 'Créer un compte';
 
   @override
   String get logIn => 'Se connecter';
@@ -128,7 +156,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Votre adresse n\'est toujours pas vérifiée.';
 
   @override
-  String get verificationEmailSent => 'Email de vérification renvoyé !';
+  String get verificationEmailSent => 'Email de vérification envoyé !';
 
   @override
   String get addAWord => 'Ajouter un mot';

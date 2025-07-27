@@ -100,6 +100,60 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @allFieldsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'All fields are required.'**
+  String get allFieldsRequired;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @accountCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Account created'**
+  String get accountCreated;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @passwordRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must contain at least 6 characters, 1 uppercase letter, 1 lowercase letter, and 1 special character.'**
+  String get passwordRequirements;
+
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePassword;
+
+  /// No description provided for @currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get currentPassword;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
   /// No description provided for @modifyPrivacyPreferences.
   ///
   /// In en, this message translates to:
@@ -262,11 +316,11 @@ abstract class AppLocalizations {
   /// **'Forgot your password?'**
   String get forgotYourPassword;
 
-  /// No description provided for @signIn.
+  /// No description provided for @signUp.
   ///
   /// In en, this message translates to:
-  /// **'Sign in'**
-  String get signIn;
+  /// **'Sign up'**
+  String get signUp;
 
   /// No description provided for @logIn.
   ///
