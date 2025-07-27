@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
           final endDate = now.add(const Duration(days: 30));
           await service.cancelSubscription(uid, endDate);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$AppLocalizations.of(context)!.subscriptionCancelled + ${_formatDate(endDate)}')),
+            SnackBar(content: Text('${AppLocalizations.of(context)!.subscriptionCancelled} : ${_formatDate(endDate)}')),
           );
         }
       } else {
