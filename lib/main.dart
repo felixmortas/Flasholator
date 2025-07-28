@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart'; // Import Hive
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'l10n/app_localizations.dart';
 import 'core/services/flashcards_collection.dart';
@@ -12,6 +13,8 @@ import 'core/services/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding
+
+  MobileAds.instance.initialize();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

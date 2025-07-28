@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:user_messaging_platform/user_messaging_platform.dart';
 
 import 'widgets/change_password_dialog.dart';
 import '../../core/services/subscription_service.dart';
@@ -214,14 +213,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void updateConsent() async {
-    // Make sure to continue with the latest consent info.
-    var info = await UserMessagingPlatform.instance.requestConsentInfoUpdate();
-
-    // Show the consent form if consent is required.
-    if (info.consentStatus == ConsentStatus.required) {
-      // `showConsentForm` returns the latest consent info, after the consent from has been closed.
-      info = await UserMessagingPlatform.instance.showConsentForm();
-    }
+    print("");
   }
 
   @override
