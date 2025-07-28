@@ -15,6 +15,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding
 
   MobileAds.instance.initialize();
+  final config = RequestConfiguration(
+    testDeviceIds: ['E779AA37025CA3C4EE7B28A571BDA15A'],
+  );
+  MobileAds.instance.updateRequestConfiguration(config);
+
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

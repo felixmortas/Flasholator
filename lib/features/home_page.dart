@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 
 import '../core/services/deepl_translator.dart';
@@ -39,6 +40,11 @@ class _HomePageState extends State<HomePage> {
   final ValueNotifier<bool> isAllLanguagesToggledNotifier =
       ValueNotifier<bool>(false);
   late TabController _tabController;
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
+  bool _isBannerAdLoadedOnce = false;
+
+
 
   @override
   void initState() {
@@ -53,12 +59,64 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+    void didChangeDependencies() {
+      super.didChangeDependencies();
+      if (!_isBannerAdLoadedOnce) {
+        _loadBannerAd();
+        _isBannerAdLoadedOnce = true;
+      }
+    }
+
+  @override
   void dispose() {
     _tabController.removeListener(_onTabChange);
     _tabController.dispose();
     isAllLanguagesToggledNotifier.dispose(); // Dispose du notifier
+    _bannerAd?.dispose();
     super.dispose();
   }
+
+  bool _shouldShowBannerAd() {
+    return !kIsWeb &&
+          (Platform.isAndroid || Platform.isIOS) &&
+          !widget.isSubscribed;
+  }
+
+
+  void _loadBannerAd() async {
+    if (!_shouldShowBannerAd()) return;
+
+    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+      MediaQuery.of(context).size.width.truncate(),
+    );
+
+    if (size == null) {
+      debugPrint('Unable to get banner ad size.');
+      return;
+    }
+
+    final ad = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/9214589741', // ID de test
+      request: const AdRequest(),
+      size: size,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          debugPrint("Ad loaded.");
+          setState(() {
+            _bannerAd = ad as BannerAd;
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint("Ad failed to load: $error");
+          ad.dispose();
+        },
+      ),
+    );
+
+    ad.load();
+  }
+
 
   void _onTabChange() {
     if (_tabController.indexIsChanging) {
@@ -194,26 +252,40 @@ class _HomePageState extends State<HomePage> {
               ),
           ],
         ),
-        body: TabBarView(
+        body: Column(
           children: [
-            TranslateTab(
-              flashcardsCollection: widget.flashcardsCollection,
-              deeplTranslator: widget.deeplTranslator,
-              addRow: dataTableTabFunction,
-              updateQuestionText: reviewTabFunction,
-            ),
-            ReviewTab(
-              flashcardsCollection: widget.flashcardsCollection,
-              key: reviewTabKey,
-              isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
-            ),
-            DataTableTab(
-              flashcardsCollection: widget.flashcardsCollection,
-              key: dataTableTabKey,
-              updateQuestionText: reviewTabFunction,
-              isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
+            if (_isAdLoaded && _bannerAd != null && _shouldShowBannerAd())
+              SafeArea(
+                child: SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ),
+            Expanded(child: 
+              TabBarView(
+                children: [
+                  TranslateTab(
+                    flashcardsCollection: widget.flashcardsCollection,
+                    deeplTranslator: widget.deeplTranslator,
+                    addRow: dataTableTabFunction,
+                    updateQuestionText: reviewTabFunction,
+                  ),
+                  ReviewTab(
+                    flashcardsCollection: widget.flashcardsCollection,
+                    key: reviewTabKey,
+                    isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
+                  ),
+                  DataTableTab(
+                    flashcardsCollection: widget.flashcardsCollection,
+                    key: dataTableTabKey,
+                    updateQuestionText: reviewTabFunction,
+                    isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
+                  )
+                ],
+              ),
             )
-          ],
+          ]
         ),
         bottomNavigationBar: const TabBar(
           tabs: [
