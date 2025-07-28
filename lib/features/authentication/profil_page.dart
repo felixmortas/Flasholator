@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'widgets/change_password_dialog.dart';
 import '../../core/services/subscription_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'unsubscribe_page.dart';
+import '../../core/services/consent_manager.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,11 +19,20 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late Future<DocumentSnapshot> _subscriptionFuture;
+  bool _showPrivacyButton = false;
 
   @override
   void initState() {
     super.initState();
     _subscriptionFuture = _loadSubscription();
+    _checkPrivacyOptionsRequirement();
+  }
+
+  Future<void> _checkPrivacyOptionsRequirement() async {
+    final required = await ConsentManager.isPrivacyOptionsRequired();
+    setState(() {
+      _showPrivacyButton = required;
+    });
   }
 
   Future<void> _handleSubscriptionAction({
@@ -213,7 +224,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void updateConsent() async {
-    print("");
+    ConsentForm.showPrivacyOptionsForm((formError) {
+      if (formError != null) {
+        debugPrint("${formError.errorCode}: ${formError.message}");
+      }
+    });
   }
 
   @override
@@ -269,23 +284,24 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Text(isSubscribed ? AppLocalizations.of(context)!.cancelSubscription : AppLocalizations.of(context)!.activateSubscription),
               ),       
               const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => updateConsent(),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size(0, 30),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  alignment: Alignment.centerLeft,
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.modifyPrivacyPreferences,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    decoration: TextDecoration.underline,
+              if (_showPrivacyButton)
+                TextButton(
+                  onPressed: () => updateConsent(),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size(0, 30),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    alignment: Alignment.centerLeft,
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.modifyPrivacyPreferences,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
-              ),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: () => _signOut(context),

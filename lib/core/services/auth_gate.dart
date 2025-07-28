@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../features/authentication/login_page.dart';
 import '../../features/home_page.dart';
 import '../../features/authentication/email_verification_pending_page.dart';
 import 'subscription_service.dart';
+import 'consent_manager.dart';
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   final dynamic flashcardsCollection;
   final dynamic deeplTranslator;
 
@@ -14,6 +16,17 @@ class AuthGate extends StatelessWidget {
     required this.flashcardsCollection,
     required this.deeplTranslator,
   });
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  @override
+  void initState() {
+    super.initState();
+    ConsentManager.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +49,12 @@ class AuthGate extends StatelessWidget {
 
               final isSubscribed = subSnapshot.data ?? false;
               return HomePage(
-                flashcardsCollection: flashcardsCollection,
-                deeplTranslator: deeplTranslator,
+                flashcardsCollection: widget.flashcardsCollection,
+                deeplTranslator: widget.deeplTranslator,
                 isSubscribed: isSubscribed,
               );
             },
-          );        
+          );
         } else if (user != null && !user.emailVerified) {
           return const EmailVerificationPendingPage();
         }
