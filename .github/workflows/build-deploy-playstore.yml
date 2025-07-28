@@ -14,8 +14,6 @@ env:
   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
   STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
 
-
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,21 +38,6 @@ jobs:
     - name: Decode Keystore
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
-
-    - name: Build APK
-      run: |
-        flutter build apk --release --split-per-abi \
-          --build-number=${{ env.BUILD_NUMBER }} \
-          --build-name=${{ env.BUILD_NAME }}
-
-    - name: Create Release
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: "build/app/outputs/flutter-apk/*.apk"
-        tag: v${{ env.BUILD_NAME }}
-        name: Release v${{ env.BUILD_NAME }}
-        body: New release for version ${{ env.BUILD_NAME }}
-        token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Build AAB
       run: |
