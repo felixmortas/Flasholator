@@ -6,6 +6,7 @@ import 'package:user_messaging_platform/user_messaging_platform.dart';
 import 'widgets/change_password_dialog.dart';
 import '../../core/services/subscription_service.dart';
 import '../../l10n/app_localizations.dart';
+import 'unsubscribe_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -30,7 +31,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-
     final service = SubscriptionService();
     final now = DateTime.now();
 
@@ -41,32 +41,29 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     } else {
       final rawEndDate = subscriptionData?['subscriptionEndDate'];
-
-      // S'il y a une date de fin future → proposer résiliation
       if (rawEndDate == null || DateTime.tryParse(rawEndDate)?.isAfter(now) == true) {
-        final confirm = await _showConfirmationDialog(
+        Navigator.push(
           context,
-          title: AppLocalizations.of(context)!.cancelSubscription,
-          content:
-              AppLocalizations.of(context)!.confirmCancelSubscription,
+          MaterialPageRoute(
+            builder: (context) => UnsubscribePage(
+              onUnsubscribe: () async {
+                final endDate = now.add(const Duration(days: 30));
+                await service.removeSubscription(uid);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${AppLocalizations.of(context)!.subscriptionCancelled} ${_formatDate(endDate)}')),
+                );
+                _refreshSubscription();
+              },
+            ),
+          ),
         );
-        if (confirm) {
-          final endDate = now.add(const Duration(days: 30));
-          // await service.cancelSubscription(uid, endDate); // Production mode
-          await service.removeSubscription(uid); // Dev mode
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${AppLocalizations.of(context)!.subscriptionCancelled} : ${_formatDate(endDate)}')),
-          );
-        }
       } else {
-        // Abonnement expiré → réactivation
         await service.markUserAsSubscribed(uid);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionReactivated)),
         );
       }
     }
-
     _refreshSubscription();
   }
 
@@ -115,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : ${e.message}')),
+        SnackBar(content: Text('${AppLocalizations.of(context)!.error} ${e.message}')),
       );
     }
   }
@@ -242,7 +239,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final subscriptionData = snapshot.data?.data() as Map<String, dynamic>?;
 
       String abonnementLabel = isSubscribed ? AppLocalizations.of(context)!.premium : AppLocalizations.of(context)!.free;
-      String renouvellementLabel = 'N/A';
+      String renouvellementLabel = '';
 
       if (isSubscribed) {
         final endDate = subscriptionData?['subscriptionEndDate'];

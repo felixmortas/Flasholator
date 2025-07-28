@@ -9,6 +9,67 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get unsubscribe => 'Désabonnement';
+
+  @override
+  String get reconsiderMessage =>
+      'Réfléchissez encore un peu, nous serions ravis de continuer ce voyage avec vous !';
+
+  @override
+  String get premiumBenefits =>
+      'Avec Flasholator Premium, vous bénéficiez d\'une expérience d\'apprentissage unique :';
+
+  @override
+  String get benefit1 => 'Pas de publicités';
+
+  @override
+  String get benefit2 => 'Pas de limite de traduction';
+
+  @override
+  String get benefit3 => 'Pas de limite de cartes dans votre jeu';
+
+  @override
+  String get benefit4 => 'Pas de limite de couples de langues';
+
+  @override
+  String get benefit5 => 'Révisions à l\'écrit';
+
+  @override
+  String get benefit6 => 'Grouper les mots par catégorie';
+
+  @override
+  String get benefit7 =>
+      'Synchronisation régulière des données sur votre Google Drive';
+
+  @override
+  String get unsubscribeAction => 'Se désabonner';
+
+  @override
+  String get sorryToSeeYouGo =>
+      'Nous sommes vraiment désolés de vous voir partir ! Avant de nous quitter, pourriez-vous nous dire ce qui vous pousse à nous quitter ? Votre avis est précieux pour nous améliorer.';
+
+  @override
+  String get selectReason => 'Sélectionnez une raison';
+
+  @override
+  String get reason1 => 'Trop cher';
+
+  @override
+  String get reason2 => 'Je ne l\'utilise pas assez';
+
+  @override
+  String get reason3 => 'Problèmes techniques';
+
+  @override
+  String get reason4 => 'Autre';
+
+  @override
+  String get additionalFeedback => 'Feedback supplémentaire';
+
+  @override
+  String get feedbackPlaceholder => 'Entrez votre feedback ici...';
+
+  @override
   String get allFieldsRequired => 'Tous les champs sont obligatoires.';
 
   @override

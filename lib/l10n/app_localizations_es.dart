@@ -9,6 +9,66 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get unsubscribe => 'Cancelar suscripción';
+
+  @override
+  String get reconsiderMessage =>
+      'Piensa de nuevo, ¡nos encantaría continuar este viaje contigo!';
+
+  @override
+  String get premiumBenefits =>
+      'Con Flasholator Premium, disfrutas de una experiencia de aprendizaje única:';
+
+  @override
+  String get benefit1 => 'Sin publicidad';
+
+  @override
+  String get benefit2 => 'Sin límites de traducción';
+
+  @override
+  String get benefit3 => 'Sin límite de tarjetas en tu juego';
+
+  @override
+  String get benefit4 => 'Sin límite de pares de idiomas';
+
+  @override
+  String get benefit5 => 'Repasos escritos';
+
+  @override
+  String get benefit6 => 'Agrupar palabras por categoría';
+
+  @override
+  String get benefit7 => 'Sincronización regular de datos en tu Google Drive';
+
+  @override
+  String get unsubscribeAction => 'Cancelar suscripción';
+
+  @override
+  String get sorryToSeeYouGo =>
+      '¡Lamentamos mucho verte ir! Antes de irte, ¿podrías decirnos qué te lleva a dejarnos? Tu opinión es valiosa para mejorar.';
+
+  @override
+  String get selectReason => 'Selecciona una razón';
+
+  @override
+  String get reason1 => 'Demasiado caro';
+
+  @override
+  String get reason2 => 'No lo uso lo suficiente';
+
+  @override
+  String get reason3 => 'Problemas técnicos';
+
+  @override
+  String get reason4 => 'Otro';
+
+  @override
+  String get additionalFeedback => 'Comentarios adicionales';
+
+  @override
+  String get feedbackPlaceholder => 'Ingresa tus comentarios aquí...';
+
+  @override
   String get allFieldsRequired => 'Todos los campos son obligatorios.';
 
   @override

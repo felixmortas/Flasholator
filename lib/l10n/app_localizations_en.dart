@@ -9,6 +9,66 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get unsubscribe => 'Unsubscribe';
+
+  @override
+  String get reconsiderMessage =>
+      'Think again, we would be delighted to continue this journey with you!';
+
+  @override
+  String get premiumBenefits =>
+      'With Flasholator Premium, you benefit from a unique learning experience:';
+
+  @override
+  String get benefit1 => 'No advertisements';
+
+  @override
+  String get benefit2 => 'No translation limits';
+
+  @override
+  String get benefit3 => 'No limit on cards in your game';
+
+  @override
+  String get benefit4 => 'No limit on language pairs';
+
+  @override
+  String get benefit5 => 'Written reviews';
+
+  @override
+  String get benefit6 => 'Group words by category';
+
+  @override
+  String get benefit7 => 'Regular data synchronization on your Google Drive';
+
+  @override
+  String get unsubscribeAction => 'Unsubscribe';
+
+  @override
+  String get sorryToSeeYouGo =>
+      'We are really sorry to see you go! Before you leave, could you tell us what is driving you to leave? Your feedback is valuable for us to improve.';
+
+  @override
+  String get selectReason => 'Select a reason';
+
+  @override
+  String get reason1 => 'Too expensive';
+
+  @override
+  String get reason2 => 'I don\'t use it enough';
+
+  @override
+  String get reason3 => 'Technical problems';
+
+  @override
+  String get reason4 => 'Other';
+
+  @override
+  String get additionalFeedback => 'Additional feedback';
+
+  @override
+  String get feedbackPlaceholder => 'Enter your feedback here...';
+
+  @override
   String get allFieldsRequired => 'All fields are required.';
 
   @override

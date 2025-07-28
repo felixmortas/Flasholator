@@ -100,6 +100,120 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @unsubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsubscribe'**
+  String get unsubscribe;
+
+  /// No description provided for @reconsiderMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Think again, we would be delighted to continue this journey with you!'**
+  String get reconsiderMessage;
+
+  /// No description provided for @premiumBenefits.
+  ///
+  /// In en, this message translates to:
+  /// **'With Flasholator Premium, you benefit from a unique learning experience:'**
+  String get premiumBenefits;
+
+  /// No description provided for @benefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'No advertisements'**
+  String get benefit1;
+
+  /// No description provided for @benefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'No translation limits'**
+  String get benefit2;
+
+  /// No description provided for @benefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'No limit on cards in your game'**
+  String get benefit3;
+
+  /// No description provided for @benefit4.
+  ///
+  /// In en, this message translates to:
+  /// **'No limit on language pairs'**
+  String get benefit4;
+
+  /// No description provided for @benefit5.
+  ///
+  /// In en, this message translates to:
+  /// **'Written reviews'**
+  String get benefit5;
+
+  /// No description provided for @benefit6.
+  ///
+  /// In en, this message translates to:
+  /// **'Group words by category'**
+  String get benefit6;
+
+  /// No description provided for @benefit7.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular data synchronization on your Google Drive'**
+  String get benefit7;
+
+  /// No description provided for @unsubscribeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsubscribe'**
+  String get unsubscribeAction;
+
+  /// No description provided for @sorryToSeeYouGo.
+  ///
+  /// In en, this message translates to:
+  /// **'We are really sorry to see you go! Before you leave, could you tell us what is driving you to leave? Your feedback is valuable for us to improve.'**
+  String get sorryToSeeYouGo;
+
+  /// No description provided for @selectReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a reason'**
+  String get selectReason;
+
+  /// No description provided for @reason1.
+  ///
+  /// In en, this message translates to:
+  /// **'Too expensive'**
+  String get reason1;
+
+  /// No description provided for @reason2.
+  ///
+  /// In en, this message translates to:
+  /// **'I don\'t use it enough'**
+  String get reason2;
+
+  /// No description provided for @reason3.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical problems'**
+  String get reason3;
+
+  /// No description provided for @reason4.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get reason4;
+
+  /// No description provided for @additionalFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional feedback'**
+  String get additionalFeedback;
+
+  /// No description provided for @feedbackPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your feedback here...'**
+  String get feedbackPlaceholder;
+
   /// No description provided for @allFieldsRequired.
   ///
   /// In en, this message translates to:
