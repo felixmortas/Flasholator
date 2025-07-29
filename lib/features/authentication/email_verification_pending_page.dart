@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../core/services/subscription_service.dart';
 
 class EmailVerificationPendingPage extends StatefulWidget {
   const EmailVerificationPendingPage({super.key});
@@ -46,6 +47,7 @@ class _EmailVerificationPendingPageState extends State<EmailVerificationPendingP
 
       if (refreshedUser!.emailVerified) {
         if (mounted) {
+          SubscriptionService.registerUser(user.uid);
           Navigator.pushReplacementNamed(context, "/"); // Retour vers AuthGate
         }
       } else {

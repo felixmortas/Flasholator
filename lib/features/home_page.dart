@@ -16,18 +16,19 @@ import 'translation/translate_tab.dart';
 import 'review/review_tab.dart';
 import 'data/data_table_tab.dart';
 import 'shared/widgets/settings_dialog.dart';
-import 'authentication/profil_page.dart';
+import 'authentication/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
   final DeeplTranslator deeplTranslator;
-  final bool isSubscribed;
+  final User user;
+
 
   const HomePage({
     Key? key,
     required this.flashcardsCollection,
     required this.deeplTranslator,
-    required this.isSubscribed,
+    required this.user,
   }) : super(key: key);
 
   @override
@@ -78,8 +79,7 @@ class _HomePageState extends State<HomePage> {
 
   bool _shouldShowBannerAd() {
     return !kIsWeb &&
-          (Platform.isAndroid || Platform.isIOS) &&
-          !widget.isSubscribed;
+          (Platform.isAndroid || Platform.isIOS);
   }
 
 
@@ -239,7 +239,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () => {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ProfilePage()),
+                  MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
                 )
               },
             ),
