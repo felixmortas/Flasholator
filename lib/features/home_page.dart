@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     final ad = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/9214589741', // ID de test
+      adUnitId: 'ca-app-pub-9706580094748746/7892523530', // 'ca-app-pub-3940256099942544/9214589741', // ID de test
       request: const AdRequest(),
       size: size,
       listener: BannerAdListener(

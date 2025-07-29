@@ -47,10 +47,10 @@
         </activity>
 
         <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
-        <!-- My AdMob app ID: ca-app-pub-9706580094748746/7892523530 -->
+        <!-- My AdMob app ID: ca-app-pub-9706580094748746~7192867142 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"
+            android:value="ca-app-pub-9706580094748746~7192867142"
         />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
