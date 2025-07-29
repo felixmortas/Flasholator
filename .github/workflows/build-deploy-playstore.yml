@@ -31,16 +31,6 @@ jobs:
       with:
         flutter-version: '3.32.5'
         channel: 'stable'
-
-    - name: Clean Gradle Cache
-      run: rm -rf ~/.gradle/caches/
-
-    - name: Clean Flutter
-      run: flutter clean
-
-
-    - name: Set Gradle Heap Size
-      run: echo "GRADLE_OPTS=-Xmx4096m" >> $GITHUB_ENV
     
     - name: Get dependencies
       run: flutter pub get
