@@ -1,5 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// subscription_service.dart
 import 'package:intl/intl.dart';
+import 'firestore_users_dao.dart';
+import 'user_preferences_service.dart';
+import 'local_user_data_notifier.dart';
 
 class SubscriptionStatus {
   final bool isSubscribed;
@@ -9,34 +12,37 @@ class SubscriptionStatus {
 }
 
 class SubscriptionService {
-  static final _firestore = FirebaseFirestore.instance;
+  static final FirestoreUsersDAO _firestoreDAO = FirestoreUsersDAO();
 
   static Future<void> registerUser(String uid) async {
-    final userDoc = _firestore.collection('users').doc(uid);
-    final doc = await userDoc.get();
-
-    if (!doc.exists) {
-      await userDoc.set({
-        'isSubscribed': false,
-        'canTranslate': true,
-        'subscriptionDate': null,
-        'subscriptionEndDate': null,
-      });
-    }
+    await _firestoreDAO.registerUser(uid);
+    
+    // Charger les données utilisateur et mettre à jour le notifier
+    final userData = await UserPreferencesService.loadUserData();
+    LocalUserDataNotifier.updateUserData(userData);
   }
 
   static Future<void> banTranslation(String uid) async {
-    await _firestore
-        .collection('users')
-        .doc(uid)
-        .update({'canTranslate': false});
+    await _firestoreDAO.banTranslation(uid);
+    
+    // Mettre à jour localement
+    await UserPreferencesService.banTranslation();
+    
+    // Mettre à jour le notifier
+    LocalUserDataNotifier.updateUserData({'canTranslate': false});
   }
 
   static Future<void> subscribeUser(String uid) async {
     final now = DateTime.now();
     final dateStr = DateFormat('yyyy-MM-dd').format(now);
 
-    await _firestore.collection('users').doc(uid).update({
+    await _firestoreDAO.subscribeUser(uid, dateStr);
+    
+    // Mettre à jour localement
+    await UserPreferencesService.subscribeUser(dateStr);
+    
+    // Mettre à jour le notifier
+    LocalUserDataNotifier.updateUserData({
       'isSubscribed': true,
       'subscriptionDate': dateStr,
       'subscriptionEndDate': null,
@@ -72,7 +78,16 @@ class SubscriptionService {
 
     final expirationStr = DateFormat('yyyy-MM-dd').format(expirationDate);
 
-    await _firestore.collection('users').doc(uid).update({
+    await _firestoreDAO.scheduleSubscriptionRevocation(
+      uid: uid,
+      expirationStr: expirationStr,
+    );
+    
+    // Mettre à jour localement
+    await UserPreferencesService.scheduleSubscriptionRevocation(expirationStr);
+    
+    // Mettre à jour le notifier
+    LocalUserDataNotifier.updateUserData({
       'subscriptionEndDate': expirationStr,
     });
   }
@@ -88,7 +103,13 @@ class SubscriptionService {
     if (endDate == null) return;
 
     if (now.isAfter(endDate)) {
-      await _firestore.collection('users').doc(uid).update({
+      await _firestoreDAO.revokeSubscription(uid);
+      
+      // Mettre à jour localement
+      await UserPreferencesService.revokeSubscription();
+      
+      // Mettre à jour le notifier
+      LocalUserDataNotifier.updateUserData({
         'isSubscribed': false,
         'subscriptionEndDate': null,
       });
@@ -96,9 +117,14 @@ class SubscriptionService {
   }
 
   static Future<void> deleteUser(String uid) async {
-    await _firestore.collection('users').doc(uid).delete();
+    await _firestoreDAO.deleteUser(uid);
+    
+    // Supprimer localement
+    await UserPreferencesService.deleteUser();
+    
+    // Mettre à jour le notifier
+    LocalUserDataNotifier.clearUserData();
   }
-
 
   static Future<Map<String, dynamic>> handleUserStatus(
     String uid,
@@ -111,16 +137,52 @@ class SubscriptionService {
     if (endDateStr != null && isSubscribed) {
       final endDate = DateTime.tryParse(endDateStr);
       if (endDate != null && now.isAfter(endDate)) {
-        await _firestore.collection('users').doc(uid).update({
-          'isSubscribed': false,
-          'subscriptionEndDate': null,
-        });
+        await _firestoreDAO.revokeSubscription(uid);
 
         userData['isSubscribed'] = false;
         userData['subscriptionEndDate'] = null;
+        
+        // Mettre à jour localement
+        await UserPreferencesService.revokeSubscription();
+        
+        // Mettre à jour le notifier
+        LocalUserDataNotifier.updateUserData({
+          'isSubscribed': false,
+          'subscriptionEndDate': null,
+        });
       }
     }
 
     return userData;
+  }
+
+  // Méthodes utilitaires pour la gestion locale
+  static Future<void> saveUserFieldsLocally(Map<String, dynamic> fields) async {
+    await UserPreferencesService.saveUserFieldsLocally(fields);
+    
+    // Mettre à jour le notifier avec les champs modifiés
+    LocalUserDataNotifier.updateUserData(fields);
+  }
+
+  static Future<void> loadUserData() async {
+    final userData = await UserPreferencesService.loadUserData();
+    
+    // Mettre à jour le notifier
+    LocalUserDataNotifier.updateUserData(userData);
+  }
+
+  static Future<bool> isUserDataCached() async {
+    return await UserPreferencesService.isUserDataCached();
+  }
+
+  static Map<String, dynamic> getCurrentUserData() {
+    return LocalUserDataNotifier.userDataNotifier.value;
+  }
+  
+  // Nouvelle méthode pour mettre à jour dynamiquement les données utilisateur
+  static Future<void> updateUser(String uid, Map<String, dynamic> data) async {
+    await _firestoreDAO.updateUser(uid, data);
+    await UserPreferencesService.updateUser(data);
+    LocalUserDataNotifier.updateUserData(data);
   }
 }

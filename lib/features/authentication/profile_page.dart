@@ -11,6 +11,7 @@ import '../../core/services/user_preferences_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'unsubscribe_page.dart';
 import '../../core/services/consent_manager.dart';
+import 'package:flasholator/core/services/local_user_data_notifier.dart';
 
 class ProfilePage extends StatefulWidget {
   final User user;
@@ -295,7 +296,7 @@ class _ProfilePageState extends State<ProfilePage> {
         }
 
         return ValueListenableBuilder<Map<String, dynamic>>(
-          valueListenable: UserPreferencesService.userDataNotifier,
+          valueListenable: LocalUserDataNotifier.userDataNotifier,
           builder: (context, userData, _) {
             final isSubscribed = userData['isSubscribed'] ?? false;
             final endDateStr = userData['subscriptionEndDate'];
