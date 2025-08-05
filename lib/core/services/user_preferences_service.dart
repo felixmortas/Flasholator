@@ -9,7 +9,7 @@ class UserPreferencesService {
   static const _userDataCachedKey = 'userDataCached';
 
   /// Enregistre les champs utilisateur localement
-  static Future<void> saveUserFieldsLocally(Map<String, dynamic> fields) async {
+  static Future<void> updateUser(Map<String, dynamic> fields) async {
     final prefs = await SharedPreferences.getInstance();
 
     for (final entry in fields.entries) {
@@ -53,37 +53,7 @@ class UserPreferencesService {
 
   /// Active la traduction pour l'utilisateur
   static Future<void> enableTranslation() async {
-    await saveUserFieldsLocally({'canTranslate': true});
-  }
-
-  /// Désactive la traduction pour l'utilisateur
-  static Future<void> banTranslation() async {
-    await saveUserFieldsLocally({'canTranslate': false});
-  }
-
-  /// Active l'abonnement de l'utilisateur
-  static Future<void> subscribeUser(String dateStr) async {
-    await saveUserFieldsLocally({
-      'isSubscribed': true,
-      'subscriptionDate': dateStr,
-      'subscriptionEndDate': null,
-      'canTranslate': true,
-    });
-  }
-
-  /// Planifie la fin de l’abonnement
-  static Future<void> scheduleSubscriptionRevocation(String expirationStr) async {
-    await saveUserFieldsLocally({
-      'subscriptionEndDate': expirationStr,
-    });
-  }
-
-  /// Révoque l'abonnement
-  static Future<void> revokeSubscription() async {
-    await saveUserFieldsLocally({
-      'isSubscribed': false,
-      'subscriptionEndDate': null,
-    });
+    await updateUser({'canTranslate': true});
   }
 
   /// Supprime toutes les données utilisateur enregistrées localement
@@ -94,11 +64,6 @@ class UserPreferencesService {
     await prefs.remove(_subscriptionDateKey);
     await prefs.remove(_subscriptionEndDateKey);
     await prefs.setBool(_userDataCachedKey, false);
-  }
-
-  /// Met à jour dynamiquement les données utilisateur
-  static Future<void> updateUser(Map<String, dynamic> data) async {
-    await saveUserFieldsLocally(data);
   }
 
   /// Marque les données utilisateur comme étant mises en cache

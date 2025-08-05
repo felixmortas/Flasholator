@@ -95,31 +95,17 @@ class _AuthGateState extends State<AuthGate> {
 
   Future<Widget> _buildUserInitializedHome(User user) async {
     try {
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final userDoc = await SubscriptionService.getUserFromFirestore(user.uid);
 
       if (!userDoc.exists) {
-        try {
-          final now = DateTime.now();
-          final dateStr = DateFormat('yyyy-MM-dd').format(now);
-          
-          final Map<String, dynamic> newUserData = {
-            'isSubscribed': false,
-            'subscriptionDate': dateStr,
-            'subscriptionEndDate': null,
-            'canTranslate': true,
-          };
-
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).set(newUserData);
-          await UserPreferencesService.saveUserFieldsLocally(newUserData);
-
+        try {          
+          await SubscriptionService.registerUser(user.uid);
         } catch (e) {
           return const Scaffold(body: Center(child: Text('Profil utilisateur non trouvé.')));
         }
       }
 
-      final userData = userDoc.data() as Map<String, dynamic>;
-      final updatedUserData = await SubscriptionService.handleUserStatus(user.uid, userData);
-      await UserPreferencesService.saveUserFieldsLocally(updatedUserData);
+      SubscriptionService.checkSubscriptionStatus(user.uid);
 
       return HomePage(
         flashcardsCollection: widget.flashcardsCollection,

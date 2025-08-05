@@ -3,15 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'widgets/change_password_dialog.dart';
 import '../../core/services/subscription_service.dart';
-import '../../core/services/user_preferences_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'unsubscribe_page.dart';
 import '../../core/services/consent_manager.dart';
-import 'package:flasholator/core/services/local_user_data_notifier.dart';
 
 class ProfilePage extends StatefulWidget {
   final User user;
@@ -29,11 +26,12 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late Future<DocumentSnapshot> _subscriptionFuture;
   bool _showPrivacyButton = false;
+  // init subscription service
 
   @override
   void initState() {
     super.initState();
-    UserPreferencesService.loadUserData(); // initialise les données locales dans le ValueNotifier
+    SubscriptionService.getUserFromNotifier(widget.user.uid); // initialise les données locales dans le ValueNotifier
     _checkPrivacyOptionsRequirement();
   }
 
@@ -45,23 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadSubscriptionFromLocal() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isSubscribed = prefs.getBool('isSubscribed') ?? false;
-    final canTranslate = prefs.getBool('canTranslate') ?? true;
-    final subscriptionDate = prefs.getString('subscriptionDate');
-    final subscriptionEndDate = prefs.getString('subscriptionEndDate');
-
-    final updatedData = await SubscriptionService.handleUserStatus(
-      widget.user.uid,
-      {
-        'isSubscribed': isSubscribed,
-        'canTranslate': canTranslate,
-        'subscriptionDate': subscriptionDate,
-        'subscriptionEndDate': subscriptionEndDate,
-      },
-    );
-
-    await UserPreferencesService.saveUserFieldsLocally(updatedData);
+    final userData = await SubscriptionService.getUserFromNotifier(widget.user.uid);
 
     setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
   }
@@ -75,12 +57,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (!isSubscribed) {
       await SubscriptionService.subscribeUser(uid);
-      await UserPreferencesService.saveUserFieldsLocally({
-        'isSubscribed': true,
-        'canTranslate': true,
-        'subscriptionDate': DateFormat('yyyy-MM-dd').format(now),
-        'subscriptionEndDate': null,
-      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
@@ -95,11 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onUnsubscribe: () async {
                 await SubscriptionService.scheduleSubscriptionRevocation(
                   uid: uid,
-                  subscriptionDateStr: DateFormat('yyyy-MM-dd').format(now),
                 );
-                await UserPreferencesService.saveUserFieldsLocally({
-                  'subscriptionEndDate': DateFormat('yyyy-MM-dd').format(now.add(Duration(days: 30))),
-                });
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -112,12 +84,6 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       } else {
         await SubscriptionService.subscribeUser(uid);
-        await UserPreferencesService.saveUserFieldsLocally({
-          'isSubscribed': true,
-          'canTranslate': true,
-          'subscriptionDate': DateFormat('yyyy-MM-dd').format(now),
-          'subscriptionEndDate': null,
-        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionReactivated)),
@@ -289,14 +255,14 @@ class _ProfilePageState extends State<ProfilePage> {
     final user = widget.user;
 
     return FutureBuilder<bool>(
-      future: UserPreferencesService.isUserDataCached(),
+      future: SubscriptionService.isUserDataCached(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || !snapshot.data!) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
         return ValueListenableBuilder<Map<String, dynamic>>(
-          valueListenable: LocalUserDataNotifier.userDataNotifier,
+          valueListenable: SubscriptionService.userDataNotifier(),
           builder: (context, userData, _) {
             final isSubscribed = userData['isSubscribed'] ?? false;
             final endDateStr = userData['subscriptionEndDate'];

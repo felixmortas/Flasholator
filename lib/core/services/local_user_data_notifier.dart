@@ -10,7 +10,7 @@ class LocalUserDataNotifier {
     userDataNotifier.value = {};
   }
 
-  static void updateUserData(Map<String, dynamic> data) {
+  static void updateUser(Map<String, dynamic> data) {
     userDataNotifier.value = {...userDataNotifier.value, ...data};
   }
 

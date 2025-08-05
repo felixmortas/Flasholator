@@ -1,4 +1,6 @@
 // subscription_service.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'firestore_users_dao.dart';
 import 'user_preferences_service.dart';
@@ -15,46 +17,42 @@ class SubscriptionService {
   static final FirestoreUsersDAO _firestoreDAO = FirestoreUsersDAO();
 
   static Future<void> registerUser(String uid) async {
-    await _firestoreDAO.registerUser(uid);
-    
-    // Charger les données utilisateur et mettre à jour le notifier
-    final userData = await UserPreferencesService.loadUserData();
-    LocalUserDataNotifier.updateUserData(userData);
+    final userData = {
+      'isSubscribed': false,
+      'canTranslate': true,
+      'subscriptionDate': '',
+      'subscriptionEndDate': '',
+    };
+
+    updateUser(uid, userData);
   }
 
   static Future<void> banTranslation(String uid) async {
-    await _firestoreDAO.banTranslation(uid);
-    
-    // Mettre à jour localement
-    await UserPreferencesService.banTranslation();
-    
-    // Mettre à jour le notifier
-    LocalUserDataNotifier.updateUserData({'canTranslate': false});
+    final updatedData = {'canTranslate': false};
+
+    updateUser(uid, updatedData);
   }
 
   static Future<void> subscribeUser(String uid) async {
     final now = DateTime.now();
     final dateStr = DateFormat('yyyy-MM-dd').format(now);
 
-    await _firestoreDAO.subscribeUser(uid, dateStr);
-    
-    // Mettre à jour localement
-    await UserPreferencesService.subscribeUser(dateStr);
-    
-    // Mettre à jour le notifier
-    LocalUserDataNotifier.updateUserData({
+    final updatedData = {
       'isSubscribed': true,
       'subscriptionDate': dateStr,
-      'subscriptionEndDate': null,
+      'subscriptionEndDate': '',
       'canTranslate': true,
-    });
+    };
+
+    updateUser(uid, updatedData);
   }
 
   static Future<void> scheduleSubscriptionRevocation({
     required String uid,
-    required String? subscriptionDateStr,
   }) async {
-    if (subscriptionDateStr == null) return;
+    final userData = LocalUserDataNotifier.userDataNotifier.value;
+    final subscriptionDateStr = userData['subscriptionDate'] as String?;
+    if (subscriptionDateStr == null || subscriptionDateStr.isEmpty) return;
 
     final subscriptionDate = DateTime.tryParse(subscriptionDateStr);
     if (subscriptionDate == null) return;
@@ -78,111 +76,91 @@ class SubscriptionService {
 
     final expirationStr = DateFormat('yyyy-MM-dd').format(expirationDate);
 
-    await _firestoreDAO.scheduleSubscriptionRevocation(
-      uid: uid,
-      expirationStr: expirationStr,
-    );
-    
-    // Mettre à jour localement
-    await UserPreferencesService.scheduleSubscriptionRevocation(expirationStr);
-    
-    // Mettre à jour le notifier
-    LocalUserDataNotifier.updateUserData({
+    final updatedData = {
       'subscriptionEndDate': expirationStr,
-    });
+    };
+
+    updateUser(uid, updatedData);
   }
 
   static Future<void> revokeSubscription({
     required String uid,
-    required String? subscriptionEndDate,
   }) async {
-    if (subscriptionEndDate == null) return;
+    final userData = LocalUserDataNotifier.userDataNotifier.value;
+    final subscriptionEndDate = userData['subscriptionEndDate'] as String?;
+    if (subscriptionEndDate == null || subscriptionEndDate.isEmpty) return;
 
     final now = DateTime.now();
     final endDate = DateTime.tryParse(subscriptionEndDate);
     if (endDate == null) return;
 
     if (now.isAfter(endDate)) {
-      await _firestoreDAO.revokeSubscription(uid);
-      
-      // Mettre à jour localement
-      await UserPreferencesService.revokeSubscription();
-      
-      // Mettre à jour le notifier
-      LocalUserDataNotifier.updateUserData({
+      final updatedData = {
         'isSubscribed': false,
         'subscriptionEndDate': null,
-      });
+      };
+
+      updateUser(uid, updatedData);
     }
   }
 
   static Future<void> deleteUser(String uid) async {
     await _firestoreDAO.deleteUser(uid);
-    
-    // Supprimer localement
     await UserPreferencesService.deleteUser();
-    
-    // Mettre à jour le notifier
     LocalUserDataNotifier.clearUserData();
   }
 
-  static Future<Map<String, dynamic>> handleUserStatus(
+  static Future<void> checkSubscriptionStatus(
     String uid,
-    Map<String, dynamic> userData,
   ) async {
+    final userData = LocalUserDataNotifier.userDataNotifier.value;
+
     final now = DateTime.now();
     final endDateStr = userData['subscriptionEndDate'];
     final isSubscribed = userData['isSubscribed'] ?? false;
 
-    if (endDateStr != null && isSubscribed) {
+    if (endDateStr != '' && isSubscribed) {
       final endDate = DateTime.tryParse(endDateStr);
       if (endDate != null && now.isAfter(endDate)) {
-        await _firestoreDAO.revokeSubscription(uid);
-
-        userData['isSubscribed'] = false;
-        userData['subscriptionEndDate'] = null;
-        
-        // Mettre à jour localement
-        await UserPreferencesService.revokeSubscription();
-        
-        // Mettre à jour le notifier
-        LocalUserDataNotifier.updateUserData({
-          'isSubscribed': false,
-          'subscriptionEndDate': null,
-        });
+        await revokeSubscription(uid: uid);
       }
     }
-
-    return userData;
   }
 
-  // Méthodes utilitaires pour la gestion locale
-  static Future<void> saveUserFieldsLocally(Map<String, dynamic> fields) async {
-    await UserPreferencesService.saveUserFieldsLocally(fields);
-    
-    // Mettre à jour le notifier avec les champs modifiés
-    LocalUserDataNotifier.updateUserData(fields);
+  static Future<Map<String, dynamic>> getUserFromNotifier(String uid) async {
+    final userDoc = LocalUserDataNotifier.userDataNotifier.value;
+    return userDoc;
   }
 
-  static Future<void> loadUserData() async {
-    final userData = await UserPreferencesService.loadUserData();
-    
-    // Mettre à jour le notifier
-    LocalUserDataNotifier.updateUserData(userData);
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore(String uid) async {
+    final userDoc = await _firestoreDAO.getUser(uid);
+    return userDoc;
   }
 
-  static Future<bool> isUserDataCached() async {
-    return await UserPreferencesService.isUserDataCached();
-  }
+  static Future<void> syncUser (String uid) async {
+    final userDoc = await _firestoreDAO.getUser(uid);
+    if (!userDoc.exists) {
+      await registerUser(uid);
+      return;
+    }
 
-  static Map<String, dynamic> getCurrentUserData() {
-    return LocalUserDataNotifier.userDataNotifier.value;
+    final userData = userDoc.data() as Map<String, dynamic>;
+    await UserPreferencesService.updateUser(userData);
+    LocalUserDataNotifier.updateUser(userData);
   }
   
   // Nouvelle méthode pour mettre à jour dynamiquement les données utilisateur
   static Future<void> updateUser(String uid, Map<String, dynamic> data) async {
     await _firestoreDAO.updateUser(uid, data);
     await UserPreferencesService.updateUser(data);
-    LocalUserDataNotifier.updateUserData(data);
+    LocalUserDataNotifier.updateUser(data);
+  }
+
+  static Future<bool> isUserDataCached() async {
+    return UserPreferencesService.isUserDataCached();
+  }
+
+  static ValueNotifier<Map<String, dynamic>> userDataNotifier() {
+    return LocalUserDataNotifier.userDataNotifier;
   }
 }
