@@ -2,7 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class FirestoreUsersDAO {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+
+  FirestoreUsersDAO() : _firestore = FirebaseFirestore.instance;
+
+  // Constructeur pour les tests
+  FirestoreUsersDAO.test(this._firestore);
 
   /// Crée un utilisateur s'il n'existe pas déjà
   Future<void> registerUser(String uid) async {
