@@ -60,7 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    await UserPreferencesService.saveUserDataLocally(updatedData);
+    await UserPreferencesService.saveUserFieldsLocally(updatedData);
 
     setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
   }
@@ -74,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (!isSubscribed) {
       await SubscriptionService.subscribeUser(uid);
-      await UserPreferencesService.saveUserDataLocally({
+      await UserPreferencesService.saveUserFieldsLocally({
         'isSubscribed': true,
         'canTranslate': true,
         'subscriptionDate': DateFormat('yyyy-MM-dd').format(now),
@@ -96,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   uid: uid,
                   subscriptionDateStr: DateFormat('yyyy-MM-dd').format(now),
                 );
-                await UserPreferencesService.saveUserDataLocally({
+                await UserPreferencesService.saveUserFieldsLocally({
                   'subscriptionEndDate': DateFormat('yyyy-MM-dd').format(now.add(Duration(days: 30))),
                 });
 
@@ -111,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       } else {
         await SubscriptionService.subscribeUser(uid);
-        await UserPreferencesService.saveUserDataLocally({
+        await UserPreferencesService.saveUserFieldsLocally({
           'isSubscribed': true,
           'canTranslate': true,
           'subscriptionDate': DateFormat('yyyy-MM-dd').format(now),

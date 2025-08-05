@@ -12,21 +12,43 @@ class UserPreferencesService {
   static final ValueNotifier<Map<String, dynamic>> userDataNotifier =
       ValueNotifier<Map<String, dynamic>>({});
 
-  static Future<void> saveUserDataLocally(Map<String, dynamic> data) async {
+  static Future<void> saveUserFieldsLocally(Map<String, dynamic> fields) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_isSubscribedKey, data['isSubscribed'] ?? false);
-    await prefs.setBool(_canTranslateKey, data['canTranslate'] ?? true);
-    await prefs.setString(_subscriptionDateKey, data['subscriptionDate'] ?? '');
-    await prefs.setString(_subscriptionEndDateKey, data['subscriptionEndDate'] ?? '');
-    await prefs.setBool(_userDataCachedKey, true);
 
-    // ✅ Met à jour le notifier
-    userDataNotifier.value = {
-      'isSubscribed': prefs.getBool(_isSubscribedKey) ?? false,
-      'canTranslate': prefs.getBool(_canTranslateKey) ?? true,
-      'subscriptionDate': prefs.getString(_subscriptionDateKey),
-      'subscriptionEndDate': prefs.getString(_subscriptionEndDateKey),
+    for (final entry in fields.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      if (value is bool) {
+        await prefs.setBool(key, value);
+      } else if (value is String) {
+        await prefs.setString(key, value);
+      } else if (value is int) {
+        await prefs.setInt(key, value);
+      } else if (value is double) {
+        await prefs.setDouble(key, value);
+      } else {
+        throw ArgumentError('Type non supporté pour la clé $key');
+      }
+    }
+
+    // Clés à surveiller pour le notifier
+    const watchedKeys = {
+      _isSubscribedKey,
+      _canTranslateKey,
+      _subscriptionDateKey,
+      _subscriptionEndDateKey,
     };
+
+    // Si au moins une des clés modifiées impacte userDataNotifier
+    if (fields.keys.toSet().intersection(watchedKeys).isNotEmpty) {
+      userDataNotifier.value = {
+        'isSubscribed': prefs.getBool(_isSubscribedKey) ?? false,
+        'canTranslate': prefs.getBool(_canTranslateKey) ?? true,
+        'subscriptionDate': prefs.getString(_subscriptionDateKey),
+        'subscriptionEndDate': prefs.getString(_subscriptionEndDateKey),
+      };
+    }
   }
 
   static Future<void> loadUserData() async {

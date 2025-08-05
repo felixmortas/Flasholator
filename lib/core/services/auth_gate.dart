@@ -110,7 +110,7 @@ class _AuthGateState extends State<AuthGate> {
           };
 
           await FirebaseFirestore.instance.collection('users').doc(user.uid).set(newUserData);
-          await UserPreferencesService.saveUserDataLocally(newUserData);
+          await UserPreferencesService.saveUserFieldsLocally(newUserData);
 
         } catch (e) {
           return const Scaffold(body: Center(child: Text('Profil utilisateur non trouvé.')));
@@ -119,7 +119,7 @@ class _AuthGateState extends State<AuthGate> {
 
       final userData = userDoc.data() as Map<String, dynamic>;
       final updatedUserData = await SubscriptionService.handleUserStatus(user.uid, userData);
-      await UserPreferencesService.saveUserDataLocally(updatedUserData);
+      await UserPreferencesService.saveUserFieldsLocally(updatedUserData);
 
       return HomePage(
         flashcardsCollection: widget.flashcardsCollection,
