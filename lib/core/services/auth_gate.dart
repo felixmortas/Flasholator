@@ -60,28 +60,27 @@ class _AuthGateState extends State<AuthGate> {
                 );
               } else {
                 return FutureBuilder<Widget>(
-  future: _buildUserInitializedHome(user),
-  builder: (context, widgetSnapshot) {
-    if (widgetSnapshot.connectionState == ConnectionState.waiting) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+                  future: _buildUserInitializedHome(user),
+                  builder: (context, widgetSnapshot) {
+                    if (widgetSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                    }
 
-    if (widgetSnapshot.hasError) {
-      return Scaffold(
-        body: Center(child: Text('Une erreur est survenue : ${widgetSnapshot.error}')),
-      );
-    }
+                    if (widgetSnapshot.hasError) {
+                      return Scaffold(
+                        body: Center(child: Text('Une erreur est survenue : ${widgetSnapshot.error}')),
+                      );
+                    }
 
-    if (!widgetSnapshot.hasData || widgetSnapshot.data == null) {
-      return const Scaffold(
-        body: Center(child: Text('Aucune donnée disponible')),
-      );
-    }
+                    if (!widgetSnapshot.hasData || widgetSnapshot.data == null) {
+                      return const Scaffold(
+                        body: Center(child: Text('Aucune donnée disponible')),
+                      );
+                    }
 
-    return widgetSnapshot.data!;
-  },
-);
-
+                    return widgetSnapshot.data!;
+                  },
+                );
               }
             },
           );
