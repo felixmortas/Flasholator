@@ -1,3 +1,4 @@
+import 'package:flasholator/core/services/local_user_data_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
@@ -27,7 +28,7 @@ void main() {
         'subscriptionDate': '2025-08-01',
         'subscriptionEndDate': '2025-09-01',
       };
-      await UserPreferencesService.saveUserFieldsLocally(initialData);
+      await UserPreferencesService.updateUser(initialData);
 
       // Vérification des données initiales
       expect(prefs.getBool('isSubscribed'), true);
@@ -43,7 +44,7 @@ void main() {
         'subscriptionDate': '2025-10-01',
         'subscriptionEndDate': '2025-11-01',
       };
-      await UserPreferencesService.saveUserFieldsLocally(updatedData);
+      await UserPreferencesService.updateUser(updatedData);
 
       // Vérification des données modifiées
       expect(prefs.getBool('isSubscribed'), false);
@@ -56,7 +57,7 @@ void main() {
       final partialUpdate = {
         'canTranslate': false,
       };
-      await UserPreferencesService.saveUserFieldsLocally(partialUpdate);
+      await UserPreferencesService.updateUser(partialUpdate);
 
       // Vérification finale
       expect(prefs.getBool('isSubscribed'), false); // inchangé
@@ -79,7 +80,7 @@ void main() {
 
       await UserPreferencesService.loadUserData();
 
-      final notifierValue = UserPreferencesService.userDataNotifier.value;
+      final notifierValue = LocalUserDataNotifier.userDataNotifier.value;
       expect(notifierValue['isSubscribed'], true);
       expect(notifierValue['canTranslate'], false);
       expect(notifierValue['subscriptionDate'], '2025-08-01');

@@ -34,12 +34,22 @@ void main() {
   });
 
   group('FirestoreUsersDAO', () {
+
+    final userData = <String, dynamic>{
+      'isSubscribed': false,
+      'canTranslate': true,
+      'subscriptionDate': '',
+      'subscriptionEndDate': '',
+    };
+
+    const fakeUid = 'user123';
+
     test('registerUser creates user if not exists', () async {
       when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
       when(() => mockSnapshot.exists).thenReturn(false);
       when(() => mockDocument.set(any())).thenAnswer((_) async {});
 
-      await dao.registerUser('user123');
+      await dao.updateUser(fakeUid, userData);
 
       verify(() => mockDocument.get()).called(1);
       verify(() => mockDocument.set(any())).called(1);
@@ -49,7 +59,7 @@ void main() {
       when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
       when(() => mockSnapshot.exists).thenReturn(true);
 
-      await dao.registerUser('user123');
+      await dao.updateUser(fakeUid, userData);
 
       verify(() => mockDocument.get()).called(1);
       verifyNever(() => mockDocument.set(any()));
@@ -58,7 +68,7 @@ void main() {
     test('banTranslation updates canTranslate to false', () async {
       when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
-      await dao.banTranslation('user123');
+      await dao.updateUser(fakeUid, {'canTranslate': false});
 
       verify(() => mockDocument.update({'canTranslate': false})).called(1);
     });
@@ -66,12 +76,15 @@ void main() {
     test('subscribeUser updates subscription fields', () async {
       when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
-      await dao.subscribeUser('user123', '2025-04-01');
+      await dao.updateUser(fakeUid, {
+        'isSubscribed': true,
+        'subscriptionDate': '2025-04-01',
+      });
 
       verify(() => mockDocument.update({
         'isSubscribed': true,
         'subscriptionDate': '2025-04-01',
-        'subscriptionEndDate': null,
+        'subscriptionEndDate': '',
         'canTranslate': true,
       })).called(1);
     });
@@ -79,10 +92,7 @@ void main() {
     test('scheduleSubscriptionRevocation sets subscriptionEndDate', () async {
       when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
-      await dao.scheduleSubscriptionRevocation(
-        uid: 'user123',
-        expirationStr: '2026-04-01',
-      );
+      await dao.updateUser(fakeUid, {'subscriptionEndDate': '2026-04-01'});
 
       verify(() => mockDocument.update({
         'subscriptionEndDate': '2026-04-01',
@@ -92,18 +102,21 @@ void main() {
     test('revokeSubscription sets isSubscribed to false and clears endDate', () async {
       when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
-      await dao.revokeSubscription('user123');
+      await dao.updateUser(fakeUid, {
+        'isSubscribed': false,
+        'subscriptionEndDate': '',
+      });
 
       verify(() => mockDocument.update({
         'isSubscribed': false,
-        'subscriptionEndDate': null,
+        'subscriptionEndDate': '',
       })).called(1);
     });
 
     test('deleteUser deletes document', () async {
       when(() => mockDocument.delete()).thenAnswer((_) async {});
 
-      await dao.deleteUser('user123');
+      await dao.deleteUser(fakeUid);
 
       verify(() => mockDocument.delete()).called(1);
     });
@@ -111,7 +124,7 @@ void main() {
     test('getUser returns document snapshot', () async {
       when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
 
-      final result = await dao.getUser('user123');
+      final result = await dao.getUser(fakeUid);
 
       expect(result, mockSnapshot);
       verify(() => mockDocument.get()).called(1);
@@ -121,7 +134,7 @@ void main() {
       when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
       final data = {'customField': 'value'};
-      await dao.updateUser('user123', data);
+      await dao.updateUser(fakeUid, data);
 
       verify(() => mockDocument.update(data)).called(1);
     });
