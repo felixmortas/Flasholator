@@ -19,15 +19,11 @@ import 'package:flasholator/features/shared/widgets/settings_dialog.dart';
 import 'package:flasholator/features/authentication/profile_page.dart';
 
 class HomePage extends StatefulWidget {
-  final FlashcardsCollection flashcardsCollection;
-  final DeeplTranslator deeplTranslator;
   final User user;
 
 
   const HomePage({
     Key? key,
-    required this.flashcardsCollection,
-    required this.deeplTranslator,
     required this.user,
   }) : super(key: key);
 
@@ -36,6 +32,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final flashcardsCollection =
+      FlashcardsCollection(); // Create an instance of FlashcardDao
+  final deeplTranslator =
+      DeeplTranslator(); // Create an instance of DeeplTranslator
   final dataTableTabKey = GlobalKey<DataTableTabState>();
   final reviewTabKey = GlobalKey<ReviewTabState>();
   final ValueNotifier<bool> isAllLanguagesToggledNotifier =
@@ -142,12 +142,12 @@ class _HomePageState extends State<HomePage> {
       if (wordToTranslate != null) {
         // Appeler la fonction de traduction
         String translatedWord =
-            await widget.deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
+            await deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
 
         if (wordToTranslate != '' &&
             translatedWord != '' &&
             translatedWord != AppLocalizations.of(context)!.connectionError &&
-            !await widget.flashcardsCollection
+            !await flashcardsCollection
                 .checkIfFlashcardExists(wordToTranslate, translatedWord)) {
           wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
               wordToTranslate.toLowerCase().substring(1);
@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> {
               translatedWord.toLowerCase().substring(1);
         }
 
-        Future<bool> isCardAdded = widget.flashcardsCollection
+        Future<bool> isCardAdded = flashcardsCollection
             .addFlashcard(wordToTranslate, translatedWord, "EN", "FR");
 
         // Confirm that the card was added
@@ -216,7 +216,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (context) => SettingsDialog(
         launchEmail: _launchEmail,
-        flashcardsCollection: widget.flashcardsCollection,
+        flashcardsCollection: flashcardsCollection,
       ),
     );
   }
@@ -266,18 +266,18 @@ class _HomePageState extends State<HomePage> {
               TabBarView(
                 children: [
                   TranslateTab(
-                    flashcardsCollection: widget.flashcardsCollection,
-                    deeplTranslator: widget.deeplTranslator,
+                    flashcardsCollection: flashcardsCollection,
+                    deeplTranslator: deeplTranslator,
                     addRow: dataTableTabFunction,
                     updateQuestionText: reviewTabFunction,
                   ),
                   ReviewTab(
-                    flashcardsCollection: widget.flashcardsCollection,
+                    flashcardsCollection: flashcardsCollection,
                     key: reviewTabKey,
                     isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
                   ),
                   DataTableTab(
-                    flashcardsCollection: widget.flashcardsCollection,
+                    flashcardsCollection: flashcardsCollection,
                     key: dataTableTabKey,
                     updateQuestionText: reviewTabFunction,
                     isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,

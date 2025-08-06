@@ -9,13 +9,9 @@ import 'package:flasholator/features/authentication/email_verification_pending_p
 import 'package:flasholator/core/services/consent_manager.dart';
 
 class AuthGate extends ConsumerStatefulWidget {
-  final dynamic flashcardsCollection;
-  final dynamic deeplTranslator;
 
   const AuthGate({
     super.key,
-    required this.flashcardsCollection,
-    required this.deeplTranslator,
   });
 
   @override
@@ -56,8 +52,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
               if (isCached) {
                 subscriptionService.checkSubscriptionStatus(user.uid);
                 return HomePage(
-                  flashcardsCollection: widget.flashcardsCollection,
-                  deeplTranslator: widget.deeplTranslator,
                   user: user,
                 );
               } else {
@@ -112,8 +106,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
       subscriptionService.checkSubscriptionStatus(user.uid);
 
       return HomePage(
-        flashcardsCollection: widget.flashcardsCollection,
-        deeplTranslator: widget.deeplTranslator,
         user: user,
       );
     } catch (e) {

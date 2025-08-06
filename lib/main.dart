@@ -7,8 +7,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/services/flashcards_collection.dart';
-import 'package:flasholator/core/services/deepl_translator.dart'; 
 import 'package:flasholator/core/models/flashcard_adapter.dart';
 import 'package:flasholator/core/services/auth_gate.dart';
 
@@ -30,16 +28,11 @@ void main() async {
   // Enregistrer l'adapter personnalisé pour Flashcard (si utilisé)
   Hive.registerAdapter(FlashcardAdapter());
 
-  runApp(ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-
-  final flashcardsCollection =
-      FlashcardsCollection(); // Create an instance of FlashcardDao
-  final deeplTranslator =
-      DeeplTranslator(); // Create an instance of DeeplTranslator
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -51,21 +44,18 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      localizationsDelegates: [
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
+      supportedLocales: const [
         Locale('en'), // English
         Locale('fr'), // French
         Locale('es'), // Spanish
       ],
-      home: AuthGate(
-        flashcardsCollection: flashcardsCollection,
-        deeplTranslator: deeplTranslator,
-      ),
+      home: const AuthGate(),
     );
   }
 }
