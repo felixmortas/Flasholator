@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 import '../../features/authentication/login_page.dart';
@@ -44,7 +43,7 @@ class _AuthGateState extends State<AuthGate> {
 
         if (user != null && user.emailVerified) {
           return FutureBuilder<bool>(
-            future: UserPreferencesService.isUserDataCached(),
+            future: SubscriptionService.isUserDataCached(),
             builder: (context, isCachedSnapshot) {
               if (isCachedSnapshot.connectionState == ConnectionState.waiting) {
                 return const Scaffold(body: Center(child: CircularProgressIndicator()));

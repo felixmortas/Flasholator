@@ -97,7 +97,8 @@ class SubscriptionService {
     if (now.isAfter(endDate)) {
       final updatedData = {
         'isSubscribed': false,
-        'subscriptionEndDate': null,
+        'subscriptionDate': '',
+        'subscriptionEndDate': '',
       };
 
       updateUser(uid, updatedData);
@@ -129,8 +130,12 @@ class SubscriptionService {
 
   static Future<Map<String, dynamic>> getUserFromNotifier(String uid) async {
     final userDoc = LocalUserDataNotifier.userDataNotifier.value;
-    return userDoc;
+    if (userDoc.isEmpty) {
+      await syncUser(uid); // assure que c'est bien rempli
+    }
+    return LocalUserDataNotifier.userDataNotifier.value;
   }
+
 
   static Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore(String uid) async {
     final userDoc = await _firestoreDAO.getUser(uid);

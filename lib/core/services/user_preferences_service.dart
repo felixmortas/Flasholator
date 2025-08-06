@@ -51,11 +51,6 @@ class UserPreferencesService {
     return prefs.getBool(_userDataCachedKey) ?? false;
   }
 
-  /// Active la traduction pour l'utilisateur
-  static Future<void> enableTranslation() async {
-    await updateUser({'canTranslate': true});
-  }
-
   /// Supprime toutes les données utilisateur enregistrées localement
   static Future<void> deleteUser() async {
     final prefs = await SharedPreferences.getInstance();

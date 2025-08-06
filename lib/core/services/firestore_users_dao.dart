@@ -9,12 +9,10 @@ class FirestoreUsersDAO {
   // Constructeur pour les tests
   FirestoreUsersDAO.test(this._firestore);
 
-  /// Supprime un utilisateur
   Future<void> deleteUser(String uid) async {
     await _firestore.collection('users').doc(uid).delete();
   }
 
-  /// Récupère les données d'un utilisateur
   Future<DocumentSnapshot<Map<String, dynamic>>> _getUser(String uid) async {
     final snapshot = await _firestore.collection('users').doc(uid).get();
     return snapshot;
