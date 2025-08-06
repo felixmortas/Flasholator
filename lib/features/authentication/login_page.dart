@@ -41,7 +41,11 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 16),
             ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
             TextButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterPage())),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage(
+                initialEmail: emailController.text.trim(),
+                initialPassword: passwordController.text,
+
+              ))),
               child: Text(AppLocalizations.of(context)!.signUp),
             ),
             TextButton(

@@ -4,7 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final String? initialEmail;
+  final String? initialPassword;
+
+  const RegisterPage({super.key, this.initialEmail, this.initialPassword});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -18,6 +21,19 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? errorMessage;
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initialEmail != null) {
+      emailController.text = widget.initialEmail!;
+    }
+    if (widget.initialPassword != null) {
+      passwordController.text = widget.initialPassword!;
+    }
+  }
+
 
   Future<void> register() async {
     final username = usernameController.text.trim();
