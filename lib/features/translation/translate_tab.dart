@@ -35,6 +35,9 @@ class _TranslateTabState extends State<TranslateTab> {
   String _lastTranslatedWord = '';
   String _sourceLanguage = '';
   String _targetLanguage = '';
+  late List<MapEntry<String, String>> sortedLanguageEntries;
+  bool _isInitialized = false;
+
 
   final TextEditingController _controller = TextEditingController();
 
@@ -42,6 +45,16 @@ class _TranslateTabState extends State<TranslateTab> {
   void initState() {
     super.initState();
     _controller.addListener(_updateButtonState);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_isInitialized) {
+      _initializeSortedLanguages();
+      _isInitialized = true;
+    }
   }
 
   @override
@@ -57,6 +70,19 @@ class _TranslateTabState extends State<TranslateTab> {
           _controller.text.isEmpty || _controller.text == _lastTranslatedWord;
     });
   }
+
+  void _initializeSortedLanguages() {
+    sortedLanguageEntries = LANGUAGE_KEYS.entries.toList();
+
+    sortedLanguageEntries.sort((a, b) =>
+      AppLocalizations.of(context)!
+          .getTranslatedLanguageName(a.key)
+          .compareTo(
+            AppLocalizations.of(context)!.getTranslatedLanguageName(b.key),
+          ));
+  }
+
+
 
   void _onLanguageChange(String newValue) {
     setState(() {
@@ -178,37 +204,31 @@ class _TranslateTabState extends State<TranslateTab> {
                         },
                         isExpanded: true,
                         isDense: true,
-                        items: LANGUAGE_KEYS.entries
-                            .map((MapEntry<String, String> entry) {
+                        items: sortedLanguageEntries.map((entry) {
                           return DropdownMenuItem<String>(
                             value: entry.key,
                             onTap: () {
-                              if (languageSelection.sourceLanguage ==
-                                  entry.key) {
+                              if (languageSelection.sourceLanguage == entry.key) {
                                 return;
-                              } else if (languageSelection.sourceLanguage !=
-                                      entry.key ||
-                                  languageSelection.targetLanguage !=
-                                      entry.key) {
+                              } else if (languageSelection.sourceLanguage != entry.key ||
+                                  languageSelection.targetLanguage != entry.key) {
                                 _onLanguageChange(entry.key);
                               }
                             },
-                            enabled:
-                                languageSelection.targetLanguage != entry.key,
+                            enabled: languageSelection.targetLanguage != entry.key,
                             child: Text(
-                              AppLocalizations.of(context)!
-                                  .getTranslatedLanguageName(entry.key),
+                              AppLocalizations.of(context)!.getTranslatedLanguageName(entry.key),
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 18.0,
-                                color: languageSelection.targetLanguage ==
-                                        entry.key
+                                color: languageSelection.targetLanguage == entry.key
                                     ? Colors.grey
                                     : null,
                               ),
                             ),
                           );
                         }).toList(),
+
                       );
                     },
                   ),
@@ -239,37 +259,31 @@ class _TranslateTabState extends State<TranslateTab> {
                         },
                         isExpanded: true,
                         isDense: true,
-                        items: LANGUAGE_KEYS.entries
-                            .map((MapEntry<String, String> entry) {
+                        items: sortedLanguageEntries.map((entry) {
                           return DropdownMenuItem<String>(
                             value: entry.key,
                             onTap: () {
-                              if (languageSelection.targetLanguage ==
-                                  entry.key) {
+                              if (languageSelection.targetLanguage == entry.key) {
                                 return;
-                              } else if (languageSelection.targetLanguage !=
-                                      entry.key ||
-                                  languageSelection.sourceLanguage !=
-                                      entry.key) {
+                              } else if (languageSelection.targetLanguage != entry.key ||
+                                  languageSelection.sourceLanguage != entry.key) {
                                 _onLanguageChange(entry.key);
                               }
                             },
-                            enabled:
-                                languageSelection.sourceLanguage != entry.key,
+                            enabled: languageSelection.sourceLanguage != entry.key,
                             child: Text(
-                              AppLocalizations.of(context)!
-                                  .getTranslatedLanguageName(entry.key),
+                              AppLocalizations.of(context)!.getTranslatedLanguageName(entry.key),
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 18.0,
-                                color: languageSelection.sourceLanguage ==
-                                        entry.key
+                                color: languageSelection.sourceLanguage == entry.key
                                     ? Colors.grey
                                     : null,
                               ),
                             ),
                           );
                         }).toList(),
+
                       );
                     },
                   ),
