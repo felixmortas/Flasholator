@@ -1,3 +1,4 @@
+import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,11 +20,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Future<void> login() async {
     try {
+
       final firebaseAuth = ref.read(firebaseAuthProvider);
       await firebaseAuth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
-      );
+      );      
+
+      final subscriptionService = ref.read(subscriptionServiceProvider);
+      await subscriptionService.syncUser();
+      
     } on Exception catch (e) {
       setState(() => errorMessage = e.toString());
     }
