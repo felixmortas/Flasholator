@@ -68,12 +68,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _handleSubscriptionAction() async {
-    print("Handling subscription action for user: ${widget.user.uid}");
     final uid = widget.user.uid;
     final now = DateTime.now();
     final userData = await SubscriptionService.getUserFromNotifier(uid);
-    print("User data loaded from notifier in _handleSubscriptionAction: ");
-    print('$userData');
 
     if (!userData['isSubscribed']) {
       await SubscriptionService.subscribeUser(uid);
@@ -135,8 +132,8 @@ class _ProfilePageState extends State<ProfilePage> {
     if (!confirmed) return;
 
     try {
-      await FirebaseAuth.instance.currentUser?.delete();
       await SubscriptionService.deleteUser(widget.user.uid);
+      await FirebaseAuth.instance.currentUser?.delete();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
