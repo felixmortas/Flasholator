@@ -62,7 +62,7 @@ class SubscriptionService {
 
     DateTime expirationDate;
 
-    if (now.day <= targetDay) {
+    if (now.day < targetDay) {
       final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
       final safeDay = targetDay > daysInMonth ? daysInMonth : targetDay;
       expirationDate = DateTime(now.year, now.month, safeDay);
