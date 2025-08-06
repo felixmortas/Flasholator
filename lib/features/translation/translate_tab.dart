@@ -71,11 +71,12 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   void _updateButtonState() {
     final canTranslate = ref.read(canTranslateProvider);
+    final isSubscribed = ref.read(isSubscribedProvider);
     setState(() {
       isTranslateButtonDisabled =
           _controller.text.isEmpty || 
           _controller.text == _lastTranslatedWord || 
-          !canTranslate;
+          (!canTranslate && !isSubscribed);
     });
   }
 
