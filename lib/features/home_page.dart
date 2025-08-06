@@ -6,9 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
@@ -19,12 +17,9 @@ import 'package:flasholator/features/shared/widgets/settings_dialog.dart';
 import 'package:flasholator/features/authentication/profile_page.dart';
 
 class HomePage extends StatefulWidget {
-  final User user;
-
 
   const HomePage({
     Key? key,
-    required this.user,
   }) : super(key: key);
 
   @override
@@ -36,16 +31,17 @@ class _HomePageState extends State<HomePage> {
       FlashcardsCollection(); // Create an instance of FlashcardDao
   final deeplTranslator =
       DeeplTranslator(); // Create an instance of DeeplTranslator
+
   final dataTableTabKey = GlobalKey<DataTableTabState>();
   final reviewTabKey = GlobalKey<ReviewTabState>();
+
   final ValueNotifier<bool> isAllLanguagesToggledNotifier =
       ValueNotifier<bool>(false);
   late TabController _tabController;
+
   BannerAd? _bannerAd;
   bool _isAdLoaded = false;
   bool _isBannerAdLoadedOnce = false;
-
-
 
   @override
   void initState() {
@@ -239,7 +235,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () => {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => ProfilePage(user: widget.user)),
+                  MaterialPageRoute(builder: (_) => ProfilePage()),
                 )
               },
             ),

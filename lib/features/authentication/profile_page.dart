@@ -8,15 +8,14 @@ import 'package:flasholator/core/services/subscription_service.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/features/authentication/unsubscribe_page.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
+import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
-  final User user;
 
   const ProfilePage({
     Key? key,
-    required this.user,
   }) : super(key: key);
 
   @override
@@ -37,18 +36,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _initializeUserData() async {
-    final uid = widget.user.uid;
-
     // Vérifie si les données sont déjà en cache
     final isCached = await subscriptionService.isUserDataCached();
 
     if (!isCached) {
       // Récupère depuis Firestore et met à jour le ValueNotifier et SharedPreferences
-      await subscriptionService.syncUser(uid);
+      await subscriptionService.syncUser();
     }
 
     // Optionnel : recharge les données depuis le notifier
-    await subscriptionService.getUserFromNotifier(uid);
+    await subscriptionService.getUserFromNotifier();
 
     // Déclenche un rebuild une fois les données prêtes
     setState(() {});
@@ -63,18 +60,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _loadSubscriptionFromLocal() async {
-    await subscriptionService.getUserFromNotifier(widget.user.uid);
+    await subscriptionService.getUserFromNotifier();
 
     setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
   }
 
   Future<void> _handleSubscriptionAction() async {
-    final uid = widget.user.uid;
     final now = DateTime.now();
-    final userData = await subscriptionService.getUserFromNotifier(uid);
+    final userData = await subscriptionService.getUserFromNotifier();
 
     if (!userData['isSubscribed']) {
-      await subscriptionService.subscribeUser(uid);
+      await subscriptionService.subscribeUser();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
@@ -88,7 +84,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             builder: (context) => UnsubscribePage(
               onUnsubscribe: () async {
                 await subscriptionService.scheduleSubscriptionRevocation(
-                  uid: uid,
                 );
 
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -101,7 +96,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
         );
       } else {
-        await subscriptionService.subscribeUser(uid);
+        await subscriptionService.subscribeUser();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionReactivated)),
@@ -133,7 +128,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (!confirmed) return;
 
     try {
-      await subscriptionService.deleteUser(widget.user.uid);
+      await subscriptionService.deleteUser();
       await FirebaseAuth.instance.currentUser?.delete();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
@@ -249,6 +244,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(firebaseAuthProvider).currentUser;
 
     return FutureBuilder<bool>(
       future: subscriptionService.isUserDataCached(),
@@ -285,7 +281,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _infoRow(AppLocalizations.of(context)!.username,
-                        widget.user.displayName ?? AppLocalizations.of(context)!.undefined),
+                        user!.displayName ?? AppLocalizations.of(context)!.undefined),
                     const SizedBox(height: 16),
                     _infoRow(AppLocalizations.of(context)!.password, '********',
                         action: () => _changePassword(context)),

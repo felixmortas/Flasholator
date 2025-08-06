@@ -1,20 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 
 class SubscriptionService {
-  static final FirestoreUsersDAO _firestoreDAO = FirestoreUsersDAO();
+  final FirestoreUsersDAO _firestoreDAO;
+  final FirebaseAuth _firebaseAuth;
   final Ref ref;
 
-  SubscriptionService(this.ref);
+  SubscriptionService({required this.ref, required FirestoreUsersDAO firestoreDAO, required FirebaseAuth firebaseAuth})
+      : _firestoreDAO = firestoreDAO,
+        _firebaseAuth = firebaseAuth;
+
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
-  Future<void> registerUser(String uid) async {
+  Future<void> registerUser() async {
     final userData = {
       'isSubscribed': false,
       'canTranslate': true,
@@ -22,16 +28,16 @@ class SubscriptionService {
       'subscriptionEndDate': '',
     };
 
-    updateUser(uid, userData);
+    updateUser(userData);
   }
 
-  Future<void> banTranslation(String uid) async {
+  Future<void> banTranslation() async {
     final updatedData = {'canTranslate': false};
 
-    updateUser(uid, updatedData);
+    updateUser(updatedData);
   }
 
-  Future<void> subscribeUser(String uid) async {
+  Future<void> subscribeUser() async {
     final now = DateTime.now();
     final dateStr = DateFormat('yyyy-MM-dd').format(now);
 
@@ -42,12 +48,10 @@ class SubscriptionService {
       'canTranslate': true,
     };
 
-    updateUser(uid, updatedData);
+    updateUser(updatedData);
   }
 
-  Future<void> scheduleSubscriptionRevocation({
-    required String uid,
-  }) async {
+  Future<void> scheduleSubscriptionRevocation() async {
     final subscriptionDateStr = userNotifier.subscriptionDate;
 
     if (subscriptionDateStr.isEmpty) return;
@@ -78,12 +82,10 @@ class SubscriptionService {
       'subscriptionEndDate': expirationStr,
     };
 
-    updateUser(uid, updatedData);
+    updateUser(updatedData);
   }
 
-  Future<void> revokeSubscription({
-    required String uid,
-  }) async {
+  Future<void> revokeSubscription() async {
     final subscriptionEndDate = userNotifier.subscriptionEndDate;
     if (subscriptionEndDate.isEmpty) return;
 
@@ -98,49 +100,54 @@ class SubscriptionService {
         'subscriptionEndDate': '',
       };
 
-      updateUser(uid, updatedData);
+      updateUser(updatedData);
     }
   }
 
-  Future<void> deleteUser(String uid) async {
-    await _firestoreDAO.deleteUser(uid);
-    await UserPreferencesService.deleteUser();
-    userNotifier.clear();
-
+  Future<void> deleteUser() async {
+    final uid = _firebaseAuth.currentUser?.uid;
+    if (uid != null) {
+      await _firestoreDAO.deleteUser(uid);
+      await UserPreferencesService.deleteUser();
+      userNotifier.clear();
+    }
   }
 
   Future<void> checkSubscriptionStatus(
-    String uid,
   ) async {
-    await getUserFromNotifier(uid); // assure le cache
+    await getUserFromNotifier(); // assure le cache
     final now = DateTime.now();
 
     if (userNotifier.subscriptionEndDate != '' &&
         userNotifier.isSubscribed) {
       final endDate = DateTime.tryParse(userNotifier.subscriptionEndDate);
       if (endDate != null && now.isAfter(endDate)) {
-        await revokeSubscription(uid: uid);
+        await revokeSubscription();
       }
     }
   }
 
-  Future<Map<String, dynamic>> getUserFromNotifier(String uid) async {
+  Future<Map<String, dynamic>> getUserFromNotifier() async {
     if (userNotifier.current.isEmpty) {
-      await syncUser(uid); // assure que c'est bien rempli
+      await syncUser(); // assure que c'est bien rempli
     }
     return userNotifier.current;
   }
 
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore(String uid) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore() async {
+    final uid = _firebaseAuth.currentUser!.uid;
+    
     final userDoc = await _firestoreDAO.getUser(uid);
     return userDoc;
   }
 
-  Future<void> syncUser (String uid) async {
+  Future<void> syncUser () async {
+    final uid = _firebaseAuth.currentUser!.uid;
     final userDoc = await _firestoreDAO.getUser(uid);
+
     if (!userDoc.exists) {
-      await registerUser(uid);
+      await registerUser();
       return;
     }
 
@@ -150,7 +157,9 @@ class SubscriptionService {
   }
   
   // Nouvelle méthode pour mettre à jour dynamiquement les données utilisateur
-  Future<void> updateUser(String uid, Map<String, dynamic> data) async {
+  Future<void> updateUser(Map<String, dynamic> data) async {
+    final uid = _firebaseAuth.currentUser!.uid;
+
     await _firestoreDAO.updateUser(uid, data);
     await UserPreferencesService.updateUser(data);
     userNotifier.update(data);

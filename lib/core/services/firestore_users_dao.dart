@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:flasholator/core/providers/firebase_auth_provider.dart';
+
 class FirestoreUsersDAO {
   final FirebaseFirestore _firestore;
+  final String uid;
 
-  FirestoreUsersDAO() : _firestore = FirebaseFirestore.instance;
+
+  FirestoreUsersDAO({required FirebaseFirestore firestore, required this.uid}) : _firestore = FirebaseFirestore.instance;
 
   // Constructeur pour les tests
-  FirestoreUsersDAO.test(this._firestore);
+  FirestoreUsersDAO.test(this._firestore, this.uid);
 
   Future<void> deleteUser(String uid) async {
     await _firestore.collection('users').doc(uid).delete();
