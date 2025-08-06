@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../core/services/subscription_service.dart';
+import 'package:flasholator/core/providers/subscription_service_provider.dart';
 
-class EmailVerificationPendingPage extends StatefulWidget {
+class EmailVerificationPendingPage extends ConsumerStatefulWidget {
   const EmailVerificationPendingPage({super.key});
 
   @override
-  State<EmailVerificationPendingPage> createState() => _EmailVerificationPendingPageState();
+  ConsumerState<EmailVerificationPendingPage> createState() => _EmailVerificationPendingPageState();
 }
 
-class _EmailVerificationPendingPageState extends State<EmailVerificationPendingPage> {
+class _EmailVerificationPendingPageState extends ConsumerState<EmailVerificationPendingPage> {
   bool isSending = false;
   bool isChecking = false;
   String? message;
@@ -47,7 +49,8 @@ class _EmailVerificationPendingPageState extends State<EmailVerificationPendingP
 
       if (refreshedUser!.emailVerified) {
         if (mounted) {
-          SubscriptionService.registerUser(user.uid);
+          final subscriptionService = ref.read(subscriptionServiceProvider);
+          await subscriptionService.registerUser(user.uid);
           Navigator.pushReplacementNamed(context, "/"); // Retour vers AuthGate
         }
       } else {

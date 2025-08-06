@@ -56,6 +56,7 @@ dependencies:
   cloud_firestore: ^5.6.12
   google_mobile_ads: ^6.0.0
   mocktail: ^1.0.4
+  flutter_riverpod: ^2.6.1            # Variables accessibles globalement dans l'app
 
 
 flutter_launcher_icons:

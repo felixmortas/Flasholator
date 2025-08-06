@@ -108,9 +108,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get subscriptionActivated => 'Abonnement activé.';
 
   @override
-  String get cancelSubscription => 'Annuler abonnement';
-
-  @override
   String get confirmCancelSubscription =>
       'Souhaitez-vous résilier votre abonnement ? Vous garderez l\'accès jusqu\'à la fin de la période.';
 
@@ -155,7 +152,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoRenewal => 'Renouvellement automatique';
 
   @override
-  String get cancelledUntil => 'Résilié (jusqu’au';
+  String get cancelledUntil => 'Résilié (Premium jusqu’au';
 
   @override
   String get subscriptionExpired => 'Abonnement expiré';

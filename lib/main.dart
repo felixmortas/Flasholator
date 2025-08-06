@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'l10n/app_localizations.dart';
 import 'core/services/flashcards_collection.dart';
@@ -29,7 +30,7 @@ void main() async {
   // Enregistrer l'adapter personnalisé pour Flashcard (si utilisé)
   Hive.registerAdapter(FlashcardAdapter());
 
-  runApp(MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

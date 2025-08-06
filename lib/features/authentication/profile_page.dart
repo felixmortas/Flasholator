@@ -3,14 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/change_password_dialog.dart';
 import '../../core/services/subscription_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'unsubscribe_page.dart';
 import '../../core/services/consent_manager.dart';
+import 'package:flasholator/core/providers/subscription_service_provider.dart';
+import 'package:flasholator/core/providers/user_data_provider.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   final User user;
 
   const ProfilePage({
@@ -19,18 +22,19 @@ class ProfilePage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   late Future<DocumentSnapshot> _subscriptionFuture;
   bool _showPrivacyButton = false;
-  // init subscription service
+  late final SubscriptionService subscriptionService;
 
   @override
   void initState() {
     super.initState();
+    subscriptionService = ref.read(subscriptionServiceProvider);
     _initializeUserData();
     _checkPrivacyOptionsRequirement();
   }
@@ -39,15 +43,15 @@ class _ProfilePageState extends State<ProfilePage> {
     final uid = widget.user.uid;
 
     // Vérifie si les données sont déjà en cache
-    final isCached = await SubscriptionService.isUserDataCached();
+    final isCached = await subscriptionService.isUserDataCached();
 
     if (!isCached) {
       // Récupère depuis Firestore et met à jour le ValueNotifier et SharedPreferences
-      await SubscriptionService.syncUser(uid);
+      await subscriptionService.syncUser(uid);
     }
 
     // Optionnel : recharge les données depuis le notifier
-    await SubscriptionService.getUserFromNotifier(uid);
+    await subscriptionService.getUserFromNotifier(uid);
 
     // Déclenche un rebuild une fois les données prêtes
     setState(() {});
@@ -62,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadSubscriptionFromLocal() async {
-    final userData = await SubscriptionService.getUserFromNotifier(widget.user.uid);
+    await subscriptionService.getUserFromNotifier(widget.user.uid);
 
     setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
   }
@@ -70,10 +74,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _handleSubscriptionAction() async {
     final uid = widget.user.uid;
     final now = DateTime.now();
-    final userData = await SubscriptionService.getUserFromNotifier(uid);
+    final userData = await subscriptionService.getUserFromNotifier(uid);
 
     if (!userData['isSubscribed']) {
-      await SubscriptionService.subscribeUser(uid);
+      await subscriptionService.subscribeUser(uid);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
@@ -86,7 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
           MaterialPageRoute(
             builder: (context) => UnsubscribePage(
               onUnsubscribe: () async {
-                await SubscriptionService.scheduleSubscriptionRevocation(
+                await subscriptionService.scheduleSubscriptionRevocation(
                   uid: uid,
                 );
 
@@ -100,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         );
       } else {
-        await SubscriptionService.subscribeUser(uid);
+        await subscriptionService.subscribeUser(uid);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionReactivated)),
@@ -132,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (!confirmed) return;
 
     try {
-      await SubscriptionService.deleteUser(widget.user.uid);
+      await subscriptionService.deleteUser(widget.user.uid);
       await FirebaseAuth.instance.currentUser?.delete();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
@@ -250,33 +254,31 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
 
     return FutureBuilder<bool>(
-      future: SubscriptionService.isUserDataCached(),
+      future: subscriptionService.isUserDataCached(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || !snapshot.data!) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
-        return ValueListenableBuilder<Map<String, dynamic>>(
-          valueListenable: SubscriptionService.userDataNotifier(),
-          builder: (context, userData, _) {
-            final isSubscribed = userData['isSubscribed'] ?? false;
-            final endDateStr = userData['subscriptionEndDate'];
+        // Données utilisateur observées via Riverpod
+        final userData = ref.watch(userDataProvider);
+        final isSubscribed = userData['isSubscribed'] ?? false;
+        final endDateStr = userData['subscriptionEndDate'] ?? '';
 
-            String abonnementLabel = isSubscribed
-                ? AppLocalizations.of(context)!.premium
-                : AppLocalizations.of(context)!.free;
+        final abonnementLabel = isSubscribed
+            ? AppLocalizations.of(context)!.premium
+            : AppLocalizations.of(context)!.free;
 
-            String renouvellementLabel = '';
-            if (isSubscribed) {
-              if (endDateStr == null || endDateStr.isEmpty) {
-                renouvellementLabel = AppLocalizations.of(context)!.autoRenewal;
-              } else {
-                final endDate = DateTime.tryParse(endDateStr);
-                renouvellementLabel =
-                      '${AppLocalizations.of(context)!.cancelledUntil} ${_formatDate(endDate ?? DateTime.now())})';
-              }
-            }
-            
+        String renouvellementLabel = '';
+        if (isSubscribed) {
+          if (endDateStr == null || endDateStr.isEmpty) {
+            renouvellementLabel = AppLocalizations.of(context)!.autoRenewal;
+          } else {
+            final endDate = DateTime.tryParse(endDateStr);
+            renouvellementLabel =
+                  '${AppLocalizations.of(context)!.cancelledUntil} ${_formatDate(endDate ?? DateTime.now())})';
+          }
+        }
 
             return Scaffold(
               appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile)),
@@ -299,7 +301,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text((isSubscribed && endDateStr != null && endDateStr != '')
                           ? AppLocalizations.of(context)!.reactivateSubscription
                           : isSubscribed
-                              ? AppLocalizations.of(context)!.cancelSubscription
+                              ? AppLocalizations.of(context)!.unsubscribeAction
                               : AppLocalizations.of(context)!.activateSubscription),
                     ),
                     const SizedBox(height: 12),
@@ -340,9 +342,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             );
           },
-        );
+        
 
-      },
+      
     );
   }
 

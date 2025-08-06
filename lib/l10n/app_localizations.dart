@@ -286,12 +286,6 @@ abstract class AppLocalizations {
   /// **'Subscription activated.'**
   String get subscriptionActivated;
 
-  /// No description provided for @cancelSubscription.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel subscription'**
-  String get cancelSubscription;
-
   /// No description provided for @confirmCancelSubscription.
   ///
   /// In en, this message translates to:
@@ -379,7 +373,7 @@ abstract class AppLocalizations {
   /// No description provided for @cancelledUntil.
   ///
   /// In en, this message translates to:
-  /// **'Cancelled (until'**
+  /// **'Cancelled (Premium until'**
   String get cancelledUntil;
 
   /// No description provided for @subscriptionExpired.

@@ -106,9 +106,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionActivated => 'Subscription activated.';
 
   @override
-  String get cancelSubscription => 'Cancel subscription';
-
-  @override
   String get confirmCancelSubscription =>
       'Do you want to cancel your subscription? You will keep access until the end of the period.';
 
@@ -152,7 +149,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoRenewal => 'Auto renewal';
 
   @override
-  String get cancelledUntil => 'Cancelled (until';
+  String get cancelledUntil => 'Cancelled (Premium until';
 
   @override
   String get subscriptionExpired => 'Subscription expired';

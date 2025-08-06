@@ -1,15 +1,15 @@
+import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/authentication/login_page.dart';
 import '../../features/home_page.dart';
 import '../../features/authentication/email_verification_pending_page.dart';
 import 'subscription_service.dart';
 import 'consent_manager.dart';
-import 'user_preferences_service.dart';
 
-class AuthGate extends StatefulWidget {
+class AuthGate extends ConsumerStatefulWidget {
   final dynamic flashcardsCollection;
   final dynamic deeplTranslator;
 
@@ -20,10 +20,11 @@ class AuthGate extends StatefulWidget {
   });
 
   @override
-  State<AuthGate> createState() => _AuthGateState();
+  ConsumerState<AuthGate> createState() => _AuthGateState();
+
 }
 
-class _AuthGateState extends State<AuthGate> {
+class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   void initState() {
     super.initState();
@@ -42,8 +43,10 @@ class _AuthGateState extends State<AuthGate> {
         final user = authSnapshot.data;
 
         if (user != null && user.emailVerified) {
+          final subscriptionService = ref.read(subscriptionServiceProvider);
+
           return FutureBuilder<bool>(
-            future: SubscriptionService.isUserDataCached(),
+            future: subscriptionService.isUserDataCached(),
             builder: (context, isCachedSnapshot) {
               if (isCachedSnapshot.connectionState == ConnectionState.waiting) {
                 return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -52,7 +55,7 @@ class _AuthGateState extends State<AuthGate> {
               final isCached = isCachedSnapshot.data ?? false;
 
               if (isCached) {
-                SubscriptionService.checkSubscriptionStatus(user.uid);
+                subscriptionService.checkSubscriptionStatus(user.uid);
                 return HomePage(
                   flashcardsCollection: widget.flashcardsCollection,
                   deeplTranslator: widget.deeplTranslator,
@@ -94,18 +97,20 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Future<Widget> _buildUserInitializedHome(User user) async {
+    final subscriptionService = ref.read(subscriptionServiceProvider);
+
     try {
-      final userDoc = await SubscriptionService.getUserFromFirestore(user.uid);
+      final userDoc = await subscriptionService.getUserFromFirestore(user.uid);
 
       if (!userDoc.exists) {
         try {          
-          await SubscriptionService.registerUser(user.uid);
+          await subscriptionService.registerUser(user.uid);
         } catch (e) {
           return const Scaffold(body: Center(child: Text('Profil utilisateur non trouvé.')));
         }
       }
 
-      SubscriptionService.checkSubscriptionStatus(user.uid);
+      subscriptionService.checkSubscriptionStatus(user.uid);
 
       return HomePage(
         flashcardsCollection: widget.flashcardsCollection,
