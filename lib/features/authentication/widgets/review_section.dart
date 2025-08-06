@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'review_card.dart';
+import 'package:flasholator/features/authentication/widgets/review_card.dart';
 
 class ReviewsSection extends StatelessWidget {
   const ReviewsSection({Key? key}) : super(key: key);

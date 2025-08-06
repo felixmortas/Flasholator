@@ -1,12 +1,12 @@
-import '../../l10n/app_localizations.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import '../../core/models/stats_model.dart';
-import '../../core/services/flashcards_collection.dart';
-import '../../core/services/stats_service.dart';
-import 'widgets/date_time_picker.dart';
-import 'widgets/summary_section.dart';
-import 'widgets/time_series_chart.dart';
-import 'widgets/ranking_section.dart';
+import 'package:flasholator/core/models/stats_model.dart';
+import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/stats_service.dart';
+import 'package:flasholator/features/stats/widgets/date_time_picker.dart';
+import 'package:flasholator/features/stats/widgets/summary_section.dart';
+import 'package:flasholator/features/stats/widgets/time_series_chart.dart';
+import 'package:flasholator/features/stats/widgets/ranking_section.dart';
 
 class StatsPage extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;

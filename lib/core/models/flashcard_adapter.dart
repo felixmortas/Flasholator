@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
-import 'flashcard.dart'; // Ajustez le chemin si nécessaire
+
+import 'package:flasholator/core/models/flashcard.dart';
 
 class FlashcardAdapter extends TypeAdapter<Flashcard> {
   @override

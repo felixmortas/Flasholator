@@ -1,12 +1,13 @@
-import '../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import '../../core/models/flashcard.dart';
-import '../../core/services/flashcards_collection.dart';
-import '../shared/utils/language_selection.dart';
-import 'widgets/all_languages_switch.dart';
-import 'widgets/response_buttons.dart';
-import 'widgets/words_display.dart';
-import 'widgets/editable_answer_field.dart';
+
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/core/models/flashcard.dart';
+import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/features/shared/utils/language_selection.dart';
+import 'package:flasholator/features/review/widgets/all_languages_switch.dart';
+import 'package:flasholator/features/review/widgets/response_buttons.dart';
+import 'package:flasholator/features/review/widgets/words_display.dart';
+import 'package:flasholator/features/review/widgets/editable_answer_field.dart';
 
 class ReviewTab extends StatefulWidget {
   // The ReviewTab widget is a StatefulWidget because it needs to be able to update its state

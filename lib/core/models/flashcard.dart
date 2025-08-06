@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
-import '../services/sm_two.dart';
+
+import 'package:flasholator/core/services/sm_two.dart';
 
 class Flashcard {
   int? id;

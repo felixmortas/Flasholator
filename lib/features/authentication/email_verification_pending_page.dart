@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../l10n/app_localizations.dart';
-import '../../core/services/subscription_service.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/providers/subscription_service_provider.dart';
 
 class EmailVerificationPendingPage extends ConsumerStatefulWidget {

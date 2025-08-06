@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../../l10n/app_localizations.dart';
-import '../../../core/services/feedback_service.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/core/services/feedback_service.dart';
 
 class UnsubscribeDialog extends StatefulWidget {
   final VoidCallback onUnsubscribe;

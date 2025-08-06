@@ -6,11 +6,11 @@ import 'firebase_options.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'l10n/app_localizations.dart';
-import 'core/services/flashcards_collection.dart';
-import 'core/services/deepl_translator.dart'; 
-import 'core/models/flashcard_adapter.dart';
-import 'core/services/auth_gate.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/deepl_translator.dart'; 
+import 'package:flasholator/core/models/flashcard_adapter.dart';
+import 'package:flasholator/core/services/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding

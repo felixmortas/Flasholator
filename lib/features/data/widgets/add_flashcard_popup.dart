@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../shared/utils/language_selection.dart';
-import '../../shared/utils/app_localizations_helper.dart';
-import '../../../config/constants.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:flasholator/features/shared/utils/language_selection.dart';
+import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
+import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 
 class AddFlashcardPopup extends StatefulWidget {
   final Function(String front, String back) onAdd;

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/flashcard.dart';
+
+import 'package:flasholator/core/models/flashcard.dart';
 
 class FlashcardsCollection {
   static const String _boxName = 'flashcards_box';

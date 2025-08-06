@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/authentication/login_page.dart';
-import '../../features/home_page.dart';
-import '../../features/authentication/email_verification_pending_page.dart';
-import 'subscription_service.dart';
-import 'consent_manager.dart';
+import 'package:flasholator/features/authentication/login_page.dart';
+import 'package:flasholator/features/home_page.dart';
+import 'package:flasholator/features/authentication/email_verification_pending_page.dart';
+import 'package:flasholator/core/services/consent_manager.dart';
 
 class AuthGate extends ConsumerStatefulWidget {
   final dynamic flashcardsCollection;

@@ -1,7 +1,6 @@
-import 'package:flasholator/l10n/app_localizations_en.dart';
-
-import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+
+import 'package:flasholator/l10n/app_localizations.dart';
 
 class EditableAnswerField extends StatelessWidget {
   final bool isDue;

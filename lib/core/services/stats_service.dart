@@ -1,6 +1,6 @@
-import '../models/flashcard.dart';
-import '../models/stats_model.dart';
-import 'flashcards_collection.dart';
+import 'package:flasholator/core/models/flashcard.dart';
+import 'package:flasholator/core/models/stats_model.dart';
+import 'package:flasholator/core/services/flashcards_collection.dart';
 
 class StatsService {
   final FlashcardsCollection collection;

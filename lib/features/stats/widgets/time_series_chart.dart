@@ -1,7 +1,8 @@
-import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../../core/models/stats_model.dart';
+
+import 'package:flasholator/core/models/stats_model.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 
 class TimeSeriesChart extends StatefulWidget {
   final StatsData data;

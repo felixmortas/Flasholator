@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'widgets/change_password_dialog.dart';
-import '../../core/services/subscription_service.dart';
-import '../../l10n/app_localizations.dart';
-import 'unsubscribe_page.dart';
-import '../../core/services/consent_manager.dart';
+import 'package:flasholator/features/authentication/widgets/change_password_dialog.dart';
+import 'package:flasholator/core/services/subscription_service.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/features/authentication/unsubscribe_page.dart';
+import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 
@@ -27,7 +25,6 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  late Future<DocumentSnapshot> _subscriptionFuture;
   bool _showPrivacyButton = false;
   late final SubscriptionService subscriptionService;
 

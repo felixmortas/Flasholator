@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../config/constants.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/config/constants.dart';
 
 extension LocalizedLanguageName on AppLocalizations {
   String getTranslatedLanguageName(String code) {

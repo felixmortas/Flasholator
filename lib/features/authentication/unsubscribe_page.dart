@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../l10n/app_localizations.dart';
-import 'widgets/unsubscribe_dialog.dart';
-import 'widgets/review_section.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/features/authentication/widgets/unsubscribe_dialog.dart';
+import 'package:flasholator/features/authentication/widgets/review_section.dart';
 
 class UnsubscribePage extends StatelessWidget {
   final VoidCallback onUnsubscribe;

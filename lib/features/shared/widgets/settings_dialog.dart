@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../stats/stats_page.dart'; // adapte le chemin si nécessaire
+
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/features/stats/stats_page.dart'; // adapte le chemin si nécessaire
 
 class SettingsDialog extends StatelessWidget {
   final VoidCallback launchEmail;

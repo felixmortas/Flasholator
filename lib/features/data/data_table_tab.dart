@@ -1,13 +1,14 @@
-import '../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import '../../core/services/flashcards_collection.dart';
-import '../shared/utils/language_selection.dart';
-import '../../config/constants.dart';
-import '../shared/utils/app_localizations_helper.dart';
-import 'widgets/all_languages_table.dart';
-import 'widgets/couple_languages_table.dart';
-import 'widgets/edit_flashcard_popup.dart';
-import 'widgets/add_flashcard_popup.dart';
+
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/features/shared/utils/language_selection.dart';
+import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
+import 'package:flasholator/features/data/widgets/all_languages_table.dart';
+import 'package:flasholator/features/data/widgets/couple_languages_table.dart';
+import 'package:flasholator/features/data/widgets/edit_flashcard_popup.dart';
+import 'package:flasholator/features/data/widgets/add_flashcard_popup.dart';
 
 // Add doc comments
 class DataTableTab extends StatefulWidget {

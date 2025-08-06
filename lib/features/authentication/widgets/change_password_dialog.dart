@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../l10n/app_localizations.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 
 class ChangePasswordDialog extends StatefulWidget {
   final Function(String currentPassword, String newPassword) onConfirm;

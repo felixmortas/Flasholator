@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../l10n/app_localizations.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
   final String? initialEmail;

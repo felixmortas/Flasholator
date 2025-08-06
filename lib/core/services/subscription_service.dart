@@ -1,10 +1,9 @@
-// subscription_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'firestore_users_dao.dart';
-import 'user_preferences_service.dart';
+import 'package:flasholator/core/services/firestore_users_dao.dart';
+import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 
 class SubscriptionService {

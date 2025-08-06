@@ -1,6 +1,7 @@
-import '../../../l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'package:flasholator/l10n/app_localizations.dart';
 
 class DateRangePickerRow extends StatelessWidget {
   final DateTime startDate;

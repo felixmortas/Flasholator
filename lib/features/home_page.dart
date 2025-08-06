@@ -10,13 +10,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 
-import '../core/services/deepl_translator.dart';
-import '../core/services/flashcards_collection.dart';
-import 'translation/translate_tab.dart';
-import 'review/review_tab.dart';
-import 'data/data_table_tab.dart';
-import 'shared/widgets/settings_dialog.dart';
-import 'authentication/profile_page.dart';
+import 'package:flasholator/core/services/deepl_translator.dart';
+import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/features/translation/translate_tab.dart';
+import 'package:flasholator/features/review/review_tab.dart';
+import 'package:flasholator/features/data/data_table_tab.dart';
+import 'package:flasholator/features/shared/widgets/settings_dialog.dart';
+import 'package:flasholator/features/authentication/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   final FlashcardsCollection flashcardsCollection;
