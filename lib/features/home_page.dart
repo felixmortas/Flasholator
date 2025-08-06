@@ -7,7 +7,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
@@ -16,17 +19,17 @@ import 'package:flasholator/features/data/data_table_tab.dart';
 import 'package:flasholator/features/shared/widgets/settings_dialog.dart';
 import 'package:flasholator/features/authentication/profile_page.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
 
   const HomePage({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final flashcardsCollection =
       FlashcardsCollection(); // Create an instance of FlashcardDao
   final deeplTranslator =
@@ -54,8 +57,9 @@ class _HomePageState extends State<HomePage> {
       _handleTextIntent();
     }
 
-    
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initUserState();
+    });
   }
 
   @override
@@ -75,6 +79,22 @@ class _HomePageState extends State<HomePage> {
     _bannerAd?.dispose();
     super.dispose();
   }
+
+  void _initUserState() async {
+    _loadUserPrefsAndUpdateNotifier;
+  }
+
+  void _loadUserPrefsAndUpdateNotifier() async {
+    final subscriptionService = ref.read(subscriptionServiceProvider);
+    final userData = ref.read(userDataProvider.notifier);
+
+    final userPrefs = await subscriptionService.getUserFromUserPrefs();
+    print("User prefs loaded: $userPrefs");
+    print("isSubscribed: ${ref.read(userDataProvider.notifier).isSubscribed}");
+
+    userData.update(userPrefs);
+  }
+
 
   bool _shouldShowBannerAd() {
     return !kIsWeb &&
