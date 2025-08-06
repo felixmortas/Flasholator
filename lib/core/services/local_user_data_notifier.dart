@@ -17,4 +17,10 @@ class LocalUserDataNotifier {
   static void clearUserData() {
     userDataNotifier.value = {};
   }
+
+    // Getters pratiques
+  static bool get isSubscribed => userDataNotifier.value['isSubscribed'] ?? false;
+  static bool get canTranslate => userDataNotifier.value['canTranslate'] ?? false;
+  static String get subscriptionDate => userDataNotifier.value['subscriptionDate'] ?? '';
+  static String get subscriptionEndDate => userDataNotifier.value['subscriptionEndDate'] ?? '';
 }

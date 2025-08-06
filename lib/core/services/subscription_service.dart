@@ -6,13 +6,6 @@ import 'firestore_users_dao.dart';
 import 'user_preferences_service.dart';
 import 'local_user_data_notifier.dart';
 
-class SubscriptionStatus {
-  final bool isSubscribed;
-  final bool canTranslate;
-
-  SubscriptionStatus({required this.isSubscribed, required this.canTranslate});
-}
-
 class SubscriptionService {
   static final FirestoreUsersDAO _firestoreDAO = FirestoreUsersDAO();
 
@@ -114,13 +107,12 @@ class SubscriptionService {
   static Future<void> checkSubscriptionStatus(
     String uid,
   ) async {
-    final userData = await getUserFromNotifier(uid);
+    await getUserFromNotifier(uid); // assure le cache
     final now = DateTime.now();
-    final endDateStr = userData['subscriptionEndDate'];
-    final isSubscribed = userData['isSubscribed'] ?? false;
 
-    if (endDateStr != '' && isSubscribed) {
-      final endDate = DateTime.tryParse(endDateStr);
+    if (LocalUserDataNotifier.subscriptionEndDate != '' &&
+        LocalUserDataNotifier.isSubscribed) {
+      final endDate = DateTime.tryParse(LocalUserDataNotifier.subscriptionEndDate);
       if (endDate != null && now.isAfter(endDate)) {
         await revokeSubscription(uid: uid);
       }
@@ -167,4 +159,9 @@ class SubscriptionService {
   static ValueNotifier<Map<String, dynamic>> userDataNotifier() {
     return LocalUserDataNotifier.userDataNotifier;
   }
+
+  static ValueNotifier<bool> isSubscribedNotifier() {
+    return ValueNotifier(LocalUserDataNotifier.isSubscribed);
+  }
+
 }
