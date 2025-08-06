@@ -1,14 +1,19 @@
-import '../../l10n/app_localizations.dart';
+import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flutter/material.dart';
-import '../../core/services/flashcards_collection.dart';
-import '../../core/services/deepl_translator.dart';
-import '../shared/utils/language_selection.dart';
-import '../../config/constants.dart';
-import '../shared/utils/app_localizations_helper.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../shared/dialogs/cancel_dialog.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TranslateTab extends StatefulWidget {
+import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/services/deepl_translator.dart';
+import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/subscription_service.dart';
+import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
+import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
+import 'package:flasholator/features/shared/utils/language_selection.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+
+class TranslateTab extends ConsumerStatefulWidget {
   final FlashcardsCollection flashcardsCollection;
   final DeeplTranslator deeplTranslator;
   final Function(Map<dynamic, dynamic>) addRow;
@@ -23,10 +28,10 @@ class TranslateTab extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<TranslateTab> createState() => _TranslateTabState();
+  ConsumerState<TranslateTab> createState() => _TranslateTabState();
 }
 
-class _TranslateTabState extends State<TranslateTab> {
+class _TranslateTabState extends ConsumerState<TranslateTab> {
   final languageSelection = LanguageSelection();
   String _wordToTranslate = '';
   String _translatedWord = '';
@@ -65,9 +70,12 @@ class _TranslateTabState extends State<TranslateTab> {
   }
 
   void _updateButtonState() {
+    final canTranslate = ref.read(canTranslateProvider);
     setState(() {
       isTranslateButtonDisabled =
-          _controller.text.isEmpty || _controller.text == _lastTranslatedWord;
+          _controller.text.isEmpty || 
+          _controller.text == _lastTranslatedWord || 
+          !canTranslate;
     });
   }
 
@@ -343,7 +351,7 @@ class _TranslateTabState extends State<TranslateTab> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
-                    child: ElevatedButton(
+                  child: ElevatedButton(
                   onPressed: isTranslateButtonDisabled
                       ? null
                       : () async {
