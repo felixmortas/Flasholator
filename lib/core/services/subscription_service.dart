@@ -84,8 +84,7 @@ class SubscriptionService {
     updateUser(updatedData);
   }
 
-  Future<void> revokeSubscription() async {
-    final subscriptionEndDate = userNotifier.subscriptionEndDate;
+  Future<void> revokeSubscription(String subscriptionEndDate) async {
     if (subscriptionEndDate.isEmpty) return;
 
     final now = DateTime.now();
@@ -114,21 +113,28 @@ class SubscriptionService {
 
   Future<void> checkSubscriptionStatus(
   ) async {
-    await getUserFromNotifier(); // assure le cache
+    final data = await getUserFromUserPrefs(); // assure le cache
     final now = DateTime.now();
+    final subscriptionEndDate = data['subscriptionEndDate'];
+    final isSubscribed = data['isSubscribed'];
 
-    if (userNotifier.subscriptionEndDate != '' &&
-        userNotifier.isSubscribed) {
-      final endDate = DateTime.tryParse(userNotifier.subscriptionEndDate);
+    if (subscriptionEndDate != '' &&
+        isSubscribed) {
+      final endDate = DateTime.tryParse(subscriptionEndDate);
       if (endDate != null && now.isAfter(endDate)) {
-        await revokeSubscription();
+        await revokeSubscription(subscriptionEndDate);
       }
     }
   }
 
+  Future<Map<String, dynamic>> getUserFromUserPrefs() async {
+    return await UserPreferencesService.loadUserData();
+  }
+
   Future<Map<String, dynamic>> getUserFromNotifier() async {
     if (userNotifier.current.isEmpty) {
-      await syncUser(); // assure que c'est bien rempli
+      final data = await UserPreferencesService.loadUserData();
+      userNotifier.update(data);
     }
     return userNotifier.current;
   }

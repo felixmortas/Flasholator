@@ -53,6 +53,9 @@ class _HomePageState extends State<HomePage> {
       requestPermissions();
       _handleTextIntent();
     }
+
+    
+
   }
 
   @override

@@ -45,7 +45,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
 
     // Optionnel : recharge les données depuis le notifier
-    await subscriptionService.getUserFromNotifier();
+    // await subscriptionService.getUserFromUserPrefs();
 
     // Déclenche un rebuild une fois les données prêtes
     setState(() {});
@@ -60,7 +60,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _loadSubscriptionFromLocal() async {
-    await subscriptionService.getUserFromNotifier();
+    // await subscriptionService.getUserFromNotifier();
 
     setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
   }
