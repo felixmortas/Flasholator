@@ -1,34 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 import 'package:flasholator/features/authentication/register_page.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String? errorMessage;
 
   Future<void> login() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final firebaseAuth = ref.read(firebaseAuthProvider);
+      await firebaseAuth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-    } on FirebaseAuthException catch (e) {
-      setState(() => errorMessage = e.message);
+    } on Exception catch (e) {
+      setState(() => errorMessage = e.toString());
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final firebaseAuth = ref.read(firebaseAuthProvider);
+
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.logIn)),
       body: Padding(
@@ -49,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(AppLocalizations.of(context)!.signUp),
             ),
             TextButton(
-              onPressed: () => FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim()),
+              onPressed: () => firebaseAuth.sendPasswordResetEmail(email: emailController.text.trim()),
               child: Text(AppLocalizations.of(context)!.forgotYourPassword),
             ),
           ],
