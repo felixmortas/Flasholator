@@ -147,14 +147,9 @@ class SubscriptionService {
     return userDoc;
   }
 
-  Future<void> syncUser () async {
+  Future<void> syncUser() async {
     final uid = _firebaseAuth.currentUser!.uid;
     final userDoc = await _firestoreDAO.getUser(uid);
-
-    if (!userDoc.exists) {
-      await registerUser();
-      return;
-    }
 
     final data = userDoc.data() as Map<String, dynamic>;
     await UserPreferencesService.updateUser(data);
