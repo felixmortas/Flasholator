@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   final String? initialEmail;
   final String? initialPassword;
 
   const RegisterPage({super.key, this.initialEmail, this.initialPassword});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -57,7 +58,8 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final firebaseAuth = ref.read(firebaseAuthProvider);
+      final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -88,9 +90,9 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         );
       }
-    } on FirebaseAuthException catch (e) {
+    } on Exception catch (e) {
       setState(() {
-        errorMessage = e.message;
+        errorMessage = e.toString();
         isLoading = false;
       });
     }
