@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
-import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 
 class SubscriptionService {
   final FirestoreUsersDAO _firestoreDAO;

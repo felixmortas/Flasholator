@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:flasholator/core/providers/firebase_auth_provider.dart';
-
 class FirestoreUsersDAO {
   final FirebaseFirestore _firestore;
   final String uid;
