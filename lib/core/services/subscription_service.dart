@@ -114,8 +114,7 @@ class SubscriptionService {
   static Future<void> checkSubscriptionStatus(
     String uid,
   ) async {
-    final userData = LocalUserDataNotifier.userDataNotifier.value;
-
+    final userData = await getUserFromNotifier(uid);
     final now = DateTime.now();
     final endDateStr = userData['subscriptionEndDate'];
     final isSubscribed = userData['isSubscribed'] ?? false;

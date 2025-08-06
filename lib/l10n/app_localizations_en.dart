@@ -9,6 +9,9 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get reactivateSubscription => 'Reactivate subscription';
+
+  @override
   String get unsubscribe => 'Unsubscribe';
 
   @override

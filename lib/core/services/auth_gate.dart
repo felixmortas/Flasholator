@@ -52,6 +52,7 @@ class _AuthGateState extends State<AuthGate> {
               final isCached = isCachedSnapshot.data ?? false;
 
               if (isCached) {
+                SubscriptionService.checkSubscriptionStatus(user.uid);
                 return HomePage(
                   flashcardsCollection: widget.flashcardsCollection,
                   deeplTranslator: widget.deeplTranslator,

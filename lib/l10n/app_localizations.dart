@@ -100,6 +100,12 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @reactivateSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate subscription'**
+  String get reactivateSubscription;
+
   /// No description provided for @unsubscribe.
   ///
   /// In en, this message translates to:

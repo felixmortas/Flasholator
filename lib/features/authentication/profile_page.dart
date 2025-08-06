@@ -31,9 +31,28 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    SubscriptionService.getUserFromNotifier(widget.user.uid); // initialise les données locales dans le ValueNotifier
+    _initializeUserData();
     _checkPrivacyOptionsRequirement();
   }
+
+  Future<void> _initializeUserData() async {
+    final uid = widget.user.uid;
+
+    // Vérifie si les données sont déjà en cache
+    final isCached = await SubscriptionService.isUserDataCached();
+
+    if (!isCached) {
+      // Récupère depuis Firestore et met à jour le ValueNotifier et SharedPreferences
+      await SubscriptionService.syncUser(uid);
+    }
+
+    // Optionnel : recharge les données depuis le notifier
+    await SubscriptionService.getUserFromNotifier(uid);
+
+    // Déclenche un rebuild une fois les données prêtes
+    setState(() {});
+  }
+
 
   Future<void> _checkPrivacyOptionsRequirement() async {
     final required = await ConsentManager.isPrivacyOptionsRequired();
@@ -48,22 +67,23 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
   }
 
-  Future<void> _handleSubscriptionAction({
-    required bool isSubscribed,
-    required Map<String, dynamic>? subscriptionData,
-  }) async {
+  Future<void> _handleSubscriptionAction() async {
+    print("Handling subscription action for user: ${widget.user.uid}");
     final uid = widget.user.uid;
     final now = DateTime.now();
+    final userData = await SubscriptionService.getUserFromNotifier(uid);
+    print("User data loaded from notifier in _handleSubscriptionAction: ");
+    print('$userData');
 
-    if (!isSubscribed) {
+    if (!userData['isSubscribed']) {
       await SubscriptionService.subscribeUser(uid);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
       );
     } else {
-      final rawEndDate = subscriptionData?['subscriptionEndDate'];
-      if (rawEndDate == null || DateTime.tryParse(rawEndDate)?.isAfter(now) == true) {
+      final rawEndDate = userData['subscriptionEndDate'];
+      if (rawEndDate == '' || rawEndDate.isEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -94,29 +114,8 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadSubscriptionFromLocal(); // rafraîchir les données locales
   }
 
-
-
-  Future<DocumentSnapshot> _loadSubscription() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) throw Exception(AppLocalizations.of(context)!.userNotConnected);
-    return FirebaseFirestore.instance.collection('subscribedUsers').doc(uid).get();
-  }
-
-  void _refreshSubscription() {
-    setState(() {
-      _subscriptionFuture = _loadSubscription();
-    });
-  }
-
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-
-  String _formatDateString(String dateString) {
-    final date = DateTime.tryParse(dateString);
-    if (date == null) return AppLocalizations.of(context)!.invalidDate;
-    return _formatDate(date);
   }
 
   Future<void> _signOut(BuildContext context) async {
@@ -252,7 +251,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = widget.user;
 
     return FutureBuilder<bool>(
       future: SubscriptionService.isUserDataCached(),
@@ -266,7 +264,6 @@ class _ProfilePageState extends State<ProfilePage> {
           builder: (context, userData, _) {
             final isSubscribed = userData['isSubscribed'] ?? false;
             final endDateStr = userData['subscriptionEndDate'];
-            final subscriptionData = {'subscriptionEndDate': endDateStr};
 
             String abonnementLabel = isSubscribed
                 ? AppLocalizations.of(context)!.premium
@@ -278,14 +275,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 renouvellementLabel = AppLocalizations.of(context)!.autoRenewal;
               } else {
                 final endDate = DateTime.tryParse(endDateStr);
-                if (endDate != null && endDate.isAfter(DateTime.now())) {
-                  renouvellementLabel =
-                      '${AppLocalizations.of(context)!.cancelledUntil} ${_formatDate(endDate)}';
-                } else {
-                  renouvellementLabel = AppLocalizations.of(context)!.subscriptionExpired;
-                }
+                renouvellementLabel =
+                      '${AppLocalizations.of(context)!.cancelledUntil} ${_formatDate(endDate ?? DateTime.now())})';
               }
             }
+            
 
             return Scaffold(
               appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile)),
@@ -304,13 +298,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     _infoRow(AppLocalizations.of(context)!.renewal, renouvellementLabel),
                     const SizedBox(height: 8),
                     ElevatedButton(
-                      onPressed: () => _handleSubscriptionAction(
-                        isSubscribed: isSubscribed,
-                        subscriptionData: subscriptionData,
-                      ),
-                      child: Text(isSubscribed
-                          ? AppLocalizations.of(context)!.cancelSubscription
-                          : AppLocalizations.of(context)!.activateSubscription),
+                      onPressed: () => _handleSubscriptionAction(),
+                      child: Text((isSubscribed && endDateStr != null && endDateStr != '')
+                          ? AppLocalizations.of(context)!.reactivateSubscription
+                          : isSubscribed
+                              ? AppLocalizations.of(context)!.cancelSubscription
+                              : AppLocalizations.of(context)!.activateSubscription),
                     ),
                     const SizedBox(height: 12),
                     if (_showPrivacyButton)
