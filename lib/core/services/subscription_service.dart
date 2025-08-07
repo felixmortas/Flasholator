@@ -61,7 +61,6 @@ class SubscriptionService {
       'isSubscribed': true,
       'subscriptionDate': dateStr,
       'subscriptionEndDate': '',
-      'canTranslate': true,
     };
 
     updateUser(updatedData);
