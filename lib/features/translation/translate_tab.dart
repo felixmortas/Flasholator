@@ -75,8 +75,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     setState(() {
       isTranslateButtonDisabled =
           _controller.text.isEmpty || 
-          _controller.text == _lastTranslatedWord || 
-          (!canTranslate && !isSubscribed);
+          _controller.text == _lastTranslatedWord;
     });
   }
 
@@ -109,7 +108,15 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   void _openSubscribePopup() {
-    // SubscribePopup.open()
+    Fluttertoast.showToast(
+      msg: "Limit reached",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   void _checkIfTranslationAvailabke() {
@@ -119,7 +126,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     if(isSubscribed || canTranslate) {
       _translate();
     } else {
-      _openSubscribePopup;
+      _openSubscribePopup();
     }
   }
 
