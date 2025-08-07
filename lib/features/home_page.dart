@@ -88,11 +88,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void checkAndRevokeSubscription(String subscriptionEndDate) async {
+    debugPrint("##DEBUG## Enter checkAndRevokeSubscription");
     final endDate = DateTime.tryParse(subscriptionEndDate);
 
     if (endDate != null && endDate.isBefore(DateTime.now())) {
-        final subscriptionService = ref.read(subscriptionServiceProvider);
-        await subscriptionService.revokeSubscription(subscriptionEndDate);
+      debugPrint("##DEBUG## subscriptionEndDate reached -> revoke subscription");
+      final subscriptionService = ref.read(subscriptionServiceProvider);
+      await subscriptionService.revokeSubscription(subscriptionEndDate);
     }
   }
 
