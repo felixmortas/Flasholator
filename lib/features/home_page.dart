@@ -48,6 +48,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   void initState() {
+    print("###### Enter initState");
     super.initState();
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
@@ -58,6 +59,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print("###### Enter _initUserState");
       _initUserState();
     });
   }
@@ -80,10 +82,16 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.dispose();
   }
 
-  void _loadUserPrefsAndUpdateNotifier() async {
+  Future<void> _loadUserPrefsAndUpdateNotifier() async {
     final subscriptionService = ref.read(subscriptionServiceProvider);
     final userPrefs = await subscriptionService.getUserFromUserPrefs();
+    print("###### userPrefs $userPrefs");
+
+
     subscriptionService.updateUserNotifier(userPrefs);
+    final userDataNotifier = ref.read(userDataProvider.notifier);
+    print("###### userDataNotifier ${userDataNotifier.toString()}");
+
   }
 
   void checkAndRevokeSubscription(String subscriptionEndDate) async {
@@ -92,16 +100,23 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (endDate != null && endDate.isBefore(DateTime.now())) {
         final subscriptionService = ref.read(subscriptionServiceProvider);
         await subscriptionService.revokeSubscription(subscriptionEndDate);
-        print("Subscription revoked due to end date.");
+        print("##### Subscription revoked due to end date.");
     }
   }
 
   void _initUserState() async {
-    _loadUserPrefsAndUpdateNotifier();
+    print("###### Enter _loadUserPrefsAndUpdateNotifier");
+    await _loadUserPrefsAndUpdateNotifier();
+    print("###### Exit _loadUserPrefsAndUpdateNotifier ------ Enterback _initUserState");
     final isSubscribed = ref.read(isSubscribedProvider);
-    final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
+
+    print("###### isSubscribed : $isSubscribed");
     if (isSubscribed) {
+      final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
+      print("###### subscriptionEndDate : $subscriptionEndDate");
+      
       if (subscriptionEndDate != '') {
+      print("###### Enter checkAndRevokeSubscription");
       checkAndRevokeSubscription(subscriptionEndDate);
       }
     }
