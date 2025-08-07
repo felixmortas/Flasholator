@@ -170,6 +170,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
       (code, key) => MapEntry(
           code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
     );
+    final isSubscribed = ref.watch(isSubscribedProvider);
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -177,18 +178,19 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ValueListenableBuilder<bool>(
-              valueListenable: widget.isAllLanguagesToggledNotifier,
-              builder: (context, value, child) {
-                return Switch(
-                  value: value,
-                  onChanged: (bool newValue) {
-                    widget.isAllLanguagesToggledNotifier.value = newValue;
-                    _fetchData(newValue);
-                  },
-                );
-              },
-            ),
+            if (isSubscribed)
+              ValueListenableBuilder<bool>(
+                valueListenable: widget.isAllLanguagesToggledNotifier,
+                builder: (context, value, child) {
+                  return Switch(
+                    value: value,
+                    onChanged: (bool newValue) {
+                      widget.isAllLanguagesToggledNotifier.value = newValue;
+                      _fetchData(newValue);
+                    },
+                  );
+                },
+              ),
             Expanded(
               child: ValueListenableBuilder<bool>(
                 valueListenable: widget.isAllLanguagesToggledNotifier,
