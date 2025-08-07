@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flasholator/features/authentication/widgets/change_password_dialog.dart';
 import 'package:flasholator/core/services/subscription_service.dart';
@@ -112,13 +112,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _signOut(BuildContext context) async {
+    final firebaseAuth = ref.read(firebaseAuthProvider);
     final confirmed = await _showConfirmationDialog(
       context,
       title: AppLocalizations.of(context)!.logOut,
       content: AppLocalizations.of(context)!.confirmLogout,
     );
     if (confirmed) {
-      await FirebaseAuth.instance.signOut();
+      await firebaseAuth.signOut();
       Navigator.pop(context); // Ferme la page de profil
     }
   }
@@ -128,12 +129,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     if (!confirmed) return;
 
     try {
+      final firebaseAuth = ref.read(firebaseAuthProvider);
       await subscriptionService.deleteUser();
-      await FirebaseAuth.instance.currentUser?.delete();
+      await firebaseAuth.currentUser?.delete();
       Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
+    } on Exception catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${AppLocalizations.of(context)!.error} ${e.message}')),
+        SnackBar(content: Text('${AppLocalizations.of(context)!.error} ${e.toString()}')),
       );
     }
   }
@@ -143,7 +145,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     context: context,
     builder: (_) => ChangePasswordDialog(
       onConfirm: (currentPassword, newPassword) async {
-        final user = FirebaseAuth.instance.currentUser;
+        final firebaseAuth = ref.read(firebaseAuthProvider);
+        final user = firebaseAuth.currentUser;
 
         if (user == null || user.email == null) return;
 
@@ -161,9 +164,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(AppLocalizations.of(context)!.passwordUpdated)),
           );
-        } on FirebaseAuthException catch (e) {
+        } on Exception catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${AppLocalizations.of(context)!.error} + ${e.message}')),
+            SnackBar(content: Text('${AppLocalizations.of(context)!.error} + ${e.toString()}')),
           );
         }
       },
@@ -213,7 +216,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               TextButton(
                 onPressed: () async {
                   try {
-                    final user = FirebaseAuth.instance.currentUser!;
+                    final firebaseAuth = ref.read(firebaseAuthProvider);
+                    final user = firebaseAuth.currentUser!;
                     final cred = EmailAuthProvider.credential(
                       email: user.email!,
                       password: controller.text,
