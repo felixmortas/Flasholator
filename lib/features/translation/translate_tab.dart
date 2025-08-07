@@ -89,8 +89,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
           ));
   }
 
-
-
   void _onLanguageChange(String newValue) {
     setState(() {
       _translatedWord = '';
