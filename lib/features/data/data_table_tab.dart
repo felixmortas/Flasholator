@@ -1,4 +1,7 @@
+import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
@@ -11,7 +14,7 @@ import 'package:flasholator/features/data/widgets/edit_flashcard_popup.dart';
 import 'package:flasholator/features/data/widgets/add_flashcard_popup.dart';
 
 // Add doc comments
-class DataTableTab extends StatefulWidget {
+class DataTableTab extends ConsumerStatefulWidget {
   final FlashcardsCollection flashcardsCollection;
   final Function() updateQuestionText;
   final ValueNotifier<bool> isAllLanguagesToggledNotifier;
@@ -24,10 +27,10 @@ class DataTableTab extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<DataTableTab> createState() => DataTableTabState();
+  ConsumerState<DataTableTab> createState() => DataTableTabState();
 }
 
-class DataTableTabState extends State<DataTableTab> {
+class DataTableTabState extends ConsumerState<DataTableTab> {
   List<Map<dynamic, dynamic>> data = [];
   LanguageSelection languageSelection = LanguageSelection.getInstance();
 
@@ -119,9 +122,32 @@ class DataTableTabState extends State<DataTableTab> {
     );
   }
 
+  void _openSubscribePopup() {
+    Fluttertoast.showToast(
+      msg: "Limit reached",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
+  Future<void> _checkIfCanAddCard() async {
+    final isSubscribed = ref.read(isSubscribedProvider);
+    final canAddCard = await widget.flashcardsCollection.canAddCard();
+
+    if (isSubscribed || canAddCard) {
+      _openAddFlashcardPopup();
+    } else {
+      _openSubscribePopup();
+    }
+  }
+
   void _addFlashcard(String front, String back) {
     widget.flashcardsCollection.addFlashcard(front, back,
-        languageSelection.sourceLanguage, languageSelection.targetLanguage);
+          languageSelection.sourceLanguage, languageSelection.targetLanguage);
     addRow({'front': front, 'back': back});
   }
 
@@ -190,7 +216,7 @@ class DataTableTabState extends State<DataTableTab> {
               ),
             ),
             ElevatedButton(
-              onPressed: _openAddFlashcardPopup,
+              onPressed: _checkIfCanAddCard,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),

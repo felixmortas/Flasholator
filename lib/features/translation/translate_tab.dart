@@ -7,7 +7,6 @@ import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
-import 'package:flasholator/features/home_page.dart';
 import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
@@ -70,8 +69,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   void _updateButtonState() {
-    final canTranslate = ref.read(canTranslateProvider);
-    final isSubscribed = ref.read(isSubscribedProvider);
     setState(() {
       isTranslateButtonDisabled =
           _controller.text.isEmpty || 
@@ -119,7 +116,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     );
   }
 
-  void _checkIfTranslationAvailabke() {
+  void _checkIfCanTranslate() {
     final isSubscribed = ref.read(isSubscribedProvider);
     final canTranslate = ref.read(canTranslateProvider);
 
@@ -161,42 +158,47 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   Future<void> _addFlashcard() async {
-    if (_wordToTranslate != '' &&
-        _translatedWord != '' &&
-        _translatedWord != AppLocalizations.of(context)!.connectionError &&
-        !await widget.flashcardsCollection
-            .checkIfFlashcardExists(_wordToTranslate, _translatedWord)) {
-      _wordToTranslate = _wordToTranslate.toLowerCase()[0].toUpperCase() +
-          _wordToTranslate.toLowerCase().substring(1);
-      _translatedWord = _translatedWord.toLowerCase()[0].toUpperCase() +
-          _translatedWord.toLowerCase().substring(1);
+    final isSubscribed = ref.read(isSubscribedProvider);
+    final canAddCard = await widget.flashcardsCollection.canAddCard();
+    if(isSubscribed || canAddCard) {
 
-      widget.addRow({
-        'front': _wordToTranslate,
-        'back': _translatedWord,
-        'sourceLang': _sourceLanguage,
-        'targetLang': _targetLanguage,
-      });
-      Future<bool> isCardAdded = widget.flashcardsCollection.addFlashcard(
-          _wordToTranslate, _translatedWord, _sourceLanguage, _targetLanguage);
+      if (_wordToTranslate != '' &&
+          _translatedWord != '' &&
+          _translatedWord != AppLocalizations.of(context)!.connectionError &&
+          !await widget.flashcardsCollection
+              .checkIfFlashcardExists(_wordToTranslate, _translatedWord)) {
+        _wordToTranslate = _wordToTranslate.toLowerCase()[0].toUpperCase() +
+            _wordToTranslate.toLowerCase().substring(1);
+        _translatedWord = _translatedWord.toLowerCase()[0].toUpperCase() +
+            _translatedWord.toLowerCase().substring(1);
 
-      widget.updateQuestionText();
-      setState(() {
-        isAddButtonDisabled = true;
-      });
+        widget.addRow({
+          'front': _wordToTranslate,
+          'back': _translatedWord,
+          'sourceLang': _sourceLanguage,
+          'targetLang': _targetLanguage,
+        });
+        Future<bool> isCardAdded = widget.flashcardsCollection.addFlashcard(
+            _wordToTranslate, _translatedWord, _sourceLanguage, _targetLanguage);
 
-      // Confirm that the card was added
-      Fluttertoast.showToast(
-        msg: await isCardAdded
-            ? AppLocalizations.of(context)!.cardAdded
-            : AppLocalizations.of(context)!.cardAlreadyAdded,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+        widget.updateQuestionText();
+        setState(() {
+          isAddButtonDisabled = true;
+        });
+
+        // Confirm that the card was added
+        Fluttertoast.showToast(
+          msg: await isCardAdded
+              ? AppLocalizations.of(context)!.cardAdded
+              : AppLocalizations.of(context)!.cardAlreadyAdded,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
     }
 
     // open cancel dialog
@@ -402,7 +404,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                   onPressed: isTranslateButtonDisabled
                       ? null
                       : () async {
-                          _checkIfTranslationAvailabke();
+                          _checkIfCanTranslate();
                         },
                   child: Text(AppLocalizations.of(context)!.translate),
                 )),
