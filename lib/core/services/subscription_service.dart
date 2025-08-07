@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,10 +31,26 @@ class SubscriptionService {
     updateUser(userData);
   }
 
-  Future<void> banTranslation() async {
+  Future<void> banTranslation(BuildContext context) async {
     final updatedData = {'canTranslate': false};
 
     updateUser(updatedData);
+  }
+
+  Future<void> incrementCounter(BuildContext context) async {
+    final currentCounter = await UserPreferencesService.getCounter();
+    final updatedCounter = currentCounter + 1;
+
+    // Mettre à jour les préférences
+    await UserPreferencesService.updateUser({'counter': updatedCounter});
+    // Mettre à jour le provider
+    userNotifier.update({'counter': updatedCounter});
+
+    // Si limite atteinte, bloquer les traductions
+    if (updatedCounter >= 100) {
+      if (!context.mounted) return;
+      await banTranslation(context);
+    }
   }
 
   Future<void> subscribeUser() async {
@@ -138,7 +155,6 @@ class SubscriptionService {
     }
     return userNotifier.current;
   }
-
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore() async {
     final uid = _firebaseAuth.currentUser!.uid;

@@ -16,6 +16,11 @@ final subscriptionEndDateProvider = Provider<String>((ref) {
   return ref.watch(userDataProvider)['subscriptionEndDate'] as String? ?? '';
 });
 
+final counterProvider = Provider<int>((ref) {
+  return ref.watch(userDataProvider)['counter'] as int? ?? 0;
+});
+
+
 class UserDataNotifier extends StateNotifier<Map<String, dynamic>> {
   UserDataNotifier() : super({});
 
@@ -36,4 +41,6 @@ class UserDataNotifier extends StateNotifier<Map<String, dynamic>> {
   bool get canTranslate => state['canTranslate'] ?? false;
   String get subscriptionDate => state['subscriptionDate'] ?? '';
   String get subscriptionEndDate => state['subscriptionEndDate'] ?? '';
+  int get counter => state['counter'] ?? 0;
+
 }

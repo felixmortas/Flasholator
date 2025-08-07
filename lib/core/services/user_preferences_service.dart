@@ -5,7 +5,46 @@ class UserPreferencesService {
   static const _canTranslateKey = 'canTranslate';
   static const _subscriptionDateKey = 'subscriptionDate';
   static const _subscriptionEndDateKey = 'subscriptionEndDate';
+  static const _counterKey = 'counter';
   static const _userDataCachedKey = 'userDataCached';
+
+  // ====================
+  // === READ METHODS ===
+  // ====================
+
+  static Future<bool> getIsSubscribed() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_isSubscribedKey) ?? false;
+  }
+
+  static Future<bool> getCanTranslate() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_canTranslateKey) ?? true;
+  }
+
+  static Future<String> getSubscriptionDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_subscriptionDateKey) ?? '';
+  }
+
+  static Future<String> getSubscriptionEndDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_subscriptionEndDateKey) ?? '';
+  }
+
+  static Future<int> getCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_counterKey) ?? 0;
+  }
+
+  static Future<bool> isUserDataCached() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_userDataCachedKey) ?? false;
+  }
+
+  // =====================
+  // === WRITE METHODS ===
+  // =====================
 
   /// Enregistre les champs utilisateur localement
   static Future<void> updateUser(Map<String, dynamic> fields) async {
@@ -28,26 +67,7 @@ class UserPreferencesService {
       }
     }
 
-    // Met à jour le cache utilisateur si nécessaire
     await _updateCachedFlag(prefs, fields);
-  }
-
-  /// Charge les données utilisateur depuis SharedPreferences
-  static Future<Map<String, dynamic>> loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    return {
-      'isSubscribed': prefs.getBool(_isSubscribedKey) ?? false,
-      'canTranslate': prefs.getBool(_canTranslateKey) ?? true,
-      'subscriptionDate': prefs.getString(_subscriptionDateKey),
-      'subscriptionEndDate': prefs.getString(_subscriptionEndDateKey),
-    };
-  }
-
-  /// Vérifie si les données utilisateur sont déjà en cache
-  static Future<bool> isUserDataCached() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_userDataCachedKey) ?? false;
   }
 
   /// Supprime toutes les données utilisateur enregistrées localement
@@ -57,12 +77,32 @@ class UserPreferencesService {
     await prefs.remove(_canTranslateKey);
     await prefs.remove(_subscriptionDateKey);
     await prefs.remove(_subscriptionEndDateKey);
+    await prefs.remove(_counterKey);
     await prefs.setBool(_userDataCachedKey, false);
   }
 
-  /// Marque les données utilisateur comme étant mises en cache
-  static Future<void> _updateCachedFlag(
-      SharedPreferences prefs, Map<String, dynamic> fields) async {
+  // =========================
+  // === BULK LOAD METHOD ===
+  // =========================
+
+  /// Charge toutes les données utilisateur d’un coup
+  static Future<Map<String, dynamic>> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'isSubscribed': prefs.getBool(_isSubscribedKey) ?? false,
+      'canTranslate': prefs.getBool(_canTranslateKey) ?? true,
+      'subscriptionDate': prefs.getString(_subscriptionDateKey) ?? '',
+      'subscriptionEndDate': prefs.getString(_subscriptionEndDateKey) ?? '',
+      'counter': prefs.getInt(_counterKey) ?? 0,
+    };
+  }
+
+  // =========================
+  // === INTERNAL HELPERS ===
+  // =========================
+
+  /// Marque les données utilisateur comme étant mises en cache si certains champs sont mis à jour
+  static Future<void> _updateCachedFlag(SharedPreferences prefs, Map<String, dynamic> fields) async {
     const watchedKeys = {
       _isSubscribedKey,
       _canTranslateKey,

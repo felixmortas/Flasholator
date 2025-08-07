@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/providers/subscription_service_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/features/home_page.dart';
 import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
@@ -106,6 +108,21 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     });
   }
 
+  void _openSubscribePopup() {
+    // SubscribePopup.open()
+  }
+
+  void _checkIfTranslationAvailabke() {
+    final isSubscribed = ref.read(isSubscribedProvider);
+    final canTranslate = ref.read(canTranslateProvider);
+
+    if(isSubscribed || canTranslate) {
+      _translate();
+    } else {
+      _openSubscribePopup;
+    }
+  }
+
   Future<void> _translate() async {
     isTranslateButtonDisabled = true;
     try {
@@ -122,6 +139,12 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         isAddButtonDisabled = false;
         isTranslateButtonDisabled = true;
       });
+      final isSubscribed = ref.read(isSubscribedProvider);
+
+      if(!isSubscribed) {
+        final subscriptionService = ref.read(subscriptionServiceProvider);
+        await subscriptionService.incrementCounter(context);
+      }
     } catch (e) {
       print('Error translating text: $e');
     } finally {
@@ -187,11 +210,17 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   @override
   Widget build(BuildContext context) {
+    final counter = ref.watch(counterProvider);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Row(
+              children: [
+                Text('Translation counter = $counter/100'),
+              ],
+            ),
             Row(
               children: [
                 Expanded(
@@ -352,7 +381,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                   onPressed: isTranslateButtonDisabled
                       ? null
                       : () async {
-                          _translate();
+                          _checkIfTranslationAvailabke();
                         },
                   child: Text(AppLocalizations.of(context)!.translate),
                 )),
