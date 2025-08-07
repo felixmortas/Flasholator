@@ -76,8 +76,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       );
     } else {
       final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
-      final rawEndDate = subscriptionEndDate;
-      if (rawEndDate == '' || rawEndDate.isEmpty) {
+      if (subscriptionEndDate == '' || subscriptionEndDate.isEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(
