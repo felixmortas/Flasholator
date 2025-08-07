@@ -66,16 +66,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _handleSubscriptionAction() async {
     final now = DateTime.now();
-    final userData = await subscriptionService.getUserFromNotifier();
+    final isSubscribed = ref.read(isSubscribedProvider);
 
-    if (!userData['isSubscribed']) {
+    if (!isSubscribed) {
       await subscriptionService.subscribeUser();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
       );
     } else {
-      final rawEndDate = userData['subscriptionEndDate'];
+      final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
+      final rawEndDate = subscriptionEndDate;
       if (rawEndDate == '' || rawEndDate.isEmpty) {
         Navigator.push(
           context,
