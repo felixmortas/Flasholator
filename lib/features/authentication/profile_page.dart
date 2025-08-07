@@ -258,9 +258,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         }
 
         // Données utilisateur observées via Riverpod
-        final userData = ref.watch(userDataProvider);
-        final isSubscribed = userData['isSubscribed'] ?? false;
-        final endDateStr = userData['subscriptionEndDate'] ?? '';
+        final isSubscribed = ref.watch(isSubscribedProvider);
+        final endDateStr = ref.watch(subscriptionEndDateProvider);
 
         final abonnementLabel = isSubscribed
             ? AppLocalizations.of(context)!.premium
@@ -268,7 +267,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
         String renouvellementLabel = '';
         if (isSubscribed) {
-          if (endDateStr == null || endDateStr.isEmpty) {
+          if (endDateStr == '' || endDateStr.isEmpty) {
             renouvellementLabel = AppLocalizations.of(context)!.autoRenewal;
           } else {
             final endDate = DateTime.tryParse(endDateStr);
@@ -276,72 +275,68 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   '${AppLocalizations.of(context)!.cancelledUntil} ${_formatDate(endDate ?? DateTime.now())})';
           }
         }
-
-            return Scaffold(
-              appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile)),
-              body: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _infoRow(AppLocalizations.of(context)!.username,
-                        user!.displayName ?? AppLocalizations.of(context)!.undefined),
-                    const SizedBox(height: 16),
-                    _infoRow(AppLocalizations.of(context)!.password, '********',
-                        action: () => _changePassword(context)),
-                    const Divider(height: 32),
-                    _infoRow(AppLocalizations.of(context)!.subscription, abonnementLabel),
-                    _infoRow(AppLocalizations.of(context)!.renewal, renouvellementLabel),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () => _handleSubscriptionAction(),
-                      child: Text((isSubscribed && endDateStr != null && endDateStr != '')
-                          ? AppLocalizations.of(context)!.reactivateSubscription
-                          : isSubscribed
-                              ? AppLocalizations.of(context)!.unsubscribeAction
-                              : AppLocalizations.of(context)!.activateSubscription),
-                    ),
-                    const SizedBox(height: 12),
-                    if (_showPrivacyButton)
-                      TextButton(
-                        onPressed: () => updateConsent(),
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size(0, 30),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          alignment: Alignment.centerLeft,
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.modifyPrivacyPreferences,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    const Spacer(),
-                    ElevatedButton.icon(
-                      onPressed: () => _signOut(context),
-                      icon: const Icon(Icons.logout),
-                      label: Text(AppLocalizations.of(context)!.logOut),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                    ),
-                    const SizedBox(height: 8),
-                    ElevatedButton.icon(
-                      onPressed: () => _deleteAccount(context),
-                      icon: const Icon(Icons.delete_forever),
-                      label: Text(AppLocalizations.of(context)!.deleteMyAccount),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    ),
-                  ],
+        return Scaffold(
+          appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile)),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _infoRow(AppLocalizations.of(context)!.username,
+                    user!.displayName ?? AppLocalizations.of(context)!.undefined),
+                const SizedBox(height: 16),
+                _infoRow(AppLocalizations.of(context)!.password, '********',
+                    action: () => _changePassword(context)),
+                const Divider(height: 32),
+                _infoRow(AppLocalizations.of(context)!.subscription, abonnementLabel),
+                _infoRow(AppLocalizations.of(context)!.renewal, renouvellementLabel),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () => _handleSubscriptionAction(),
+                  child: Text((isSubscribed && endDateStr != null && endDateStr != '')
+                      ? AppLocalizations.of(context)!.reactivateSubscription
+                      : isSubscribed
+                          ? AppLocalizations.of(context)!.unsubscribeAction
+                          : AppLocalizations.of(context)!.activateSubscription),
                 ),
-              ),
-            );
-          },
-        
-
-      
+                const SizedBox(height: 12),
+                if (_showPrivacyButton)
+                  TextButton(
+                    onPressed: () => updateConsent(),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size(0, 30),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      alignment: Alignment.centerLeft,
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.modifyPrivacyPreferences,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                const Spacer(),
+                ElevatedButton.icon(
+                  onPressed: () => _signOut(context),
+                  icon: const Icon(Icons.logout),
+                  label: Text(AppLocalizations.of(context)!.logOut),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () => _deleteAccount(context),
+                  icon: const Icon(Icons.delete_forever),
+                  label: Text(AppLocalizations.of(context)!.deleteMyAccount),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
