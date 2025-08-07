@@ -156,6 +156,10 @@ class SubscriptionService {
     userNotifier.update(data);
   }
   
+  Future<void> updateUserNotifier(Map<String, dynamic> data) async {
+    userNotifier.update(data);
+  }
+
   // Nouvelle méthode pour mettre à jour dynamiquement les données utilisateur
   Future<void> updateUser(Map<String, dynamic> data) async {
     final uid = _firebaseAuth.currentUser!.uid;

@@ -80,20 +80,34 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.dispose();
   }
 
-  void _initUserState() async {
-    _loadUserPrefsAndUpdateNotifier;
-  }
-
   void _loadUserPrefsAndUpdateNotifier() async {
     final subscriptionService = ref.read(subscriptionServiceProvider);
-    final userData = ref.read(userDataProvider.notifier);
 
     final userPrefs = await subscriptionService.getUserFromUserPrefs();
-    print("User prefs loaded: $userPrefs");
-    print("isSubscribed: ${ref.read(userDataProvider.notifier).isSubscribed}");
-
-    userData.update(userPrefs);
+    subscriptionService.updateUserNotifier(userPrefs);
   }
+
+  void checkAndRevokeSubscription(String subscriptionEndDate) async {
+    final endDate = DateTime.tryParse(subscriptionEndDate);
+
+    if (endDate != null && endDate.isBefore(DateTime.now())) {
+        final subscriptionService = ref.read(subscriptionServiceProvider);    
+        await subscriptionService.revokeSubscription(subscriptionEndDate);
+        print("Subscription revoked due to end date.");
+    }
+  }
+
+  void _initUserState() async {
+    _loadUserPrefsAndUpdateNotifier();
+    final userState = ref.read(userDataProvider.notifier);
+    if (userState.isSubscribed) {
+      if (userState.subscriptionEndDate.isNotEmpty) {
+      checkAndRevokeSubscription(userState.subscriptionEndDate);
+      }
+    }
+  }
+
+  
 
 
   bool _shouldShowBannerAd() {
