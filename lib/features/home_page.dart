@@ -35,6 +35,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   final deeplTranslator =
       DeeplTranslator(); // Create an instance of DeeplTranslator
 
+  late final subscriptionService = ref.read(subscriptionServiceProvider);
+  late final userStateNotifier = ref.read(userDataProvider.notifier);
+
   final dataTableTabKey = GlobalKey<DataTableTabState>();
   final reviewTabKey = GlobalKey<ReviewTabState>();
 
@@ -81,8 +84,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _loadUserPrefsAndUpdateNotifier() async {
-    final subscriptionService = ref.read(subscriptionServiceProvider);
-
     final userPrefs = await subscriptionService.getUserFromUserPrefs();
     subscriptionService.updateUserNotifier(userPrefs);
   }
@@ -91,7 +92,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     final endDate = DateTime.tryParse(subscriptionEndDate);
 
     if (endDate != null && endDate.isBefore(DateTime.now())) {
-        final subscriptionService = ref.read(subscriptionServiceProvider);    
         await subscriptionService.revokeSubscription(subscriptionEndDate);
         print("Subscription revoked due to end date.");
     }
@@ -99,10 +99,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _initUserState() async {
     _loadUserPrefsAndUpdateNotifier();
-    final userState = ref.read(userDataProvider.notifier);
-    if (userState.isSubscribed) {
-      if (userState.subscriptionEndDate.isNotEmpty) {
-      checkAndRevokeSubscription(userState.subscriptionEndDate);
+    if (userStateNotifier.isSubscribed) {
+      if (userStateNotifier.subscriptionEndDate.isNotEmpty) {
+      checkAndRevokeSubscription(userStateNotifier.subscriptionEndDate);
       }
     }
   }
@@ -164,10 +163,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       MethodChannel('com.felinx18.flasholator.translate_and_add_card');
 
   Future<void> _handleTextIntent() async {
-    final userState = ref.read(userDataProvider.notifier);
     final canAddCard = await flashcardsCollection.canAddCard();
 
-    if (userState.isSubscribed || (userState.canTranslate && canAddCard)) {
+    if (userStateNotifier.isSubscribed || (userStateNotifier.canTranslate && canAddCard)) {
       try {
         // Récupérer le texte sélectionné
         String? wordToTranslate = await _platform.invokeMethod<String>('getText');
@@ -263,11 +261,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         flashcardsCollection: flashcardsCollection,
       ),
     );
-  }
-
-  bool checkUserLoggedIn() {
-    // Exemple simple (à remplacer par une vraie logique)
-    return false;
   }
 
   @override
