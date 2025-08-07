@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/models/flashcard.dart';
+import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/review/widgets/all_languages_switch.dart';
@@ -9,7 +11,7 @@ import 'package:flasholator/features/review/widgets/response_buttons.dart';
 import 'package:flasholator/features/review/widgets/words_display.dart';
 import 'package:flasholator/features/review/widgets/editable_answer_field.dart';
 
-class ReviewTab extends StatefulWidget {
+class ReviewTab extends ConsumerStatefulWidget {
   // The ReviewTab widget is a StatefulWidget because it needs to be able to update its state
   final FlashcardsCollection flashcardsCollection;
   final ValueNotifier<bool> isAllLanguagesToggledNotifier;
@@ -21,10 +23,10 @@ class ReviewTab extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ReviewTab> createState() => ReviewTabState();
+  ConsumerState<ReviewTab> createState() => ReviewTabState();
 }
 
-class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
+class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMixin {
   // The _ReviewTabState class is a State because it needs to be able to update its state
   List<Flashcard> dueFlashcards = [];
   late Flashcard _currentFlashcard;
@@ -147,20 +149,23 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final isSubscribed = ref.watch(isSubscribedProvider);
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AllLanguagesSwitch(
-              isAllLanguagesToggledNotifier:
-                  widget.isAllLanguagesToggledNotifier,
-              onToggle: (newValue) {
-                updateSwitchState(newValue);
-                updateQuestionText(newValue);
-              },
-            ),
+            if (isSubscribed)
+              AllLanguagesSwitch(
+                isAllLanguagesToggledNotifier:
+                    widget.isAllLanguagesToggledNotifier,
+                onToggle: (newValue) {
+                  updateSwitchState(newValue);
+                  updateQuestionText(newValue);
+                },
+              ),
             WordsDisplay(
               questionLang: _questionLang,
               questionText: _questionText,
@@ -170,19 +175,20 @@ class ReviewTabState extends State<ReviewTab> with TickerProviderStateMixin {
               isDue: isDue,
             ),
             const Spacer(),
-            EditableAnswerField(
-              isDue: isDue,
-              isEditing: isEditing,
-              onToggleEditing: () {
-                setState(() {
-                  isEditing = !isEditing;
-                  if (!isEditing) {
-                    overrideQuality = null;
-                  }
-                });
-              },
-              controller: editingController,
-            ),
+            if (isSubscribed)
+              EditableAnswerField(
+                isDue: isDue,
+                isEditing: isEditing,
+                onToggleEditing: () {
+                  setState(() {
+                    isEditing = !isEditing;
+                    if (!isEditing) {
+                      overrideQuality = null;
+                    }
+                  });
+                },
+                controller: editingController,
+              ),
             const SizedBox(height: 12),
             ReviewControls(
               isResponseHidden: isResponseHidden,
