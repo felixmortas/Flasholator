@@ -18,6 +18,9 @@ class FlashcardsCollection {
     debugPrint('Hive box initialized: $_boxName');
   }
 
+  Future<int> countFlashcards() async {
+    return _box.length;
+  }
 
   Future<List<Flashcard>> _loadFlashcards() async {
     // Charger tous les flashcards depuis la boîte Hive
