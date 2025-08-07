@@ -138,6 +138,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         languageSelection.targetLanguage,
         languageSelection.sourceLanguage,
       );
+      
       setState(() {
         _translatedWord = translation;
         _lastTranslatedWord = _wordToTranslate;
@@ -146,8 +147,8 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         isAddButtonDisabled = false;
         isTranslateButtonDisabled = true;
       });
-      final isSubscribed = ref.read(isSubscribedProvider);
 
+      final isSubscribed = ref.read(isSubscribedProvider);
       if(!isSubscribed) {
         final subscriptionService = ref.read(subscriptionServiceProvider);
         await subscriptionService.incrementCounter(context);

@@ -20,17 +20,6 @@ class SubscriptionService {
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
-  Future<void> registerUser() async {
-    final userData = {
-      'isSubscribed': false,
-      'canTranslate': true,
-      'subscriptionDate': '',
-      'subscriptionEndDate': '',
-    };
-
-    updateUser(userData);
-  }
-
   Future<void> banTranslation(BuildContext context) async {
     final updatedData = {'canTranslate': false};
 
@@ -51,6 +40,17 @@ class SubscriptionService {
       if (!context.mounted) return;
       await banTranslation(context);
     }
+  }
+
+  Future<void> registerUser() async {
+    final userData = {
+      'isSubscribed': false,
+      'canTranslate': true,
+      'subscriptionDate': '',
+      'subscriptionEndDate': '',
+    };
+
+    updateUser(userData);
   }
 
   Future<void> subscribeUser() async {
