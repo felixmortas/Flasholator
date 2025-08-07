@@ -12,6 +12,10 @@ final isSubscribedProvider = Provider<bool>((ref) {
   return ref.watch(userDataProvider)['isSubscribed'] as bool? ?? false;
 });
 
+final subscriptionEndDateProvider = Provider<String>((ref) {
+  return ref.watch(userDataProvider)['subscriptionEndDate'] as String? ?? '';
+});
+
 class UserDataNotifier extends StateNotifier<Map<String, dynamic>> {
   UserDataNotifier() : super({});
 

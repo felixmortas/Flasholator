@@ -98,10 +98,11 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _initUserState() async {
     _loadUserPrefsAndUpdateNotifier();
-    final userStateNotifier = ref.read(userDataProvider.notifier);
-    if (userStateNotifier.isSubscribed) {
-      if (userStateNotifier.subscriptionEndDate.isNotEmpty) {
-      checkAndRevokeSubscription(userStateNotifier.subscriptionEndDate);
+    final isSubscribed = ref.read(isSubscribedProvider);
+    final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
+    if (isSubscribed) {
+      if (subscriptionEndDate != '') {
+      checkAndRevokeSubscription(subscriptionEndDate);
       }
     }
   }
@@ -163,10 +164,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       MethodChannel('com.felinx18.flasholator.translate_and_add_card');
 
   Future<void> _handleTextIntent() async {
-    final userStateNotifier = ref.read(userDataProvider.notifier);
+    final isSubscribed = ref.read(isSubscribedProvider);
+    final canTranslate = ref.read(isSubscribedProvider);
     final canAddCard = await flashcardsCollection.canAddCard();
     
-    if (userStateNotifier.isSubscribed || (userStateNotifier.canTranslate && canAddCard)) {
+    if (isSubscribed || (canTranslate && canAddCard)) {
       try {
         // Récupérer le texte sélectionné
         String? wordToTranslate = await _platform.invokeMethod<String>('getText');
