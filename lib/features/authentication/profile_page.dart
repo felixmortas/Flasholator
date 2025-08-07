@@ -22,7 +22,6 @@ class ProfilePage extends ConsumerStatefulWidget {
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _showPrivacyButton = false;
   late final SubscriptionService subscriptionService;
@@ -258,8 +257,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         }
 
         // Données utilisateur observées via Riverpod
-        final isSubscribed = ref.watch(isSubscribedProvider);
-        final endDateStr = ref.watch(subscriptionEndDateProvider);
+        final isSubscribed = ref.read(isSubscribedProvider);
+        final endDateStr = ref.read(subscriptionEndDateProvider);
 
         final abonnementLabel = isSubscribed
             ? AppLocalizations.of(context)!.premium
