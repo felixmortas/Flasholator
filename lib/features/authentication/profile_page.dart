@@ -3,6 +3,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:flasholator/features/subscription_paywall.dart';
 import 'package:flasholator/features/authentication/widgets/change_password_dialog.dart';
 import 'package:flasholator/core/services/subscription_service.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
@@ -69,7 +70,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final isSubscribed = ref.read(isSubscribedProvider);
 
     if (!isSubscribed) {
-      await subscriptionService.subscribeUser();
+
+      // naviguer jusqu'à subscription_paywall 
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SubscriptionPaywall(),
+        ),
+      );
+
+
+      // await subscriptionService.subscribeUser();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
