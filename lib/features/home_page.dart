@@ -170,7 +170,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Future<void> _handleTextIntent() async {
     final isSubscribed = ref.read(isSubscribedProvider);
-    final canTranslate = ref.read(isSubscribedProvider);
+    final canTranslate = ref.read(canTranslateProvider);
     final canAddCard = await flashcardsCollection.canAddCard();
     
     if (isSubscribed || (canTranslate && canAddCard)) {
