@@ -138,7 +138,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         languageSelection.targetLanguage,
         languageSelection.sourceLanguage,
       );
-      
+
       setState(() {
         _translatedWord = translation;
         _lastTranslatedWord = _wordToTranslate;
@@ -219,6 +219,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   @override
   Widget build(BuildContext context) {
     final counter = ref.watch(counterProvider);
+    final isSubscribed = ref.watch(isSubscribedProvider);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -238,10 +239,14 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                       return DropdownButton<String>(
                         value: languageSelection.sourceLanguage,
                         onChanged: (String? newValue) {
-                          if (newValue != languageSelection.targetLanguage) {
-                            setState(() {
-                              languageSelection.sourceLanguage = newValue!;
-                            });
+                          if (isSubscribed) {
+                            if (newValue != languageSelection.targetLanguage) {
+                              setState(() {
+                                languageSelection.sourceLanguage = newValue!;
+                              });
+                            }
+                          } else {
+                            _openSubscribePopup();
                           }
                         },
                         isExpanded: true,
@@ -250,11 +255,13 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                           return DropdownMenuItem<String>(
                             value: entry.key,
                             onTap: () {
-                              if (languageSelection.sourceLanguage == entry.key) {
-                                return;
-                              } else if (languageSelection.sourceLanguage != entry.key ||
-                                  languageSelection.targetLanguage != entry.key) {
-                                _onLanguageChange(entry.key);
+                              if (isSubscribed) {
+                                if (languageSelection.sourceLanguage == entry.key) {
+                                  return;
+                                } else if (languageSelection.sourceLanguage != entry.key ||
+                                    languageSelection.targetLanguage != entry.key) {
+                                  _onLanguageChange(entry.key);
+                                }
                               }
                             },
                             enabled: languageSelection.targetLanguage != entry.key,
@@ -293,10 +300,14 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                       return DropdownButton<String>(
                         value: languageSelection.targetLanguage,
                         onChanged: (String? newValue) {
-                          if (newValue != languageSelection.sourceLanguage) {
-                            setState(() {
-                              languageSelection.targetLanguage = newValue!;
-                            });
+                          if (isSubscribed) {
+                            if (newValue != languageSelection.sourceLanguage) {
+                              setState(() {
+                                languageSelection.targetLanguage = newValue!;
+                              });
+                            }
+                          } else {
+                            _openSubscribePopup();
                           }
                         },
                         isExpanded: true,
@@ -305,11 +316,13 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                           return DropdownMenuItem<String>(
                             value: entry.key,
                             onTap: () {
-                              if (languageSelection.targetLanguage == entry.key) {
-                                return;
-                              } else if (languageSelection.targetLanguage != entry.key ||
-                                  languageSelection.sourceLanguage != entry.key) {
-                                _onLanguageChange(entry.key);
+                              if (isSubscribed) {
+                                if (languageSelection.targetLanguage == entry.key) {
+                                  return;
+                                } else if (languageSelection.targetLanguage != entry.key ||
+                                    languageSelection.sourceLanguage != entry.key) {
+                                  _onLanguageChange(entry.key);
+                                }
                               }
                             },
                             enabled: languageSelection.sourceLanguage != entry.key,
