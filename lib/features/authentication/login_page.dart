@@ -19,8 +19,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   String? errorMessage;
 
   Future<void> login() async {
+    debugPrint("##DEBUG## Enter LoginPage.login()");
     try {
-
       final firebaseAuth = ref.read(firebaseAuthProvider);
       await firebaseAuth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -28,6 +28,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       );      
 
       final subscriptionService = ref.read(subscriptionServiceProvider);
+      debugPrint("##DEBUG## Enter subscriptionService.syncUser()");
       await subscriptionService.syncUser();
       
     } on Exception catch (e) {

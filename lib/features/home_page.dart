@@ -83,14 +83,14 @@ class _HomePageState extends ConsumerState<HomePage> {
   Future<void> _loadUserPrefsAndUpdateNotifier() async {
     final subscriptionService = ref.read(subscriptionServiceProvider);
     final userPrefs = await subscriptionService.getUserFromUserPrefs();
-
+    debugPrint("##DEBUG## userPrefs $userPrefs");
     subscriptionService.updateUserNotifier(userPrefs);
   }
 
   void checkAndRevokeSubscription(String subscriptionEndDate) async {
     debugPrint("##DEBUG## Enter checkAndRevokeSubscription");
     final endDate = DateTime.tryParse(subscriptionEndDate);
-
+    debugPrint("##DEBUG## endDate: $endDate");
     if (endDate != null && endDate.isBefore(DateTime.now())) {
       debugPrint("##DEBUG## subscriptionEndDate reached -> revoke subscription");
       final subscriptionService = ref.read(subscriptionServiceProvider);
@@ -99,12 +99,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _initUserState() async {
+    debugPrint("##DEBUG## Enter _loadUserPrefsAndUpdateNotifier");
     await _loadUserPrefsAndUpdateNotifier();
     final isSubscribed = ref.read(isSubscribedProvider);
-
+    debugPrint("##DEBUG## isSubscribed: $isSubscribed");
     if (isSubscribed) {
       final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
-      
+      debugPrint("##DEBUG## subscriptionEndDate: $subscriptionEndDate");
       if (subscriptionEndDate != '') {
       checkAndRevokeSubscription(subscriptionEndDate);
       }

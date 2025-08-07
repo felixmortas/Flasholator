@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/providers/user_sync_provider.dart';
 
 class SubscriptionService {
   final FirestoreUsersDAO _firestoreDAO;
@@ -163,12 +164,17 @@ class SubscriptionService {
   }
 
   Future<void> syncUser() async {
+    debugPrint("##DEBUG## SubscriptionService.syncUser() entered");
     final uid = _firebaseAuth.currentUser!.uid;
+    debugPrint("##DEBUG## uid : $uid");
     final userDoc = await _firestoreDAO.getUser(uid);
-
+    debugPrint("##DEBUG## userDoc : $userDoc");
     final data = userDoc.data() as Map<String, dynamic>;
+    debugPrint("##DEBUG## data : $data");
     await UserPreferencesService.updateUser(data);
     userNotifier.update(data);
+
+    ref.read(userSyncStateProvider.notifier).state = true;
   }
   
   Future<void> updateUserNotifier(Map<String, dynamic> data) async {

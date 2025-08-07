@@ -7,6 +7,7 @@ import 'package:flasholator/features/home_page.dart';
 import 'package:flasholator/features/authentication/email_verification_pending_page.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/firebase_auth_provider.dart';
+import 'package:flasholator/core/providers/user_sync_provider.dart';
 
 class AuthGate extends ConsumerStatefulWidget {
 
@@ -29,7 +30,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   Widget build(BuildContext context) {
     final firebaseAuth = ref.watch(firebaseAuthProvider);
-
+    final isUserSynced = ref.watch(userSyncStateProvider);
+    
     return StreamBuilder<User?>(
       stream: firebaseAuth.authStateChanges(),
       builder: (context, snapshot) {
@@ -38,12 +40,18 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         }
 
         final user = snapshot.data;
-
+        
         if (user != null && user.emailVerified) {
+          if (!isUserSynced) {
+            return const Scaffold(body: Center(child: Text('Synchronisation en cours...')));
+          }
           return const HomePage();
         } else if (user != null && !user.emailVerified) {
           return const EmailVerificationPendingPage();
         } else {
+          if (isUserSynced) {
+            ref.read(userSyncStateProvider.notifier).state = false;
+          }
           return const LoginPage();
         }
       },
