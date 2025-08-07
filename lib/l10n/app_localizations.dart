@@ -100,6 +100,12 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @freeSubscriptionLimitsExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Free subscription limits exceeded'**
+  String get freeSubscriptionLimitsExceeded;
+
   /// No description provided for @reactivateSubscription.
   ///
   /// In en, this message translates to:

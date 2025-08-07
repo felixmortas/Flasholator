@@ -1,4 +1,5 @@
 {  
+    "freeSubscriptionLimitsExceeded": "Se han superado los límites de la suscripción gratuita.",
     "reactivateSubscription": "Reactivar suscripción",
     "unsubscribe": "Cancelar suscripción",
     "reconsiderMessage": "Piensa de nuevo, ¡nos encantaría continuar este viaje contigo!",

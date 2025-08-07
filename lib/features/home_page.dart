@@ -107,14 +107,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  
-
-
   bool _shouldShowBannerAd() {
     return !kIsWeb &&
           (Platform.isAndroid || Platform.isIOS);
   }
-
 
   void _loadBannerAd() async {
     if (!_shouldShowBannerAd()) return;
@@ -150,7 +146,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     ad.load();
   }
 
-
   void _onTabChange() {
     if (_tabController.indexIsChanging) {
       _synchronizeSwitchState();
@@ -169,43 +164,59 @@ class _HomePageState extends ConsumerState<HomePage> {
       MethodChannel('com.felinx18.flasholator.translate_and_add_card');
 
   Future<void> _handleTextIntent() async {
-    try {
-      // Récupérer le texte sélectionné
-      String? wordToTranslate = await _platform.invokeMethod<String>('getText');
-      if (wordToTranslate != null) {
-        // Appeler la fonction de traduction
-        String translatedWord =
-            await deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
+    final userState = ref.read(userDataProvider.notifier);
+    final canAddCard = await flashcardsCollection.canAddCard();
 
-        if (wordToTranslate != '' &&
-            translatedWord != '' &&
-            translatedWord != AppLocalizations.of(context)!.connectionError &&
-            !await flashcardsCollection
-                .checkIfFlashcardExists(wordToTranslate, translatedWord)) {
-          wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
-              wordToTranslate.toLowerCase().substring(1);
-          translatedWord = translatedWord.toLowerCase()[0].toUpperCase() +
-              translatedWord.toLowerCase().substring(1);
+    if (userState.isSubscribed || (userState.canTranslate && canAddCard)) {
+      try {
+        // Récupérer le texte sélectionné
+        String? wordToTranslate = await _platform.invokeMethod<String>('getText');
+        if (wordToTranslate != null) {
+          // Appeler la fonction de traduction
+          String translatedWord =
+              await deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
+
+          if (wordToTranslate != '' &&
+              translatedWord != '' &&
+              translatedWord != AppLocalizations.of(context)!.connectionError &&
+              !await flashcardsCollection
+                  .checkIfFlashcardExists(wordToTranslate, translatedWord)) {
+            wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
+                wordToTranslate.toLowerCase().substring(1);
+            translatedWord = translatedWord.toLowerCase()[0].toUpperCase() +
+                translatedWord.toLowerCase().substring(1);
+          }
+
+          Future<bool> isCardAdded = flashcardsCollection
+              .addFlashcard(wordToTranslate, translatedWord, "EN", "FR");
+
+          // Confirm that the card was added
+          Fluttertoast.showToast(
+            msg: await isCardAdded
+                ? AppLocalizations.of(context)!.cardAdded
+                : AppLocalizations.of(context)!.cardAlreadyAdded,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         }
-
-        Future<bool> isCardAdded = flashcardsCollection
-            .addFlashcard(wordToTranslate, translatedWord, "EN", "FR");
-
-        // Confirm that the card was added
-        Fluttertoast.showToast(
-          msg: await isCardAdded
-              ? AppLocalizations.of(context)!.cardAdded
-              : AppLocalizations.of(context)!.cardAlreadyAdded,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+      } on PlatformException catch (e) {
+        print("Failed to get text: '${e.message}'.");
       }
-    } on PlatformException catch (e) {
-      print("Failed to get text: '${e.message}'.");
+    } else {
+      // Inform that the card was NOT added
+      Fluttertoast.showToast(
+        msg: AppLocalizations.of(context)!.freeSubscriptionLimitsExceeded,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 

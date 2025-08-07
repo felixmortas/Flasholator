@@ -9,6 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get freeSubscriptionLimitsExceeded =>
+      'Free subscription limits exceeded';
+
+  @override
   String get reactivateSubscription => 'Reactivate subscription';
 
   @override
