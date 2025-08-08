@@ -10,6 +10,7 @@ import 'package:flasholator/core/services/flashcards_collection.dart';
 import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
+import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
@@ -40,7 +41,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   String _sourceLanguage = '';
   String _targetLanguage = '';
   late List<MapEntry<String, String>> sortedLanguageEntries;
-  bool _isInitialized = false;
 
 
   final TextEditingController _controller = TextEditingController();
@@ -55,10 +55,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (!_isInitialized) {
-      _initializeSortedLanguages();
-      _isInitialized = true;
-    }
+      sortedLanguageEntries = getSortedLanguageEntries(context, LANGUAGE_KEYS);;
   }
 
   @override
@@ -74,17 +71,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
           _controller.text.isEmpty || 
           _controller.text == _lastTranslatedWord;
     });
-  }
-
-  void _initializeSortedLanguages() {
-    sortedLanguageEntries = LANGUAGE_KEYS.entries.toList();
-
-    sortedLanguageEntries.sort((a, b) =>
-      AppLocalizations.of(context)!
-          .getTranslatedLanguageName(a.key)
-          .compareTo(
-            AppLocalizations.of(context)!.getTranslatedLanguageName(b.key),
-          ));
   }
 
   void _onLanguageChange(String newValue) {
