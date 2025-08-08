@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/providers/subscription_service_provider.dart';
+import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 
 class EmailVerificationPendingPage extends ConsumerStatefulWidget {
@@ -52,10 +52,10 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
 
       if (refreshedUser!.emailVerified) {
         if (mounted) {
-          final subscriptionService = ref.read(subscriptionServiceProvider);
+          final userManager = ref.read(userManagerProvider);
           
           final uid = firebaseAuth.currentUser!.uid;
-          await subscriptionService.registerUser();
+          await userManager.registerUser();
           Navigator.pushReplacementNamed(context, "/"); // Retour vers AuthGate
         }
       } else {

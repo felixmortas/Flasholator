@@ -9,12 +9,12 @@ import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_sync_provider.dart';
 
-class SubscriptionService {
+class UserManager {
   final FirestoreUsersDAO _firestoreDAO;
   final FirebaseAuth _firebaseAuth;
   final Ref ref;
 
-  SubscriptionService({required this.ref, required FirestoreUsersDAO firestoreDAO, required FirebaseAuth firebaseAuth})
+  UserManager({required this.ref, required FirestoreUsersDAO firestoreDAO, required FirebaseAuth firebaseAuth})
       : _firestoreDAO = firestoreDAO,
         _firebaseAuth = firebaseAuth;
 
@@ -164,18 +164,27 @@ class SubscriptionService {
   }
 
   Future<void> syncUser() async {
-    debugPrint("##DEBUG## SubscriptionService.syncUser() entered");
     final uid = _firebaseAuth.currentUser!.uid;
-    debugPrint("##DEBUG## uid : $uid");
     final userDoc = await _firestoreDAO.getUser(uid);
-    debugPrint("##DEBUG## userDoc : $userDoc");
     final data = userDoc.data() as Map<String, dynamic>;
-    debugPrint("##DEBUG## data : $data");
+
     await UserPreferencesService.updateUser(data);
     userNotifier.update(data);
 
     ref.read(userSyncStateProvider.notifier).state = true;
   }
+
+  Future<void> loginAndSyncUser(String email, String password) async {
+    try {
+      
+      await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      await syncUser();
+
+    } catch (e) {
+      throw Exception('Failed to login and sync user: $e');
+    }
+  }
+
   
   Future<void> updateUserNotifier(Map<String, dynamic> data) async {
     userNotifier.update(data);

@@ -5,12 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flasholator/features/subscription_paywall.dart';
 import 'package:flasholator/features/authentication/widgets/change_password_dialog.dart';
-import 'package:flasholator/core/services/subscription_service.dart';
+import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/features/authentication/unsubscribe_page.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/firebase_auth_provider.dart';
-import 'package:flasholator/core/providers/subscription_service_provider.dart';
+import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -25,32 +25,14 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _showPrivacyButton = false;
-  late final SubscriptionService subscriptionService;
+  late final UserManager userManager;
 
   @override
   void initState() {
     super.initState();
-    subscriptionService = ref.read(subscriptionServiceProvider);
-    _initializeUserData();
+    userManager = ref.read(userManagerProvider);
     _checkPrivacyOptionsRequirement();
   }
-
-  Future<void> _initializeUserData() async {
-    // Vérifie si les données sont déjà en cache
-    final isCached = await subscriptionService.isUserDataCached();
-
-    if (!isCached) {
-      // Récupère depuis Firestore et met à jour le ValueNotifier et SharedPreferences
-      await subscriptionService.syncUser();
-    }
-
-    // Optionnel : recharge les données depuis le notifier
-    // await subscriptionService.getUserFromUserPrefs();
-
-    // Déclenche un rebuild une fois les données prêtes
-    setState(() {});
-  }
-
 
   Future<void> _checkPrivacyOptionsRequirement() async {
     final required = await ConsentManager.isPrivacyOptionsRequired();
@@ -60,7 +42,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _loadSubscriptionFromLocal() async {
-    // await subscriptionService.getUserFromNotifier();
+    // await UserManager.getUserFromNotifier();
 
     setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
   }
@@ -80,7 +62,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       );
 
 
-      // await subscriptionService.subscribeUser();
+      // await UserManager.subscribeUser();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
@@ -93,7 +75,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           MaterialPageRoute(
             builder: (context) => UnsubscribePage(
               onUnsubscribe: () async {
-                await subscriptionService.scheduleSubscriptionRevocation(
+                await userManager.scheduleSubscriptionRevocation(
                 );
 
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -106,7 +88,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
         );
       } else {
-        await subscriptionService.subscribeUser();
+        await userManager.subscribeUser();
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionReactivated)),
@@ -140,7 +122,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     try {
       final firebaseAuth = ref.read(firebaseAuthProvider);
-      await subscriptionService.deleteUser();
+      await userManager.deleteUser();
       await firebaseAuth.currentUser?.delete();
       Navigator.pop(context);
     } on Exception catch (e) {
@@ -261,7 +243,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final user = ref.watch(firebaseAuthProvider).currentUser;
 
     return FutureBuilder<bool>(
-      future: subscriptionService.isUserDataCached(),
+      future: userManager.isUserDataCached(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || !snapshot.data!) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));

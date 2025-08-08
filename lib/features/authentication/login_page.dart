@@ -1,4 +1,6 @@
-import 'package:flasholator/core/providers/subscription_service_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/core/providers/user_sync_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,22 +21,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   String? errorMessage;
 
   Future<void> login() async {
-    debugPrint("##DEBUG## Enter LoginPage.login()");
-    try {
-      final firebaseAuth = ref.read(firebaseAuthProvider);
-      await firebaseAuth.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );      
+  try {
+    ref.read(userSyncStateProvider.notifier).state = false;
 
-      final subscriptionService = ref.read(subscriptionServiceProvider);
-      debugPrint("##DEBUG## Enter subscriptionService.syncUser()");
-      await subscriptionService.syncUser();
-      
-    } on Exception catch (e) {
-      setState(() => errorMessage = e.toString());
-    }
+    final userManager = ref.read(userManagerProvider);    
+    await userManager.loginAndSyncUser(emailController.text.trim(), passwordController.text.trim());
+    
+  } on FirebaseAuthException catch (e) {
+    if (!mounted) return;
+    setState(() => errorMessage = e.message ?? 'Erreur de connexion');
+  } catch (e) {
+    if (!mounted) return;
+    setState(() => errorMessage = 'Une erreur est survenue : $e');
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreUsersDAO {
   final FirebaseFirestore _firestore;
-  final String uid;
 
-
-  FirestoreUsersDAO({required FirebaseFirestore firestore, required this.uid}) : _firestore = FirebaseFirestore.instance;
+  FirestoreUsersDAO({required FirebaseFirestore firestore}) : _firestore = FirebaseFirestore.instance;
 
   // Constructeur pour les tests
-  FirestoreUsersDAO.test(this._firestore, this.uid);
+  FirestoreUsersDAO.test(this._firestore);
 
   Future<void> deleteUser(String uid) async {
     await _firestore.collection('users').doc(uid).delete();

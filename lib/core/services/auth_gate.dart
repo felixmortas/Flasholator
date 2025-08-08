@@ -1,3 +1,4 @@
+import 'package:flasholator/core/providers/user_sync_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +8,6 @@ import 'package:flasholator/features/home_page.dart';
 import 'package:flasholator/features/authentication/email_verification_pending_page.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/firebase_auth_provider.dart';
-import 'package:flasholator/core/providers/user_sync_provider.dart';
 
 class AuthGate extends ConsumerStatefulWidget {
 
@@ -30,28 +30,22 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   @override
   Widget build(BuildContext context) {
     final firebaseAuth = ref.watch(firebaseAuthProvider);
-    final isUserSynced = ref.watch(userSyncStateProvider);
+    final userSyncState = ref.watch(userSyncStateProvider);
     
     return StreamBuilder<User?>(
       stream: firebaseAuth.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.waiting || !userSyncState) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
         final user = snapshot.data;
         
-        if (user != null && user.emailVerified) {
-          if (!isUserSynced) {
-            return const Scaffold(body: Center(child: Text('Synchronisation en cours...')));
-          }
+        if (user != null && user.emailVerified && userSyncState) {
           return const HomePage();
         } else if (user != null && !user.emailVerified) {
           return const EmailVerificationPendingPage();
         } else {
-          if (isUserSynced) {
-            ref.read(userSyncStateProvider.notifier).state = false;
-          }
           return const LoginPage();
         }
       },

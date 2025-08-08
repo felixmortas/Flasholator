@@ -10,7 +10,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/core/providers/user_data_provider.dart';
-import 'package:flasholator/core/providers/subscription_service_provider.dart';
+import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
@@ -81,32 +81,32 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _loadUserPrefsAndUpdateNotifier() async {
-    final subscriptionService = ref.read(subscriptionServiceProvider);
-    final userPrefs = await subscriptionService.getUserFromUserPrefs();
-    debugPrint("##DEBUG## userPrefs $userPrefs");
-    subscriptionService.updateUserNotifier(userPrefs);
+    final userManager = ref.read(userManagerProvider);
+    
+    final userPrefs = await userManager.getUserFromUserPrefs();
+    
+    userManager.updateUserNotifier(userPrefs);
   }
 
   void checkAndRevokeSubscription(String subscriptionEndDate) async {
-    debugPrint("##DEBUG## Enter checkAndRevokeSubscription");
+    
     final endDate = DateTime.tryParse(subscriptionEndDate);
-    debugPrint("##DEBUG## endDate: $endDate");
     if (endDate != null && endDate.isBefore(DateTime.now())) {
-      debugPrint("##DEBUG## subscriptionEndDate reached -> revoke subscription");
-      final subscriptionService = ref.read(subscriptionServiceProvider);
-      await subscriptionService.revokeSubscription(subscriptionEndDate);
+      
+      final userManager = ref.read(userManagerProvider);
+      await userManager.revokeSubscription(subscriptionEndDate);
     }
   }
 
-  void _initUserState() async {
-    debugPrint("##DEBUG## Enter _loadUserPrefsAndUpdateNotifier");
+  void _initUserState() async {    
     await _loadUserPrefsAndUpdateNotifier();
-    final isSubscribed = ref.read(isSubscribedProvider);
-    debugPrint("##DEBUG## isSubscribed: $isSubscribed");
+
+    final isSubscribed = ref.read(isSubscribedProvider);    
     if (isSubscribed) {
-      final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
-      debugPrint("##DEBUG## subscriptionEndDate: $subscriptionEndDate");
+
+      final subscriptionEndDate = ref.read(subscriptionEndDateProvider);      
       if (subscriptionEndDate != '') {
+        
       checkAndRevokeSubscription(subscriptionEndDate);
       }
     }

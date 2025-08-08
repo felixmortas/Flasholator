@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
-import 'package:flasholator/core/providers/subscription_service_provider.dart';
+import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
 import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
@@ -147,8 +147,8 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
       final isSubscribed = ref.read(isSubscribedProvider);
       if(!isSubscribed) {
-        final subscriptionService = ref.read(subscriptionServiceProvider);
-        await subscriptionService.incrementCounter(context);
+        final userManager = ref.read(userManagerProvider);
+        await userManager.incrementCounter(context);
       }
     } catch (e) {
       print('Error translating text: $e');
