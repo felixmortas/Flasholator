@@ -16,7 +16,7 @@ import 'package:flasholator/core/services/flashcards_collection.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
 import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
-import 'package:flasholator/features/shared/widgets/settings_dialog.dart';
+import 'package:flasholator/features/shared/dialogs/settings_dialog.dart';
 import 'package:flasholator/features/shared/dialogs/language_selection_popup.dart';
 import 'package:flasholator/features/authentication/profile_page.dart';
 
