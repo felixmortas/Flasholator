@@ -6,11 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/core/services/ad_service.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
@@ -43,15 +43,16 @@ class _HomePageState extends ConsumerState<HomePage> {
       ValueNotifier<bool>(false);
   late TabController _tabController;
 
-  BannerAd? _bannerAd;
-  bool _isAdLoaded = false;
-  bool _isBannerAdLoadedOnce = false;
+  final AdService _adService = AdService();
+
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
+
+    _adService.loadInterstitial();
 
     if (!kIsWeb && Platform.isAndroid) {
       requestPermissions();
@@ -66,10 +67,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
     void didChangeDependencies() {
       super.didChangeDependencies();
-      if (!_isBannerAdLoadedOnce) {
-        _loadBannerAd();
-        _isBannerAdLoadedOnce = true;
-      }
+      _adService.loadBanner(context);
+
     }
 
   @override
@@ -77,7 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     _tabController.removeListener(_onTabChange);
     _tabController.dispose();
     isAllLanguagesToggledNotifier.dispose(); // Dispose du notifier
-    _bannerAd?.dispose();
+    _adService.dispose();
     super.dispose();
   }
 
@@ -127,45 +126,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       checkAndRevokeSubscription(subscriptionEndDate);
       }
     }
-  }
-
-  bool _shouldShowBannerAd() {
-    return !kIsWeb &&
-          (Platform.isAndroid || Platform.isIOS);
-  }
-
-  void _loadBannerAd() async {
-    if (!_shouldShowBannerAd()) return;
-
-    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-      MediaQuery.of(context).size.width.truncate(),
-    );
-
-    if (size == null) {
-      debugPrint('Unable to get banner ad size.');
-      return;
-    }
-
-    final ad = BannerAd(
-      adUnitId: 'ca-app-pub-9706580094748746/7892523530', // 'ca-app-pub-3940256099942544/9214589741', // ID de test
-      request: const AdRequest(),
-      size: size,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          debugPrint("Ad loaded.");
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            _isAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          debugPrint("Ad failed to load: $error");
-          ad.dispose();
-        },
-      ),
-    );
-
-    ad.load();
   }
 
   void _onTabChange() {
@@ -315,14 +275,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         body: Column(
           children: [
-            if (_isAdLoaded && _bannerAd != null && _shouldShowBannerAd())
-              SafeArea(
-                child: SizedBox(
-                  width: _bannerAd!.size.width.toDouble(),
-                  height: _bannerAd!.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd!),
-                ),
-              ),
+            if (_adService.getBannerWidget() != null)
+              _adService.getBannerWidget()!,
+
             Expanded(child: 
               TabBarView(
                 children: [
