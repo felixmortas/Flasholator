@@ -24,7 +24,7 @@ class UserManager {
   Future<void> setCoupleLang(String sourceLang, String targetLang) async {
     final updatedData = {'coupleLang': '$sourceLang-$targetLang'};
 
-    updateUser(updatedData);
+    await updateUser(updatedData);
   }
 
   Future<void> banTranslation(BuildContext context) async {
@@ -178,7 +178,7 @@ class UserManager {
     await _firestoreDAO.updateUser(uid, data);
     await UserPreferencesService.updateUser(data);
     userNotifier.update(data);
-  }
+    }
 
   Future<bool> isUserDataCached() async {
     return UserPreferencesService.isUserDataCached();

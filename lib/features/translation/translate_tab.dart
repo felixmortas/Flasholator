@@ -117,7 +117,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   Future<void> _translate() async {
-    
+
     isTranslateButtonDisabled = true;
     try {
       String translation = await widget.deeplTranslator.translate(

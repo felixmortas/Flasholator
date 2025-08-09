@@ -81,20 +81,16 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.dispose();
   }
 
-  void _showLanguageSelectionPopup(String sourceLang, String targetLang) {
-    print("-- Entered _showLanguageSelectionPopup");
+  Future<void> _showLanguageSelectionPopup(String sourceLang, String targetLang) async {
     final userManager = ref.read(userManagerProvider);
 
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false, // obligatoire, pour forcer le choix
       builder: (_) {
         return LanguageSelectionPopup(
           onSave: (newSourceLang, newTargetLang) async {
             await userManager.setCoupleLang(newSourceLang, newTargetLang);
-
-            // Optionnel : ferme la popup automatiquement
-            Navigator.of(context).pop();
           },
         );
       },
@@ -102,24 +98,17 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _loadUserPrefsAndUpdateNotifier() async {
-    print("-- Entered _loadUserPrefsAndUpdateNotifier");
     final userManager = ref.read(userManagerProvider);
-    print("-- Enter syncNotifierFromLocal()");
     await userManager.syncNotifierFromLocal();
-    print("-- Exited syncNotifierFromLocal()");
 
     final coupleLang = ref.read(coupleLangProvider);
-    print("-- coupleLang: $coupleLang");
     final sourceLang = coupleLang.contains('-') ? coupleLang.split('-')[0] : '';
     final targetLang = coupleLang.contains('-') ? coupleLang.split('-')[1] : '';
-    print("-- sourceLang: $sourceLang");
-    print("-- targetLang: $targetLang");
+
     if (sourceLang == '' || targetLang == '') {
-      print("-- Entered if langs==''()");
       // Première connexion sans couple de langue
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        print("-- Entered addPostFrameCallback");
-        _showLanguageSelectionPopup(sourceLang, targetLang);
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _showLanguageSelectionPopup(sourceLang, targetLang);
       });
     }
   }
@@ -130,16 +119,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _initUserState() async {    
-    print("-- Entered _initUserState");
-
     await _loadUserPrefsAndUpdateNotifier();
-
     final isSubscribed = ref.read(isSubscribedProvider);    
     if (isSubscribed) {
-
       final subscriptionEndDate = ref.read(subscriptionEndDateProvider);      
       if (subscriptionEndDate != '') {
-        
       checkAndRevokeSubscription(subscriptionEndDate);
       }
     }
