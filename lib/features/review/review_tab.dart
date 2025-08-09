@@ -1,3 +1,5 @@
+import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -41,6 +43,8 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   String _responseText = "";
   String _questionLang = "";
   String _responseLang = "";
+
+  int adCounter = 0;
 
   set currentFlashcard(Flashcard currentFlashcard) {
     _currentFlashcard = currentFlashcard;
@@ -112,6 +116,12 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   }
 
   void _onQualityButtonPress(int quality) async {
+    if (!ref.read(isSubscribedProvider)) {
+      if (adCounter % INTERSTITIAL_FREQUENCY == 0) {
+        ref.read(adServiceProvider).showInterstitial();
+      }
+      adCounter += 1;
+    }
     // Update the flashcard with the quality in the database then update the question text
     await widget.flashcardsCollection
         .review(_currentFlashcard.front, _currentFlashcard.back, quality);

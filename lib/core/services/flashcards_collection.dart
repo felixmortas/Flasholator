@@ -1,3 +1,4 @@
+import 'package:flasholator/config/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -23,7 +24,7 @@ class FlashcardsCollection {
   }
 
   Future<bool> canAddCard() async {
-    return await _countFlashcards() < 20;
+    return await _countFlashcards() < MAX_CARDS;
   }
 
 

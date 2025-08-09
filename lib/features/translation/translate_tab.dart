@@ -230,7 +230,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
           children: [
             Row(
               children: [
-                Text('Translation counter = ${ref.watch(counterProvider)}/100'),
+                Text('Translation counter = ${ref.watch(counterProvider)}/$MAX_TRANSLATIONS'),
               ],
             ),
             Row(

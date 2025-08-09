@@ -1,3 +1,9 @@
+/// Free plan limits
+
+const int INTERSTITIAL_FREQUENCY = 5;
+const int MAX_TRANSLATIONS = 100;
+const int MAX_CARDS = 20;
+
 /// Code → clé de traduction
 const Map<String, String> LANGUAGE_KEYS = {
   'AR': 'lang_ar',

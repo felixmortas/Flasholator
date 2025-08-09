@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flasholator/config/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,7 +44,7 @@ class UserManager {
     userNotifier.update({'counter': updatedCounter});
 
     // Si limite atteinte, bloquer les traductions
-    if (updatedCounter >= 100) {
+    if (updatedCounter >= MAX_TRANSLATIONS) {
       if (!context.mounted) return;
       await banTranslation(context);
     }
