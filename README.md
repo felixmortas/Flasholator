@@ -34,9 +34,6 @@ __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
-- Publicités (banière + interstice après 5 révisions)
-- Différenciations fonctionnalités premium
-- Choix du couple de langue au premier lancement 
 - Facturation abonnement 
 - Une ou deux langues fun translator
 - Notifications de rappel cartes à réviser
