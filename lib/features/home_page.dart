@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/ad_service.dart';
@@ -43,16 +44,13 @@ class _HomePageState extends ConsumerState<HomePage> {
       ValueNotifier<bool>(false);
   late TabController _tabController;
 
-  final AdService _adService = AdService();
-
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
 
-    _adService.loadInterstitial();
+    ref.read(adServiceProvider).loadInterstitial();
 
     if (!kIsWeb && Platform.isAndroid) {
       requestPermissions();
@@ -67,8 +65,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
     void didChangeDependencies() {
       super.didChangeDependencies();
-      _adService.loadBanner(context);
-
+      ref.read(adServiceProvider).loadBanner(context);
     }
 
   @override
@@ -76,7 +73,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     _tabController.removeListener(_onTabChange);
     _tabController.dispose();
     isAllLanguagesToggledNotifier.dispose(); // Dispose du notifier
-    _adService.dispose();
     super.dispose();
   }
 
@@ -250,6 +246,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final adService = ref.read(adServiceProvider);
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -275,8 +273,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         body: Column(
           children: [
-            if (_adService.getBannerWidget() != null)
-              _adService.getBannerWidget()!,
+            if (adService.getBannerWidget() != null)
+              adService.getBannerWidget()!,
 
             Expanded(child: 
               TabBarView(

@@ -13,13 +13,18 @@ class AdService {
   bool _isBannerLoaded = false;
   bool _isBannerLoadedOnce = false;
 
-  // ---------- IDs de test ----------
+  // ---------- IDs ----------
   final String interstitialAdUnitId = 'ca-app-pub-9706580094748746/2652484340'; // Test ID : ca-app-pub-3940256099942544/1033173712
   final String bannerAdUnitId = 'ca-app-pub-9706580094748746/7892523530'; // Test ID : ca-app-pub-3940256099942544/9214589741
 
   // ---------- INITIALISATION ----------
   static Future<void> initialize() async {
     await MobileAds.instance.initialize();
+
+    final config = RequestConfiguration(
+      testDeviceIds: ['E779AA37025CA3C4EE7B28A571BDA15A'], // Ton ID de test
+    );
+    await MobileAds.instance.updateRequestConfiguration(config);
   }
 
   // ---------- INTERSTITIAL ----------
