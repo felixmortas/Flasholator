@@ -8,8 +8,8 @@ permissions:
   packages: write
 
 env:
-  BUILD_NUMBER: 10
-  BUILD_NAME: 0.4.0
+  BUILD_NUMBER: 1
+  BUILD_NAME: 0.5.0
   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
   STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
@@ -60,5 +60,5 @@ jobs:
         serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
         packageName: com.felinx18.flasholator
         releaseFiles: build/app/outputs/bundle/release/app-release.aab
-        track: production
+        track: internal
         status: completed
