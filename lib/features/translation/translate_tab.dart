@@ -11,6 +11,7 @@ import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
+import 'package:flasholator/features/shared/widgets/language_dropdown.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
@@ -33,6 +34,7 @@ class TranslateTab extends ConsumerStatefulWidget {
 
 class _TranslateTabState extends ConsumerState<TranslateTab> {
   final languageSelection = LanguageSelection();
+  String? _lastCoupleLang;
   String _wordToTranslate = '';
   String _translatedWord = '';
   bool isTranslateButtonDisabled = true;
@@ -49,6 +51,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   void initState() {
     super.initState();
     _controller.addListener(_updateButtonState);
+
   }
 
   @override
@@ -114,6 +117,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   Future<void> _translate() async {
+    
     isTranslateButtonDisabled = true;
     try {
       String translation = await widget.deeplTranslator.translate(
@@ -206,8 +210,19 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   @override
   Widget build(BuildContext context) {
-    final counter = ref.watch(counterProvider);
     final isSubscribed = ref.watch(isSubscribedProvider);
+
+    final coupleLang = ref.watch(coupleLangProvider);
+
+    if (coupleLang != _lastCoupleLang) {
+      _lastCoupleLang = coupleLang;
+
+      if (coupleLang.contains('-')) {
+        languageSelection.sourceLanguage = coupleLang.split('-')[0];
+        languageSelection.targetLanguage = coupleLang.split('-')[1];
+      }
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -215,119 +230,56 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
           children: [
             Row(
               children: [
-                Text('Translation counter = $counter/100'),
+                Text('Translation counter = ${ref.watch(counterProvider)}/100'),
               ],
             ),
             Row(
               children: [
                 Expanded(
-                  child: LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return DropdownButton<String>(
-                        value: languageSelection.sourceLanguage,
-                        onChanged: (String? newValue) {
-                          if (isSubscribed) {
-                            if (newValue != languageSelection.targetLanguage) {
-                              setState(() {
-                                languageSelection.sourceLanguage = newValue!;
-                              });
-                            }
-                          } else {
-                            _openSubscribePopup();
-                          }
-                        },
-                        isExpanded: true,
-                        isDense: true,
-                        items: sortedLanguageEntries.map((entry) {
-                          return DropdownMenuItem<String>(
-                            value: entry.key,
-                            onTap: () {
-                              if (isSubscribed) {
-                                if (languageSelection.sourceLanguage == entry.key) {
-                                  return;
-                                } else if (languageSelection.sourceLanguage != entry.key ||
-                                    languageSelection.targetLanguage != entry.key) {
-                                  _onLanguageChange(entry.key);
-                                }
-                              }
-                            },
-                            enabled: languageSelection.targetLanguage != entry.key,
-                            child: Text(
-                              AppLocalizations.of(context)!.getTranslatedLanguageName(entry.key),
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                color: languageSelection.targetLanguage == entry.key
-                                    ? Colors.grey
-                                    : null,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-
-                      );
+                  child: 
+                  LanguageDropdown(
+                    selectedLanguage: languageSelection.sourceLanguage,
+                    otherLanguage: languageSelection.targetLanguage,
+                    sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                  AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                    )).toList(),
+                    onChanged: isSubscribed
+                    ? (val) {
+                      setState(() {
+                        languageSelection.sourceLanguage = val!;
+                      });
+                    }
+                    : (val) {
+                      print("not subscribed");
                     },
                   ),
                 ),
+                
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        _swapContent();
-                      });
-                    },
+                            setState(() {
+                              _swapContent();
+                            });
+                          },
                     child: const Icon(Icons.swap_horiz),
                   ),
                 ),
                 Expanded(
-                  child: LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return DropdownButton<String>(
-                        value: languageSelection.targetLanguage,
-                        onChanged: (String? newValue) {
-                          if (isSubscribed) {
-                            if (newValue != languageSelection.sourceLanguage) {
-                              setState(() {
-                                languageSelection.targetLanguage = newValue!;
-                              });
-                            }
-                          } else {
-                            _openSubscribePopup();
-                          }
-                        },
-                        isExpanded: true,
-                        isDense: true,
-                        items: sortedLanguageEntries.map((entry) {
-                          return DropdownMenuItem<String>(
-                            value: entry.key,
-                            onTap: () {
-                              if (isSubscribed) {
-                                if (languageSelection.targetLanguage == entry.key) {
-                                  return;
-                                } else if (languageSelection.targetLanguage != entry.key ||
-                                    languageSelection.sourceLanguage != entry.key) {
-                                  _onLanguageChange(entry.key);
-                                }
-                              }
-                            },
-                            enabled: languageSelection.sourceLanguage != entry.key,
-                            child: Text(
-                              AppLocalizations.of(context)!.getTranslatedLanguageName(entry.key),
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                color: languageSelection.sourceLanguage == entry.key
-                                    ? Colors.grey
-                                    : null,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-
-                      );
+                  child: LanguageDropdown(
+                    selectedLanguage: languageSelection.targetLanguage,
+                    otherLanguage: languageSelection.sourceLanguage,
+                    sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                      AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                    )).toList(),
+                    onChanged: isSubscribed
+                    ? (val) {
+                      setState(() {
+                        languageSelection.targetLanguage = val!;
+                      });
+                    }: (val) {
+                      print("not subscribed");
                     },
                   ),
                 ),

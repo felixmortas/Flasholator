@@ -21,6 +21,12 @@ class UserManager {
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
+  Future<void> setCoupleLang(String sourceLang, String targetLang) async {
+    final updatedData = {'coupleLang': '$sourceLang-$targetLang'};
+
+    updateUser(updatedData);
+  }
+
   Future<void> banTranslation(BuildContext context) async {
     final updatedData = {'canTranslate': false};
 
@@ -101,7 +107,7 @@ class UserManager {
     updateUser(updatedData);
   }
 
-  Future<void> revokeSubscription(String subscriptionEndDate) async {
+  Future<void> checkAndRevokeSubscription(String subscriptionEndDate) async {
     if (subscriptionEndDate.isEmpty) return;
 
     final now = DateTime.now();
@@ -128,35 +134,16 @@ class UserManager {
     }
   }
 
-  Future<void> checkSubscriptionStatus(
-  ) async {
-    final data = await getUserFromUserPrefs(); // assure le cache
-    final now = DateTime.now();
-    final subscriptionEndDate = data['subscriptionEndDate'];
-    final isSubscribed = data['isSubscribed'];
-
-    if (subscriptionEndDate != '' &&
-        isSubscribed) {
-      final endDate = DateTime.tryParse(subscriptionEndDate);
-      if (endDate != null && now.isAfter(endDate)) {
-        await revokeSubscription(subscriptionEndDate);
-      }
-    }
+  Future<void> syncNotifierFromLocal() async {
+    final localData = await UserPreferencesService.loadUserData();
+    userNotifier.update(localData);
   }
 
   Future<Map<String, dynamic>> getUserFromUserPrefs() async {
     return await UserPreferencesService.loadUserData();
   }
 
-  Future<Map<String, dynamic>> getUserFromNotifier() async {
-    if (userNotifier.current.isEmpty) {
-      final data = await UserPreferencesService.loadUserData();
-      userNotifier.update(data);
-    }
-    return userNotifier.current;
-  }
-
-  Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore() async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> _getUserFromFirestore() async {
     final uid = _firebaseAuth.currentUser!.uid;
     
     final userDoc = await _firestoreDAO.getUser(uid);
@@ -164,8 +151,7 @@ class UserManager {
   }
 
   Future<void> syncUser() async {
-    final uid = _firebaseAuth.currentUser!.uid;
-    final userDoc = await _firestoreDAO.getUser(uid);
+    final userDoc = await _getUserFromFirestore();
     final data = userDoc.data() as Map<String, dynamic>;
 
     await UserPreferencesService.updateUser(data);
@@ -183,11 +169,6 @@ class UserManager {
     } catch (e) {
       throw Exception('Failed to login and sync user: $e');
     }
-  }
-
-  
-  Future<void> updateUserNotifier(Map<String, dynamic> data) async {
-    userNotifier.update(data);
   }
 
   // Nouvelle méthode pour mettre à jour dynamiquement les données utilisateur

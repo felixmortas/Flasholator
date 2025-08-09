@@ -17,6 +17,7 @@ import 'package:flasholator/features/translation/translate_tab.dart';
 import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
 import 'package:flasholator/features/shared/widgets/settings_dialog.dart';
+import 'package:flasholator/features/shared/dialogs/language_selection_popup.dart';
 import 'package:flasholator/features/authentication/profile_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -80,25 +81,57 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.dispose();
   }
 
-  Future<void> _loadUserPrefsAndUpdateNotifier() async {
+  void _showLanguageSelectionPopup(String sourceLang, String targetLang) {
+    print("-- Entered _showLanguageSelectionPopup");
     final userManager = ref.read(userManagerProvider);
-    
-    final userPrefs = await userManager.getUserFromUserPrefs();
-    
-    userManager.updateUserNotifier(userPrefs);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // obligatoire, pour forcer le choix
+      builder: (_) {
+        return LanguageSelectionPopup(
+          onSave: (newSourceLang, newTargetLang) async {
+            await userManager.setCoupleLang(newSourceLang, newTargetLang);
+
+            // Optionnel : ferme la popup automatiquement
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
   }
 
-  void checkAndRevokeSubscription(String subscriptionEndDate) async {
-    
-    final endDate = DateTime.tryParse(subscriptionEndDate);
-    if (endDate != null && endDate.isBefore(DateTime.now())) {
-      
-      final userManager = ref.read(userManagerProvider);
-      await userManager.revokeSubscription(subscriptionEndDate);
+  Future<void> _loadUserPrefsAndUpdateNotifier() async {
+    print("-- Entered _loadUserPrefsAndUpdateNotifier");
+    final userManager = ref.read(userManagerProvider);
+    print("-- Enter syncNotifierFromLocal()");
+    await userManager.syncNotifierFromLocal();
+    print("-- Exited syncNotifierFromLocal()");
+
+    final coupleLang = ref.read(coupleLangProvider);
+    print("-- coupleLang: $coupleLang");
+    final sourceLang = coupleLang.contains('-') ? coupleLang.split('-')[0] : '';
+    final targetLang = coupleLang.contains('-') ? coupleLang.split('-')[1] : '';
+    print("-- sourceLang: $sourceLang");
+    print("-- targetLang: $targetLang");
+    if (sourceLang == '' || targetLang == '') {
+      print("-- Entered if langs==''()");
+      // Première connexion sans couple de langue
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        print("-- Entered addPostFrameCallback");
+        _showLanguageSelectionPopup(sourceLang, targetLang);
+      });
     }
   }
 
+  void checkAndRevokeSubscription(String subscriptionEndDate) async { 
+    final userManager = ref.read(userManagerProvider);
+    await userManager.checkAndRevokeSubscription(subscriptionEndDate);
+  }
+
   void _initUserState() async {    
+    print("-- Entered _initUserState");
+
     await _loadUserPrefsAndUpdateNotifier();
 
     final isSubscribed = ref.read(isSubscribedProvider);    
@@ -288,7 +321,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 )
               },
             ),
-
             IconButton(
                 icon: Icon(Icons.settings),
                 onPressed: () {

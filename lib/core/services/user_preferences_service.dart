@@ -7,6 +7,7 @@ class UserPreferencesService {
   static const _subscriptionEndDateKey = 'subscriptionEndDate';
   static const _counterKey = 'counter';
   static const _userDataCachedKey = 'userDataCached';
+  static const _coupleLangKey = 'coupleLang';
 
   // ====================
   // === READ METHODS ===
@@ -40,6 +41,11 @@ class UserPreferencesService {
   static Future<bool> isUserDataCached() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_userDataCachedKey) ?? false;
+  }
+
+  static Future<String> getCoupleLang() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_coupleLangKey) ?? '';
   }
 
   // =====================
@@ -79,6 +85,7 @@ class UserPreferencesService {
     await prefs.remove(_subscriptionEndDateKey);
     await prefs.remove(_counterKey);
     await prefs.setBool(_userDataCachedKey, false);
+    await prefs.remove(_coupleLangKey);
   }
 
   // =========================
@@ -94,6 +101,7 @@ class UserPreferencesService {
       'subscriptionDate': prefs.getString(_subscriptionDateKey) ?? '',
       'subscriptionEndDate': prefs.getString(_subscriptionEndDateKey) ?? '',
       'counter': prefs.getInt(_counterKey) ?? 0,
+      'coupleLang': prefs.getString(_coupleLangKey) ?? '',
     };
   }
 
@@ -108,6 +116,7 @@ class UserPreferencesService {
       _canTranslateKey,
       _subscriptionDateKey,
       _subscriptionEndDateKey,
+      _coupleLangKey,
     };
 
     if (fields.keys.toSet().intersection(watchedKeys).isNotEmpty) {
