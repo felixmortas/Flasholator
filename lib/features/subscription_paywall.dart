@@ -36,7 +36,7 @@ class SubscriptionPaywall extends ConsumerWidget {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
-                  title: Text(product.title),
+                  title: Text(package.storeProduct.identifier.split('_').last),
                   subtitle: Text(product.description),
                   trailing: Text(product.priceString),
                   onTap: () async {

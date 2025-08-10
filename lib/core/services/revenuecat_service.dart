@@ -1,6 +1,7 @@
 // lib/core/services/revenuecat_service.dart
 
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 class RevenueCatService {
 
@@ -13,6 +14,11 @@ class RevenueCatService {
 
   Future<CustomerInfo> getCustomerInfo() async {
     return await Purchases.getCustomerInfo();
+  }
+
+  Future presentPaywall() async {
+    final paywallResult = await RevenueCatUI.presentPaywall();
+    return paywallResult;
   }
 
   Future<Offerings?> getOfferings() async {

@@ -58,6 +58,7 @@ dependencies:
   mocktail: ^1.0.4
   flutter_riverpod: ^2.6.1            # Variables accessibles globalement dans l'app (=providers)
   purchases_flutter: ^9.2.0           # RevenueCat subscriptions
+  purchases_ui_flutter: ^9.2.0
 
 
 flutter_launcher_icons:

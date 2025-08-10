@@ -3,7 +3,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:flasholator/features/subscription_paywall.dart';
+// import 'package:flasholator/features/subscription_paywall.dart';
 import 'package:flasholator/features/authentication/widgets/change_password_dialog.dart';
 import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
@@ -12,6 +12,7 @@ import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/providers/revenuecat_provider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
 
@@ -52,17 +53,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final isSubscribed = ref.read(isSubscribedProvider);
 
     if (!isSubscribed) {
+      final service = ref.read(revenueCatServiceProvider);
+      final paywallResult = await service.presentPaywall();
 
-      // naviguer jusqu'à subscription_paywall 
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const SubscriptionPaywall(),
-        ),
-      );
+      // naviguer jusqu'à subscription_paywall
+      // final result = await Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const SubscriptionPaywall(),
+      //   ),
+      // );
 
-
-      // await UserManager.subscribeUser();
+      if(paywallResult.purchased) {
+        final customerInfo = await service.getCustomerInfo();
+        final isActive = customerInfo.entitlements.active.containsKey("pro");
+        if(isActive) {
+          userManager = ref.read(userManagerProvider);
+          await userManager.subscribeUser();
+        }
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
