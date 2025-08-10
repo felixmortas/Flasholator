@@ -54,7 +54,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     if (!isSubscribed) {
       final service = ref.read(revenueCatServiceProvider);
-      final paywallResult = await service.presentPaywall();
+      await service.presentPaywall();
 
       // naviguer jusqu'à subscription_paywall
       // final result = await Navigator.push(
@@ -64,14 +64,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       //   ),
       // );
 
-      if(paywallResult.purchased) {
-        final customerInfo = await service.getCustomerInfo();
-        final isActive = customerInfo.entitlements.active.containsKey("pro");
-        if(isActive) {
-          userManager = ref.read(userManagerProvider);
-          await userManager.subscribeUser();
-        }
-      }
+      final customerInfo = await service.getCustomerInfo();
+      print(customerInfo);
+      print(customerInfo.entitlements.active);
+      final isActive = customerInfo.entitlements.active.containsKey("pro");
+      print(isActive);
+      if(isActive) {
+        await userManager.subscribeUser();
+    }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
