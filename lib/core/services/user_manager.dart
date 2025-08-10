@@ -22,6 +22,11 @@ class UserManager {
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
+  String getUserId() {
+    final firebaseUser = _firebaseAuth.currentUser;
+    return firebaseUser?.uid ?? "";
+  }
+
   Future<void> setCoupleLang(String sourceLang, String targetLang) async {
     final updatedData = {'coupleLang': '$sourceLang-$targetLang'};
 

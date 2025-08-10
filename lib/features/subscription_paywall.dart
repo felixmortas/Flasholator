@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-import '../../core/providers/revenuecat_provider.dart';
+import 'package:flasholator/core/providers/revenuecat_provider.dart';
 
 class SubscriptionPaywall extends ConsumerWidget {
   const SubscriptionPaywall({super.key});

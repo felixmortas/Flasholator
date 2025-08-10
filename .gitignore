@@ -49,3 +49,6 @@ app.*.map.json
 # iOS build folder
 /certs/
 /provisioning/
+
+# Google cloud service access API key
+flasholator-5f32a92b4c53.json

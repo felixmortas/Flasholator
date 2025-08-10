@@ -3,7 +3,8 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class RevenueCatService {
-  static const String _apiKey = 'REVENUECAT_PUBLIC_API_KEY'; // Remplace par ta clé
+
+  static const String _apiKey = 'goog_yrvYeFcZAwKnCSkdHaMeUAIUPFb';
 
   Future<void> initRevenueCat(String userId) async {
     await Purchases.setLogLevel(LogLevel.debug);
