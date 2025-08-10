@@ -34,11 +34,10 @@ __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
-- Facturation abonnement 
-- Une ou deux langues fun translator
 - Notifications de rappel cartes à réviser
 - Plusieurs résultats lors de la traduction.
 - Prononciation
+- Une ou deux langues fun translator
 
 ### Expérience utilisateur :
 - Réduction au maximum le nombre de clics nécessaires pour utiliser l'application.
