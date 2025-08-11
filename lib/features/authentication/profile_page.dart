@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-// import 'package:flasholator/features/subscription_paywall.dart';
 import 'package:flasholator/features/authentication/widgets/change_password_dialog.dart';
 import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
@@ -49,10 +47,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
       );
     } 
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   Future<void> _signOut(BuildContext context) async {
@@ -173,9 +167,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
-        // Données utilisateur observées via Riverpod
-        final isSubscribed = ref.read(isSubscribedProvider);
-
+        final isSubscribed = ref.watch(isSubscribedProvider);
         final abonnementLabel = isSubscribed
             ? AppLocalizations.of(context)!.premium
             : AppLocalizations.of(context)!.free;

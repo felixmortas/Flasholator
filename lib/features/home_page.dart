@@ -1,6 +1,4 @@
-import 'package:flasholator/core/providers/revenuecat_provider.dart';
 
-import '../l10n/app_localizations.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/core/providers/revenuecat_provider.dart';
 import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
@@ -28,7 +28,7 @@ class HomePage extends ConsumerStatefulWidget {
   const HomePage({
     Key? key,
   }) : super(key: key);
-
+  
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
@@ -45,6 +45,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   final ValueNotifier<bool> isAllLanguagesToggledNotifier =
       ValueNotifier<bool>(false);
   late TabController _tabController;
+
+  UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
   @override
   void initState() {
@@ -103,8 +105,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _initUserState() async {
     final userManager = ref.read(userManagerProvider);
-    await userManager.syncNotifierFromLocal();
-
+    await userManager.syncNotifier();
+    
     final coupleLang = ref.read(coupleLangProvider);
     final sourceLang = coupleLang.contains('-') ? coupleLang.split('-')[0] : '';
     final targetLang = coupleLang.contains('-') ? coupleLang.split('-')[1] : '';

@@ -59,12 +59,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     try {
       final userManager = ref.read(userManagerProvider);
-      await userManager.registerUser(email, password);
-
-      await userManager.updateDisplayName(username);
-      await userManager.sendEmailVerification();
-
-      // On peut aussi stocker le nom dans Firestore ici si besoin
+      await userManager.registerUser(email, password, username);
 
       setState(() => isLoading = false);
 

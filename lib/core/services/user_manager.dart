@@ -25,8 +25,9 @@ class UserManager {
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
-  Future<void> updateDisplayName(String displayName) async {
-    await _authService.updateDisplayName(displayName);
+  Future<bool> isSubscribed() async {
+    final isSubscribed = await _revenueCatService.isSubscribed();
+    return isSubscribed;
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
@@ -86,13 +87,10 @@ class UserManager {
     }
   }
 
-  Future<void> registerUser(String email, String password) async {
+  Future<void> registerUser(String email, String password, String username) async {
     await _authService.registerUser(email, password);
-
-    final userData = {
-      'canTranslate': true,
-    };
-    updateUser(userData);
+    await _authService.updateDisplayName(username);
+    await _authService.sendEmailVerification();
   }
 
   Future<void> subscribeUser() async {
@@ -133,9 +131,9 @@ class UserManager {
     }
   }
 
-  Future<void> syncNotifierFromLocal() async {
+  Future<void> syncNotifier() async {
     final data = await UserPreferencesService.loadUserData();
-    userNotifier.update(data);
+    userNotifier.update(data..['isSubscribed'] = await _revenueCatService.isSubscribed());
   }
 
   Future<Map<String, dynamic>> getUserFromUserPrefs() async {

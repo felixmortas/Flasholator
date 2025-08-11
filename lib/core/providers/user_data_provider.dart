@@ -5,15 +5,11 @@ final userDataProvider = StateNotifierProvider<UserDataNotifier, Map<String, dyn
 );
 
 final canTranslateProvider = Provider<bool>((ref) {
-  return ref.watch(userDataProvider)['canTranslate'] as bool? ?? false;
+  return ref.watch(userDataProvider)['canTranslate'] as bool? ?? true;
 });
 
 final isSubscribedProvider = Provider<bool>((ref) {
   return ref.watch(userDataProvider)['isSubscribed'] as bool? ?? false;
-});
-
-final subscriptionEndDateProvider = Provider<String>((ref) {
-  return ref.watch(userDataProvider)['subscriptionEndDate'] as String? ?? '';
 });
 
 final counterProvider = Provider<int>((ref) {
@@ -43,8 +39,6 @@ class UserDataNotifier extends StateNotifier<Map<String, dynamic>> {
   // Getters pratiques
   bool get isSubscribed => state['isSubscribed'] ?? false;
   bool get canTranslate => state['canTranslate'] ?? false;
-  String get subscriptionDate => state['subscriptionDate'] ?? '';
-  String get subscriptionEndDate => state['subscriptionEndDate'] ?? '';
   int get counter => state['counter'] ?? 0;
   String get coupleLang => state['coupleLang'] ?? '';
 

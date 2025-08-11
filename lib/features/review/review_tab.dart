@@ -1,9 +1,9 @@
-import 'package:flasholator/config/constants.dart';
-import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/models/flashcard.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';

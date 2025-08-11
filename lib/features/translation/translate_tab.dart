@@ -94,15 +94,8 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   void _openSubscribePopup() {
-    Fluttertoast.showToast(
-      msg: "Limit reached",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    final userManager = ref.read(userManagerProvider);
+    userManager.subscribeUser();
   }
 
   void _checkIfCanTranslate() {
@@ -110,13 +103,13 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     final canTranslate = ref.read(canTranslateProvider);
 
     if(isSubscribed || canTranslate) {
-      _translate();
+      _translate(isSubscribed);
     } else {
       _openSubscribePopup();
     }
   }
 
-  Future<void> _translate() async {
+  Future<void> _translate(bool isSubscribed) async {
 
     isTranslateButtonDisabled = true;
     try {
@@ -135,7 +128,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         isTranslateButtonDisabled = true;
       });
 
-      final isSubscribed = ref.read(isSubscribedProvider);
       if(!isSubscribed) {
         final userManager = ref.read(userManagerProvider);
         await userManager.incrementCounter(context);

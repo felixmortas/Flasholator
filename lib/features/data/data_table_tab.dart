@@ -1,17 +1,17 @@
-import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
-import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/config/constants.dart';
-import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/data/widgets/all_languages_table.dart';
 import 'package:flasholator/features/data/widgets/couple_languages_table.dart';
 import 'package:flasholator/features/data/widgets/edit_flashcard_popup.dart';
 import 'package:flasholator/features/data/widgets/add_flashcard_popup.dart';
+import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
+import 'package:flasholator/features/shared/utils/language_selection.dart';
 
 // Add doc comments
 class DataTableTab extends ConsumerStatefulWidget {
@@ -123,15 +123,8 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   }
 
   void _openSubscribePopup() {
-    Fluttertoast.showToast(
-      msg: "Limit reached",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
+    final userManager = ref.read(userManagerProvider);
+    userManager.subscribeUser();
   }
 
   Future<void> _checkIfCanAddCard() async {

@@ -45,7 +45,7 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
 
       if (await userManager.isEmailVerified()) {
         if (mounted) {
-          await userManager.registerUser();
+          await userManager.updateUser({'canTranslate': true});
           Navigator.pushReplacementNamed(context, "/"); // Retour vers AuthGate
         }
       } else {
