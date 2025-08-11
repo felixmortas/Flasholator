@@ -110,7 +110,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   Future<void> _translate(bool isSubscribed) async {
-
     isTranslateButtonDisabled = true;
     try {
       String translation = await widget.deeplTranslator.translate(
@@ -220,11 +219,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Row(
-              children: [
-                Text('Translation counter = ${ref.watch(counterProvider)}/$MAX_TRANSLATIONS'),
-              ],
-            ),
             Row(
               children: [
                 Expanded(
