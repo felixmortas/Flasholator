@@ -7,17 +7,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
+import 'package:flasholator/core/services/revenuecat_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_sync_provider.dart';
 
 class UserManager {
   final FirestoreUsersDAO _firestoreDAO;
   final FirebaseAuth _firebaseAuth;
+  final RevenueCatService _revenueCatService;
   final Ref ref;
 
-  UserManager({required this.ref, required FirestoreUsersDAO firestoreDAO, required FirebaseAuth firebaseAuth})
+  UserManager({required this.ref, required FirestoreUsersDAO firestoreDAO, required FirebaseAuth firebaseAuth, required RevenueCatService revenueCatService})
       : _firestoreDAO = firestoreDAO,
-        _firebaseAuth = firebaseAuth;
+        _firebaseAuth = firebaseAuth,
+        _revenueCatService = revenueCatService;
 
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
@@ -57,26 +60,27 @@ class UserManager {
 
   Future<void> registerUser() async {
     final userData = {
-      'isSubscribed': false,
       'canTranslate': true,
-      'subscriptionDate': '',
-      'subscriptionEndDate': '',
     };
 
     updateUser(userData);
   }
 
   Future<void> subscribeUser() async {
-    final now = DateTime.now();
-    final dateStr = DateFormat('yyyy-MM-dd').format(now);
+    final bool wasSubscribed = userNotifier.isSubscribed;
+    await _revenueCatService.presentPaywall();
+    if(!wasSubscribed) {
+      final bool isSubscribed = await _revenueCatService.isSubscribed();
+      if (isSubscribed) {
+        updateLocal({"isSubscribed": isSubscribed});
+      }
+    }
+    
+  }
 
-    final updatedData = {
-      'isSubscribed': true,
-      'subscriptionDate': dateStr,
-      'subscriptionEndDate': '',
-    };
-
-    updateUser(updatedData);
+  Future<void> updateLocal(Map<String, dynamic> data) async {
+    await UserPreferencesService.updateUser(data);
+    userNotifier.update(data);
   }
 
   Future<void> scheduleSubscriptionRevocation() async {

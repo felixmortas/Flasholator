@@ -42,70 +42,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     });
   }
 
-  Future<void> _loadSubscriptionFromLocal() async {
-    // await UserManager.getUserFromNotifier();
-
-    setState(() {}); // déclenche un rebuild pour prendre en compte les nouvelles valeurs
-  }
-
-  Future<void> _handleSubscriptionAction() async {
-    final now = DateTime.now();
+  Future<void> _subscribe() async {
+    final bool wasSubscribed = ref.read(isSubscribedProvider);
+    await userManager.subscribeUser();
     final isSubscribed = ref.read(isSubscribedProvider);
 
-    if (!isSubscribed) {
-      final service = ref.read(revenueCatServiceProvider);
-      await service.presentPaywall();
-
-      // naviguer jusqu'à subscription_paywall
-      // final result = await Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => const SubscriptionPaywall(),
-      //   ),
-      // );
-
-      final customerInfo = await service.getCustomerInfo();
-      print(customerInfo);
-      print(customerInfo.entitlements.active);
-      final isActive = customerInfo.entitlements.active.containsKey("pro");
-      print(isActive);
-      if(isActive) {
-        await userManager.subscribeUser();
-    }
-
+    if (isSubscribed && !wasSubscribed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
       );
-    } else {
-      final subscriptionEndDate = ref.read(subscriptionEndDateProvider);
-      if (subscriptionEndDate == '' || subscriptionEndDate.isEmpty) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UnsubscribePage(
-              onUnsubscribe: () async {
-                await userManager.scheduleSubscriptionRevocation(
-                );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text('${AppLocalizations.of(context)!.subscriptionCancelled} ${_formatDate(now.add(const Duration(days: 30)))}')),
-                );
-                _loadSubscriptionFromLocal(); // rafraîchir
-              },
-            ),
-          ),
-        );
-      } else {
-        await userManager.subscribeUser();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionReactivated)),
-        );
-      }
-    }
-
-    _loadSubscriptionFromLocal(); // rafraîchir les données locales
+    } 
   }
 
   String _formatDate(DateTime date) {
@@ -293,12 +239,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 _infoRow(AppLocalizations.of(context)!.renewal, renouvellementLabel),
                 const SizedBox(height: 8),
                 ElevatedButton(
-                  onPressed: () => _handleSubscriptionAction(),
-                  child: Text((isSubscribed && endDateStr != null && endDateStr != '')
-                      ? AppLocalizations.of(context)!.reactivateSubscription
-                      : isSubscribed
-                          ? AppLocalizations.of(context)!.unsubscribeAction
-                          : AppLocalizations.of(context)!.activateSubscription),
+                  onPressed: () => _subscribe(),
+                  child: Text(AppLocalizations.of(context)!.activateSubscription),
                 ),
                 const SizedBox(height: 12),
                 if (_showPrivacyButton)

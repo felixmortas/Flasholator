@@ -16,6 +16,12 @@ class RevenueCatService {
     return await Purchases.getCustomerInfo();
   }
 
+  Future<bool> isSubscribed() async {
+    final customerInfo = await getCustomerInfo();
+    final isActive = customerInfo.entitlements.active.containsKey("pro");
+    return isActive;
+  }
+
   Future presentPaywall() async {
     final paywallResult = await RevenueCatUI.presentPaywall();
     return paywallResult;
