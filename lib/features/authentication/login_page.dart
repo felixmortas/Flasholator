@@ -24,7 +24,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.read(userSyncStateProvider.notifier).state = false;
 
     final userManager = ref.read(userManagerProvider);    
-    await userManager.loginAndSyncUser(emailController.text.trim(), passwordController.text.trim());
+    await userManager.login(emailController.text.trim(), passwordController.text.trim());
     
   } on FirebaseAuthException catch (e) {
     if (!mounted) return;

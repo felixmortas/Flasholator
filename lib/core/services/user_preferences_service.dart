@@ -1,7 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPreferencesService {
-  static const _isSubscribedKey = 'isSubscribed';
   static const _canTranslateKey = 'canTranslate';
   static const _counterKey = 'counter';
   static const _userDataCachedKey = 'userDataCached';
@@ -10,11 +9,6 @@ class UserPreferencesService {
   // ====================
   // === READ METHODS ===
   // ====================
-
-  static Future<bool> getIsSubscribed() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_isSubscribedKey) ?? false;
-  }
 
   static Future<bool> getCanTranslate() async {
     final prefs = await SharedPreferences.getInstance();
@@ -67,7 +61,6 @@ class UserPreferencesService {
   /// Supprime toutes les données utilisateur enregistrées localement
   static Future<void> deleteUser() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_isSubscribedKey);
     await prefs.remove(_canTranslateKey);
     await prefs.remove(_counterKey);
     await prefs.setBool(_userDataCachedKey, false);
@@ -82,7 +75,6 @@ class UserPreferencesService {
   static Future<Map<String, dynamic>> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     return {
-      'isSubscribed': prefs.getBool(_isSubscribedKey) ?? false,
       'canTranslate': prefs.getBool(_canTranslateKey) ?? true,
       'counter': prefs.getInt(_counterKey) ?? 0,
       'coupleLang': prefs.getString(_coupleLangKey) ?? '',
@@ -96,9 +88,9 @@ class UserPreferencesService {
   /// Marque les données utilisateur comme étant mises en cache si certains champs sont mis à jour
   static Future<void> _updateCachedFlag(SharedPreferences prefs, Map<String, dynamic> fields) async {
     const watchedKeys = {
-      _isSubscribedKey,
       _canTranslateKey,
       _coupleLangKey,
+      _counterKey,
     };
 
     if (fields.keys.toSet().intersection(watchedKeys).isNotEmpty) {

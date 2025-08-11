@@ -25,17 +25,40 @@ class UserManager {
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
-  Future<bool> isSubscribed() async {
-    final isSubscribed = await _revenueCatService.isSubscribed();
-    return isSubscribed;
+  Future<void> setCoupleLang(String sourceLang, String targetLang) async {
+    final data = {'coupleLang': '$sourceLang-$targetLang'};
+
+    await updateUser(data);
+  }
+
+  Future<void> banTranslation(BuildContext context) async {
+    final data = {'canTranslate': false};
+
+    await updateUser(data);
+  }
+
+  Future<void> incrementCounter(BuildContext context) async {
+    final currentCounter = await UserPreferencesService.getCounter();
+    final updatedCounter = currentCounter + 1;
+
+    updateLocal({'counter': updatedCounter});
+
+    // Si limite atteinte, bloquer les traductions
+    if (updatedCounter >= MAX_TRANSLATIONS) {
+      await banTranslation(context);
+    }
+  }
+
+  Future<void> reauthenticateWithCredential(String password) async {
+    await _authService.reauthenticateWithCredential(password);
+  }
+
+  Future<void> changePassword(String currentPassword, String newPassword) async {
+    await _authService.changePassword(currentPassword, newPassword);
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
     await _authService.sendPasswordResetEmail(email);
-  }
-
-  String getUserEmail() {
-    return _authService.getUserEmail();
   }
 
   Future<bool> isEmailVerified() async {
@@ -51,46 +74,20 @@ class UserManager {
     return _authService.authStateChanges();
   }
 
-  String getUserName() {
-    return _authService.getUserName();
-  }
-
-  String getUserId() {
-    return _authService.getUserId();
-  }
-
-  Future<void> setCoupleLang(String sourceLang, String targetLang) async {
-    final updatedData = {'coupleLang': '$sourceLang-$targetLang'};
-
-    await updateUser(updatedData);
-  }
-
-  Future<void> banTranslation(BuildContext context) async {
-    final updatedData = {'canTranslate': false};
-
-    updateUser(updatedData);
-  }
-
-  Future<void> incrementCounter(BuildContext context) async {
-    final currentCounter = await UserPreferencesService.getCounter();
-    final updatedCounter = currentCounter + 1;
-
-    // Mettre à jour les préférences
-    await UserPreferencesService.updateUser({'counter': updatedCounter});
-    // Mettre à jour le provider
-    userNotifier.update({'counter': updatedCounter});
-
-    // Si limite atteinte, bloquer les traductions
-    if (updatedCounter >= MAX_TRANSLATIONS) {
-      if (!context.mounted) return;
-      await banTranslation(context);
-    }
-  }
-
   Future<void> registerUser(String email, String password, String username) async {
     await _authService.registerUser(email, password);
     await _authService.updateDisplayName(username);
     await _authService.sendEmailVerification();
+  }
+
+  Future<void> login(String email, String password) async {
+    try {
+      await _authService.login(email, password);
+      await syncUser();
+
+    } catch (e) {
+      throw Exception('Failed to login and sync user: $e');
+    }
   }
 
   Future<void> subscribeUser() async {
@@ -108,19 +105,6 @@ class UserManager {
     await _authService.signOut();
   }
 
-  Future<void> reauthenticateWithCredential(String password) async {
-    await _authService.reauthenticateWithCredential(password);
-  }
-
-  Future<void> changePassword(String currentPassword, String newPassword) async {
-    await _authService.changePassword(currentPassword, newPassword);
-  }
-
-  Future<void> updateLocal(Map<String, dynamic> data) async {
-    await UserPreferencesService.updateUser(data);
-    userNotifier.update(data);
-  }
-
   Future<void> deleteUser() async {
     final uid = _authService.getUserId();
     if (uid != null) {
@@ -136,19 +120,8 @@ class UserManager {
     userNotifier.update(data..['isSubscribed'] = await _revenueCatService.isSubscribed());
   }
 
-  Future<Map<String, dynamic>> getUserFromUserPrefs() async {
-    return await UserPreferencesService.loadUserData();
-  }
-
-  Future<DocumentSnapshot<Map<String, dynamic>>> _getUserFromFirestore() async {
-    final uid = _authService.getUserId();
-
-    final userDoc = await _firestoreDAO.getUser(uid);
-    return userDoc;
-  }
-
   Future<void> syncUser() async {
-    final userDoc = await _getUserFromFirestore();
+    final userDoc = await getUserFromFirestore();
     final userDocData = userDoc.data() as Map<String, dynamic>;
     final bool canTranslate = userDocData['canTranslate'] ?? false;
     final String coupleLang = userDocData['coupleLang'] ?? '';
@@ -165,26 +138,49 @@ class UserManager {
     ref.read(userSyncStateProvider.notifier).state = true;
   }
 
-  Future<void> loginAndSyncUser(String email, String password) async {
-    try {
 
-      await _authService.login(email, password);
-      await syncUser();
-
-    } catch (e) {
-      throw Exception('Failed to login and sync user: $e');
-    }
+  Future<void> updateLocal(Map<String, dynamic> data) async {
+    await UserPreferencesService.updateUser(data);
+    userNotifier.update(data);
   }
 
   Future<void> updateUser(Map<String, dynamic> data) async {
     final uid = _authService.getUserId();
-
+    
     await _firestoreDAO.updateUser(uid, data);
     await UserPreferencesService.updateUser(data);
     userNotifier.update(data);
-    }
+  }
 
   Future<bool> isUserDataCached() async {
     return UserPreferencesService.isUserDataCached();
   }
+
+  Future<bool> isSubscribed() async {
+    final isSubscribed = await _revenueCatService.isSubscribed();
+    return isSubscribed;
+  }
+
+  Future<Map<String, dynamic>> getUserFromUserPrefs() async {
+    return await UserPreferencesService.loadUserData();
+  }
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore() async {
+    final uid = _authService.getUserId();
+    final userDoc = await _firestoreDAO.getUser(uid);
+    return userDoc;
+  }
+
+    String getUserEmail() {
+    return _authService.getUserEmail();
+  }
+
+  String getUserName() {
+    return _authService.getUserName();
+  }
+
+  String getUserId() {
+    return _authService.getUserId();
+  }
+
 }
