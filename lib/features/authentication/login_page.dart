@@ -4,7 +4,6 @@ import 'package:flasholator/core/providers/user_sync_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 import 'package:flasholator/features/authentication/register_page.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
@@ -38,7 +37,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final firebaseAuth = ref.read(firebaseAuthProvider);
+    final userManager = ref.read(userManagerProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.logIn)),
@@ -60,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Text(AppLocalizations.of(context)!.signUp),
             ),
             TextButton(
-              onPressed: () => firebaseAuth.sendPasswordResetEmail(email: emailController.text.trim()),
+              onPressed: () => userManager.sendPasswordResetEmail(emailController.text.trim()),
               child: Text(AppLocalizations.of(context)!.forgotYourPassword),
             ),
           ],

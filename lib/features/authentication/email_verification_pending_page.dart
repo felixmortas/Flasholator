@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
-import 'package:flasholator/core/providers/firebase_auth_provider.dart';
 
 class EmailVerificationPendingPage extends ConsumerStatefulWidget {
   const EmailVerificationPendingPage({super.key});
@@ -24,9 +23,8 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
     });
 
     try {
-      final firebaseAuth = ref.read(firebaseAuthProvider);
-      final user = firebaseAuth.currentUser!;
-      await user.sendEmailVerification();
+      final userManager = ref.read(userManagerProvider);
+      await userManager.sendEmailVerification();
 
       setState(() => message = AppLocalizations.of(context)!.verificationEmailSent);
     } catch (e) {
@@ -43,18 +41,10 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
     });
 
     try {
-      final firebaseAuth = ref.read(firebaseAuthProvider);
-      final user = firebaseAuth.currentUser!;
-      
-      await user.reload(); // Important : recharge l’état depuis Firebase
-      final refreshedUser = firebaseAuth.currentUser;
+      final userManager = ref.read(userManagerProvider);
 
-
-      if (refreshedUser!.emailVerified) {
+      if (await userManager.isEmailVerified()) {
         if (mounted) {
-          final userManager = ref.read(userManagerProvider);
-          
-          final uid = firebaseAuth.currentUser!.uid;
           await userManager.registerUser();
           Navigator.pushReplacementNamed(context, "/"); // Retour vers AuthGate
         }
@@ -70,8 +60,7 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
 
   @override
   Widget build(BuildContext context) {
-    final firebaseAuth = ref.read(firebaseAuthProvider);
-    final userEmail = firebaseAuth.currentUser?.email ?? AppLocalizations.of(context)!.yourEmail;
+    final userManager = ref.read(userManagerProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.emailVerification)),
@@ -82,7 +71,7 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
           children: [
             Text(AppLocalizations.of(context)!.aVerificationEmailHasBeenSentTo,
                 style: Theme.of(context).textTheme.bodyMedium),
-            Text(userEmail,
+            Text(userManager.getUserEmail(),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 20),
             if (message != null)
@@ -108,7 +97,7 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
             ),
             const SizedBox(height: 30),
             TextButton(
-              onPressed: () => firebaseAuth.signOut(),
+              onPressed: () => userManager.signOut(),
               child: Text(AppLocalizations.of(context)!.logOut),
             ),
           ],

@@ -12,13 +12,8 @@ class FirestoreUsersDAO {
     await _firestore.collection('users').doc(uid).delete();
   }
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> _getUser(String uid) async {
-    final snapshot = await _firestore.collection('users').doc(uid).get();
-    return snapshot;
-  }
-
   Future<DocumentSnapshot<Map<String, dynamic>>> getUser(String uid) async {
-    final snapshot = await _getUser(uid);
+    final snapshot = await _firestore.collection('users').doc(uid).get();
     return snapshot;
   }
 

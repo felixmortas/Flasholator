@@ -3,8 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserPreferencesService {
   static const _isSubscribedKey = 'isSubscribed';
   static const _canTranslateKey = 'canTranslate';
-  static const _subscriptionDateKey = 'subscriptionDate';
-  static const _subscriptionEndDateKey = 'subscriptionEndDate';
   static const _counterKey = 'counter';
   static const _userDataCachedKey = 'userDataCached';
   static const _coupleLangKey = 'coupleLang';
@@ -21,16 +19,6 @@ class UserPreferencesService {
   static Future<bool> getCanTranslate() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_canTranslateKey) ?? true;
-  }
-
-  static Future<String> getSubscriptionDate() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_subscriptionDateKey) ?? '';
-  }
-
-  static Future<String> getSubscriptionEndDate() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_subscriptionEndDateKey) ?? '';
   }
 
   static Future<int> getCounter() async {
@@ -81,8 +69,6 @@ class UserPreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_isSubscribedKey);
     await prefs.remove(_canTranslateKey);
-    await prefs.remove(_subscriptionDateKey);
-    await prefs.remove(_subscriptionEndDateKey);
     await prefs.remove(_counterKey);
     await prefs.setBool(_userDataCachedKey, false);
     await prefs.remove(_coupleLangKey);
@@ -98,8 +84,6 @@ class UserPreferencesService {
     return {
       'isSubscribed': prefs.getBool(_isSubscribedKey) ?? false,
       'canTranslate': prefs.getBool(_canTranslateKey) ?? true,
-      'subscriptionDate': prefs.getString(_subscriptionDateKey) ?? '',
-      'subscriptionEndDate': prefs.getString(_subscriptionEndDateKey) ?? '',
       'counter': prefs.getInt(_counterKey) ?? 0,
       'coupleLang': prefs.getString(_coupleLangKey) ?? '',
     };
@@ -114,8 +98,6 @@ class UserPreferencesService {
     const watchedKeys = {
       _isSubscribedKey,
       _canTranslateKey,
-      _subscriptionDateKey,
-      _subscriptionEndDateKey,
       _coupleLangKey,
     };
 

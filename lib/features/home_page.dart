@@ -15,6 +15,7 @@ import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
 import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
@@ -50,7 +51,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
-
+    ConsentManager.initialize();
     ref.read(adServiceProvider).loadInterstitial();
 
     if (!kIsWeb && Platform.isAndroid) {
@@ -100,7 +101,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Future<void> _loadUserPrefsAndUpdateNotifier() async {
+  void _initUserState() async {
     final userManager = ref.read(userManagerProvider);
     await userManager.syncNotifierFromLocal();
 
@@ -113,22 +114,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showLanguageSelectionPopup(sourceLang, targetLang);
       });
-    }
-  }
-
-  void checkAndRevokeSubscription(String subscriptionEndDate) async { 
-    final userManager = ref.read(userManagerProvider);
-    await userManager.checkAndRevokeSubscription(subscriptionEndDate);
-  }
-
-  void _initUserState() async {    
-    await _loadUserPrefsAndUpdateNotifier();
-    final isSubscribed = ref.read(isSubscribedProvider);    
-    if (isSubscribed) {
-      final subscriptionEndDate = ref.read(subscriptionEndDateProvider);      
-      if (subscriptionEndDate != '') {
-      checkAndRevokeSubscription(subscriptionEndDate);
-      }
     }
   }
 

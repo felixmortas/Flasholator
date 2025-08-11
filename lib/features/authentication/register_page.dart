@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/providers/firebase_auth_provider.dart';
+import 'package:flasholator/core/providers/user_manager_provider.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   final String? initialEmail;
@@ -58,14 +58,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     });
 
     try {
-      final firebaseAuth = ref.read(firebaseAuthProvider);
-      final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userManager = ref.read(userManagerProvider);
+      await userManager.registerUser(email, password);
 
-      await userCredential.user!.updateDisplayName(username);
-      await userCredential.user!.sendEmailVerification();
+      await userManager.updateDisplayName(username);
+      await userManager.sendEmailVerification();
 
       // On peut aussi stocker le nom dans Firestore ici si besoin
 
