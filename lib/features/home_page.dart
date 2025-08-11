@@ -255,6 +255,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final adService = ref.read(adServiceProvider);
+    final isSubscribed = ref.read(isSubscribedProvider);
 
     return DefaultTabController(
       length: 3,
@@ -281,7 +282,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         body: Column(
           children: [
-            if (adService.getBannerWidget() != null)
+            if (adService.getBannerWidget() != null && !isSubscribed)
               adService.getBannerWidget()!,
 
             Expanded(child: 
