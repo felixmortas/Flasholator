@@ -21,6 +21,7 @@ import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
 import 'package:flasholator/features/shared/dialogs/settings_dialog.dart';
 import 'package:flasholator/features/shared/dialogs/language_selection_popup.dart';
+import 'package:flasholator/features/shared/widgets/ad_banner_widget.dart';
 import 'package:flasholator/features/authentication/profile_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -261,35 +262,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         body: Column(
           children: [
-            // On utilise .when pour gérer les états de manière élégante
-            bannerAdAsyncValue.when(
-              // Chargement en cours : on affiche un conteneur vide de la bonne hauteur
-              loading: () => Container(height: 50.0, alignment: Alignment.center, child: const CircularProgressIndicator()), 
-              
-              // Erreur : on n'affiche rien ou un message de debug
-              error: (err, stack) {
-                  debugPrint('Failed to load banner: $err');
-                  return const SizedBox.shrink(); // N'affiche rien
-              },
-
-              // Succès : on a la donnée (la bannière)
-              data: (bannerAd) {
-                if (bannerAd == null) {
-                  // Cas où l'utilisateur est abonné ou la pub n'a pas chargé
-                  return const SizedBox.shrink();
-                }
-
-                // Affiche la bannière
-                return SafeArea(
-                  child: SizedBox(
-                    width: bannerAd.size.width.toDouble(),
-                    height: bannerAd.size.height.toDouble(),
-                    child: AdWidget(ad: bannerAd),
-                  ),
-                );
-              },
-            ),
-
+            const AdBannerWidget(),
             Expanded(child: 
               TabBarView(
                 children: [
