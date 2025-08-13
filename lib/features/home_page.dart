@@ -14,7 +14,7 @@ import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
-import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
 import 'package:flasholator/features/review/review_tab.dart';
@@ -35,8 +35,8 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  final flashcardsCollection =
-      FlashcardsCollection(); // Create an instance of FlashcardDao
+  final flashcardsService =
+      FlashcardsService(); // Create an instance of FlashcardsService
   final deeplTranslator =
       DeeplTranslator(); // Create an instance of DeeplTranslator
 
@@ -129,7 +129,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Future<void> _handleTextIntent() async {
     final isSubscribed = ref.read(isSubscribedProvider);
     final canTranslate = ref.read(canTranslateProvider);
-    final canAddCard = await flashcardsCollection.canAddCard();
+    final canAddCard = await flashcardsService.canAddCard();
     
     if (isSubscribed || (canTranslate && canAddCard)) {
       try {
@@ -143,7 +143,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           if (wordToTranslate != '' &&
               translatedWord != '' &&
               translatedWord != AppLocalizations.of(context)!.connectionError &&
-              !await flashcardsCollection
+              !await flashcardsService
                   .checkIfFlashcardExists(wordToTranslate, translatedWord)) {
             wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
                 wordToTranslate.toLowerCase().substring(1);
@@ -151,7 +151,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 translatedWord.toLowerCase().substring(1);
           }
 
-          Future<bool> isCardAdded = flashcardsCollection
+          Future<bool> isCardAdded = flashcardsService
               .addFlashcard(wordToTranslate, translatedWord, "EN", "FR");
 
           // Confirm that the card was added
@@ -224,7 +224,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       context: context,
       builder: (context) => SettingsDialog(
         launchEmail: _launchEmail,
-        flashcardsCollection: flashcardsCollection,
+        flashcardsService: flashcardsService,
       ),
     );
   }
@@ -267,18 +267,18 @@ class _HomePageState extends ConsumerState<HomePage> {
               TabBarView(
                 children: [
                   TranslateTab(
-                    flashcardsCollection: flashcardsCollection,
+                    flashcardsService: flashcardsService,
                     deeplTranslator: deeplTranslator,
                     addRow: dataTableTabFunction,
                     updateQuestionText: reviewTabFunction,
                   ),
                   ReviewTab(
-                    flashcardsCollection: flashcardsCollection,
+                    flashcardsService: flashcardsService,
                     key: reviewTabKey,
                     isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
                   ),
                   DataTableTab(
-                    flashcardsCollection: flashcardsCollection,
+                    flashcardsService: flashcardsService,
                     key: dataTableTabKey,
                     updateQuestionText: reviewTabFunction,
                     isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,

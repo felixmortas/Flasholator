@@ -4,11 +4,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:flasholator/core/models/flashcard.dart';
 
-class FlashcardsCollection {
+class FlashcardsService {
   static const String _boxName = 'flashcards_box';
   late Box<Flashcard> _box;
 
-  FlashcardsCollection() {
+  FlashcardsService() {
     _initDatabase();
   }
 

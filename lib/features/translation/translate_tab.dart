@@ -6,7 +6,7 @@ import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
-import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
@@ -15,14 +15,14 @@ import 'package:flasholator/features/shared/widgets/language_dropdown.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
-  final FlashcardsCollection flashcardsCollection;
+  final FlashcardsService flashcardsService;
   final DeeplTranslator deeplTranslator;
   final Function(Map<dynamic, dynamic>) addRow;
   final Function() updateQuestionText;
 
   const TranslateTab({
     Key? key,
-    required this.flashcardsCollection,
+    required this.flashcardsService,
     required this.deeplTranslator,
     required this.addRow,
     required this.updateQuestionText,
@@ -140,13 +140,13 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   Future<void> _addFlashcard() async {
     final isSubscribed = ref.read(isSubscribedProvider);
-    final canAddCard = await widget.flashcardsCollection.canAddCard();
+    final canAddCard = await widget.flashcardsService.canAddCard();
     if(isSubscribed || canAddCard) {
 
       if (_wordToTranslate != '' &&
           _translatedWord != '' &&
           _translatedWord != AppLocalizations.of(context)!.connectionError &&
-          !await widget.flashcardsCollection
+          !await widget.flashcardsService
               .checkIfFlashcardExists(_wordToTranslate, _translatedWord)) {
         _wordToTranslate = _wordToTranslate.toLowerCase()[0].toUpperCase() +
             _wordToTranslate.toLowerCase().substring(1);
@@ -159,7 +159,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
           'sourceLang': _sourceLanguage,
           'targetLang': _targetLanguage,
         });
-        Future<bool> isCardAdded = widget.flashcardsCollection.addFlashcard(
+        Future<bool> isCardAdded = widget.flashcardsService.addFlashcard(
             _wordToTranslate, _translatedWord, _sourceLanguage, _targetLanguage);
 
         widget.updateQuestionText();
@@ -186,7 +186,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     CancelDialog.show(
       context,
       onCancel: () {
-        widget.flashcardsCollection
+        widget.flashcardsService
             .removeFlashcard(_wordToTranslate, _translatedWord);
         // close the dialog
         Navigator.of(context).pop();

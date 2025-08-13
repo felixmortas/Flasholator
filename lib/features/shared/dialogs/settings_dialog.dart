@@ -1,3 +1,4 @@
+import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
@@ -5,12 +6,12 @@ import 'package:flasholator/features/stats/stats_page.dart';
 
 class SettingsDialog extends StatelessWidget {
   final VoidCallback launchEmail;
-  final dynamic flashcardsCollection; // remplace "dynamic" par ton type exact
+  final FlashcardsService flashcardsService;
 
   const SettingsDialog({
     Key? key,
     required this.launchEmail,
-    required this.flashcardsCollection,
+    required this.flashcardsService,
   }) : super(key: key);
 
   @override
@@ -52,7 +53,7 @@ class SettingsDialog extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      StatsPage(flashcardsCollection: flashcardsCollection),
+                      StatsPage(flashcardsService: flashcardsService),
                 ),
               );
             },

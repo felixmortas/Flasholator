@@ -1,7 +1,7 @@
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/core/models/stats_model.dart';
-import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/core/services/stats_service.dart';
 import 'package:flasholator/features/stats/widgets/date_time_picker.dart';
 import 'package:flasholator/features/stats/widgets/summary_section.dart';
@@ -9,9 +9,9 @@ import 'package:flasholator/features/stats/widgets/time_series_chart.dart';
 import 'package:flasholator/features/stats/widgets/ranking_section.dart';
 
 class StatsPage extends StatefulWidget {
-  final FlashcardsCollection flashcardsCollection;
+  final FlashcardsService flashcardsService;
 
-  const StatsPage({Key? key, required this.flashcardsCollection})
+  const StatsPage({Key? key, required this.flashcardsService})
       : super(key: key);
 
   @override
@@ -31,7 +31,7 @@ class _StatsPageState extends State<StatsPage> {
   }
 
   Future<void> _initializeDateRange() async {
-    final flashcards = await widget.flashcardsCollection.loadAllFlashcards();
+    final flashcards = await widget.flashcardsService.loadAllFlashcards();
     final dates = flashcards
         .map((f) => DateTime.tryParse(f.addedDate))
         .where((d) => d != null)
@@ -51,7 +51,7 @@ class _StatsPageState extends State<StatsPage> {
 
   void _loadStats() {
     setState(() {
-      _statsFuture = StatsService(widget.flashcardsCollection)
+      _statsFuture = StatsService(widget.flashcardsService)
           .calculateStats(startDate: _startDate!, endDate: _endDate);
     });
   }

@@ -1,15 +1,15 @@
 import 'package:flasholator/core/models/flashcard.dart';
 import 'package:flasholator/core/models/stats_model.dart';
-import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/flashcards_service.dart';
 
 class StatsService {
-  final FlashcardsCollection collection;
+  final FlashcardsService flashcardsService;
 
-  StatsService(this.collection);
+  StatsService(this.flashcardsService);
 
   Future<StatsData> calculateStats(
       {DateTime? startDate, DateTime? endDate}) async {
-    final flashcards = await collection.loadAllFlashcards();
+    final flashcards = await flashcardsService.loadAllFlashcards();
 
     // Filtrage selon la période définie
     final filtered = flashcards.where((fc) {

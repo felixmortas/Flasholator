@@ -6,7 +6,7 @@ import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/models/flashcard.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
-import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/review/widgets/all_languages_switch.dart';
 import 'package:flasholator/features/review/widgets/response_buttons.dart';
@@ -15,12 +15,12 @@ import 'package:flasholator/features/review/widgets/editable_answer_field.dart';
 
 class ReviewTab extends ConsumerStatefulWidget {
   // The ReviewTab widget is a StatefulWidget because it needs to be able to update its state
-  final FlashcardsCollection flashcardsCollection;
+  final FlashcardsService flashcardsService;
   final ValueNotifier<bool> isAllLanguagesToggledNotifier;
 
   const ReviewTab({
     Key? key,
-    required this.flashcardsCollection,
+    required this.flashcardsService,
     required this.isAllLanguagesToggledNotifier,
   }) : super(key: key);
 
@@ -66,7 +66,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   void updateQuestionText(bool isAllLanguagesToggledNotifier) async {
     // Get the due flashcards from the database and set the question text and translated text
     List<Flashcard> dueFlashcards =
-        await widget.flashcardsCollection.dueFlashcards();
+        await widget.flashcardsService.dueFlashcards();
 
     if (dueFlashcards.isNotEmpty) {
       // Filter dueFlashcards based on languageSelection
@@ -123,7 +123,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
       adCounter += 1;
     }
     // Update the flashcard with the quality in the database then update the question text
-    await widget.flashcardsCollection
+    await widget.flashcardsService
         .review(_currentFlashcard.front, _currentFlashcard.back, quality);
     updateQuestionText(widget.isAllLanguagesToggledNotifier.value);
   }

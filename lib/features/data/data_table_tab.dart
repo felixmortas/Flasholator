@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
-import 'package:flasholator/core/services/flashcards_collection.dart';
+import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/features/data/widgets/all_languages_table.dart';
 import 'package:flasholator/features/data/widgets/couple_languages_table.dart';
@@ -15,13 +15,13 @@ import 'package:flasholator/features/shared/utils/language_selection.dart';
 
 // Add doc comments
 class DataTableTab extends ConsumerStatefulWidget {
-  final FlashcardsCollection flashcardsCollection;
+  final FlashcardsService flashcardsService;
   final Function() updateQuestionText;
   final ValueNotifier<bool> isAllLanguagesToggledNotifier;
 
   const DataTableTab({
     Key? key,
-    required this.flashcardsCollection,
+    required this.flashcardsService,
     required this.updateQuestionText,
     required this.isAllLanguagesToggledNotifier,
   }) : super(key: key);
@@ -53,7 +53,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
 
   Future<void> _fetchData(bool isAllLanguagesToggled) async {
     List<Map<dynamic, dynamic>> fetchedData =
-        await widget.flashcardsCollection.loadData();
+        await widget.flashcardsService.loadData();
     setState(() {
       if (isAllLanguagesToggled) {
         data = fetchedData
@@ -76,7 +76,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   }
 
   void removeRow(Map<dynamic, dynamic> row) {
-    widget.flashcardsCollection.removeFlashcard(row['front'], row['back']);
+    widget.flashcardsService.removeFlashcard(row['front'], row['back']);
     setState(() {
       data.removeAt(data.indexOf(row));
     });
@@ -89,7 +89,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     final targetLanguage = row['targetLang'];
 
     if (data.contains(row)) {
-      widget.flashcardsCollection.editFlashcard(
+      widget.flashcardsService.editFlashcard(
           front,
           back,
           sourceLanguage,
@@ -129,7 +129,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
 
   Future<void> _checkIfCanAddCard() async {
     final isSubscribed = ref.read(isSubscribedProvider);
-    final canAddCard = await widget.flashcardsCollection.canAddCard();
+    final canAddCard = await widget.flashcardsService.canAddCard();
 
     if (isSubscribed || canAddCard) {
       _openAddFlashcardPopup();
@@ -139,7 +139,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   }
 
   void _addFlashcard(String front, String back) {
-    widget.flashcardsCollection.addFlashcard(front, back,
+    widget.flashcardsService.addFlashcard(front, back,
           languageSelection.sourceLanguage, languageSelection.targetLanguage);
     addRow({'front': front, 'back': back});
   }
