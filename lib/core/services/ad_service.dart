@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -70,57 +71,47 @@ class AdService {
   }
 
   // ---------- BANNER ----------
-  Future<void> loadBanner(BuildContext context) async {
-    if (_isBannerLoadedOnce) return;
-    _isBannerLoadedOnce = true;
-
-    if (!_shouldShowBanner()) return;
+  Future<BannerAd?> loadBanner(double width) async {
+    if (!_shouldShowBanner()) return null;
 
     final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-      MediaQuery.of(context).size.width.truncate(),
+      width.truncate(),
     );
 
     if (size == null) {
       debugPrint('Unable to get banner ad size.');
-      return;
+      return null;
     }
+    
+    // On utilise un Completer pour transformer le callback en Future
+    final completer = Completer<BannerAd?>();
 
     final ad = BannerAd(
-      adUnitId: bannerAdUnitId,
+      adUnitId: bannerAdUnitId, // Assurez-vous que cette variable est accessible
       request: const AdRequest(),
       size: size,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          debugPrint("Banner loaded.");
-          _bannerAd = ad as BannerAd;
-          _isBannerLoaded = true;
+          debugPrint("Banner loaded successfully.");
+          completer.complete(ad as BannerAd);
         },
         onAdFailedToLoad: (ad, error) {
           debugPrint("Banner failed to load: $error");
           ad.dispose();
+          completer.complete(null); // Complète avec null en cas d'échec
         },
       ),
     );
 
     ad.load();
+    return completer.future;
   }
-
+  
   bool _shouldShowBanner() {
+    // Votre logique existante
     return !kIsWeb && (Platform.isAndroid || Platform.isIOS);
   }
 
-  Widget? getBannerWidget() {
-    if (_isBannerLoaded && _bannerAd != null && _shouldShowBanner()) {
-      return SafeArea(
-        child: SizedBox(
-          width: _bannerAd!.size.width.toDouble(),
-          height: _bannerAd!.size.height.toDouble(),
-          child: AdWidget(ad: _bannerAd!),
-        ),
-      );
-    }
-    return null;
-  }
 
   // ---------- DISPOSE ----------
   void dispose() {
@@ -128,3 +119,8 @@ class AdService {
     _interstitialAd?.dispose();
   }
 }
+
+  void disposeBanner(BannerAd? banner) {
+    banner?.dispose();
+  }
+
