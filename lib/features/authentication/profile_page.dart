@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,10 +32,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Future<void> _checkPrivacyOptionsRequirement() async {
-    final required = await ConsentManager.isPrivacyOptionsRequired();
-    setState(() {
-      _showPrivacyButton = required;
-    });
+    if (!kIsWeb) {
+      final required = await ConsentManager.isPrivacyOptionsRequired();
+      setState(() {
+        _showPrivacyButton = required;
+      });
+    } else {
+      setState(() {
+        _showPrivacyButton = false;
+      });
+    }
   }
 
   Future<void> _subscribe() async {
