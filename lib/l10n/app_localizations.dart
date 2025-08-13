@@ -100,6 +100,36 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @chooseYourLanguagePair.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language pair'**
+  String get chooseYourLanguagePair;
+
+  /// No description provided for @sourceLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Source language'**
+  String get sourceLanguage;
+
+  /// No description provided for @targetLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Target language'**
+  String get targetLanguage;
+
+  /// No description provided for @subscriptionWarningForLanguageChange.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ You will need to subscribe to change this choice later.'**
+  String get subscriptionWarningForLanguageChange;
+
+  /// No description provided for @continueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueAction;
+
   /// No description provided for @freeSubscriptionLimitsExceeded.
   ///
   /// In en, this message translates to:

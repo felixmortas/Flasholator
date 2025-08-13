@@ -9,6 +9,22 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get chooseYourLanguagePair => 'Elige tu par de idiomas';
+
+  @override
+  String get sourceLanguage => 'Idioma de origen';
+
+  @override
+  String get targetLanguage => 'Idioma de destino';
+
+  @override
+  String get subscriptionWarningForLanguageChange =>
+      '⚠️ Tendrás que suscribirte para cambiar esta elección más adelante.';
+
+  @override
+  String get continueAction => 'Continuar';
+
+  @override
   String get freeSubscriptionLimitsExceeded =>
       'Se han superado los límites de la suscripción gratuita.';
 

@@ -9,6 +9,22 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get chooseYourLanguagePair => 'Choisissez votre couple de langues';
+
+  @override
+  String get sourceLanguage => 'Langue source';
+
+  @override
+  String get targetLanguage => 'Langue cible';
+
+  @override
+  String get subscriptionWarningForLanguageChange =>
+      '⚠️ Vous devrez vous abonner pour modifier ce choix plus tard.';
+
+  @override
+  String get continueAction => 'Continuer';
+
+  @override
   String get freeSubscriptionLimitsExceeded =>
       'Limites d\'abonnement gratuit dépassées';
 

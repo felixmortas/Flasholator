@@ -44,12 +44,12 @@ class _LanguageSelectionPopupState extends State<LanguageSelectionPopup> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(AppLocalization.of(context)!.chooseYourLanguagePair),
+      title: Text(AppLocalizations.of(context)!.chooseYourLanguagePair),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           LanguageDropdown(
-            label: AppLocalization.of(context)!.sourceLanguage,
+            label: AppLocalizations.of(context)!.sourceLanguage,
             selectedLanguage: selectedSource!,
             otherLanguage: selectedTarget!,
             sortedLanguages: sortedLanguageEntries,
@@ -57,7 +57,7 @@ class _LanguageSelectionPopupState extends State<LanguageSelectionPopup> {
           ),
           const SizedBox(height: 12),
           LanguageDropdown(
-            label: AppLocalization.of(context)!.targetLanguage,
+            label: AppLocalizations.of(context)!.targetLanguage,
             selectedLanguage: selectedTarget!,
             otherLanguage: selectedSource!,
             sortedLanguages: sortedLanguageEntries,
@@ -65,7 +65,7 @@ class _LanguageSelectionPopupState extends State<LanguageSelectionPopup> {
           ),
           const SizedBox(height: 16),
           Text(
-            AppLocalization.of(context)!.subscriptionWarningForLanguageChange,
+            AppLocalizations.of(context)!.subscriptionWarningForLanguageChange,
             style: const TextStyle(
               color: Colors.red,
               fontSize: 14,
@@ -84,7 +84,7 @@ class _LanguageSelectionPopupState extends State<LanguageSelectionPopup> {
                   }
                 }
               : null,
-          child: Text(AppLocalization.of(context)!.continueAction),
+          child: Text(AppLocalizations.of(context)!.continueAction),
         ),
       ],
     );

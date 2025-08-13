@@ -9,6 +9,22 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get chooseYourLanguagePair => 'Choose your language pair';
+
+  @override
+  String get sourceLanguage => 'Source language';
+
+  @override
+  String get targetLanguage => 'Target language';
+
+  @override
+  String get subscriptionWarningForLanguageChange =>
+      '⚠️ You will need to subscribe to change this choice later.';
+
+  @override
+  String get continueAction => 'Continue';
+
+  @override
   String get freeSubscriptionLimitsExceeded =>
       'Free subscription limits exceeded';
 
