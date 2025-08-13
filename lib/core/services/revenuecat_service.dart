@@ -1,6 +1,7 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:url_launcher/url_launcher.dart';
 
 class RevenueCatService {
 
@@ -22,9 +23,20 @@ class RevenueCatService {
     return isActive;
   }
 
-  Future presentPaywall() async {
-    final paywallResult = await RevenueCatUI.presentPaywall();
-    return paywallResult;
+  Future presentPaywall(String userId) async {
+    if (kIsWeb) {
+      final url = Uri.parse('https://pay.rev.cat/xnwjzccdwcxdalbd/$userId');
+      if (await canLaunchUrl(url)) {
+        await launchUrl(
+          url,
+          mode: LaunchMode.externalApplication, // Ouvre dans un nouvel onglet
+        );
+      } else {
+        throw 'Impossible d\'ouvrir le lien du paywall';
+      }
+    } else {
+      return await RevenueCatUI.presentPaywall();
+    }
   }
 
   Future<Offerings?> getOfferings() async {

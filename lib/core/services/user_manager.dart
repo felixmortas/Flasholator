@@ -96,7 +96,8 @@ class UserManager {
 
   Future<void> subscribeUser() async {
     final bool wasSubscribed = userNotifier.isSubscribed;
-    await _revenueCatService.presentPaywall();
+    final userId = getUserId();
+    await _revenueCatService.presentPaywall(userId);
     if(!wasSubscribed) {
       final bool isSubscribed = await _revenueCatService.isSubscribed();
       if (isSubscribed) {
