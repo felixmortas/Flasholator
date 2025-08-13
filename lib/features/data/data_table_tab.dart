@@ -52,8 +52,11 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   }
 
   Future<void> _fetchData(bool isAllLanguagesToggled) async {
-    List<Map<dynamic, dynamic>> fetchedData =
-        await widget.flashcardsService.loadData();
+    final flashcards = await widget.flashcardsService.loadAllFlashcards();
+    
+    // On convertit chaque Flashcard en Map<String, dynamic>
+    final fetchedData = flashcards.map((f) => f.toMap()).toList();
+
     setState(() {
       if (isAllLanguagesToggled) {
         data = fetchedData
