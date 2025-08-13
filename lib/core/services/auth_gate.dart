@@ -24,7 +24,6 @@ class _AuthGateState extends ConsumerState<AuthGate> {
   Widget build(BuildContext context) {
     final userManager = ref.watch(userManagerProvider);
     final userSyncState = ref.watch(userSyncStateProvider);
-    
     return StreamBuilder<User?>(
       stream: userManager.authStateChanges(),
       builder: (context, snapshot) {

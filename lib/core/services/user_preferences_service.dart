@@ -67,6 +67,12 @@ class UserPreferencesService {
     await prefs.remove(_coupleLangKey);
   }
 
+  /// Clear all user data
+  static Future<void> clearUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
+
   // =========================
   // === BULK LOAD METHOD ===
   // =========================

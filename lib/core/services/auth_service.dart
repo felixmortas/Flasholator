@@ -34,8 +34,8 @@ class AuthService {
   }
 
   Stream<User?> authStateChanges() {
-      return _firebaseAuth.authStateChanges();
-    }
+    return _firebaseAuth.authStateChanges();
+  }
 
   String getUserName() {
     final user = _firebaseAuth.currentUser;

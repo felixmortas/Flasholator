@@ -9,7 +9,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/providers/revenuecat_provider.dart';
 import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
@@ -64,7 +63,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _initRevenueCat();
       _initUserState();
     });
   }
@@ -82,12 +80,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     isAllLanguagesToggledNotifier.dispose(); // Dispose du notifier
     super.dispose();
   }
-
-  Future<void> _initRevenueCat() async {
-    final uid = ref.read(userManagerProvider).getUserId();
-    await ref.read(revenueCatServiceProvider).initRevenueCat(uid);
-  }
-
 
   Future<void> _showLanguageSelectionPopup(String sourceLang, String targetLang) async {
     final userManager = ref.read(userManagerProvider);

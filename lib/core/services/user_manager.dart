@@ -25,6 +25,10 @@ class UserManager {
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
+  void initRevenueCat(String userId) {
+    _revenueCatService.initRevenueCat(userId);
+  }
+
   Future<void> setCoupleLang(String sourceLang, String targetLang) async {
     final data = {'coupleLang': '$sourceLang-$targetLang'};
 
@@ -103,6 +107,12 @@ class UserManager {
 
   Future<void> signOut() async {
     await _authService.signOut();
+    await clearLocalData();
+  }
+
+  Future<void> clearLocalData() async {
+    await UserPreferencesService.clearUserData();
+    userNotifier.clear();
   }
 
   Future<void> deleteUser() async {
@@ -133,8 +143,7 @@ class UserManager {
       'isSubscribed': isSubscribed,
     };
 
-    updateLocal(data);
-
+    await updateLocal(data);
     ref.read(userSyncStateProvider.notifier).state = true;
   }
 

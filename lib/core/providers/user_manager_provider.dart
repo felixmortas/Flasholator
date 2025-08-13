@@ -9,5 +9,20 @@ final userManagerProvider = Provider<UserManager>((ref) {
   final firestoreDAO = ref.watch(firestoreUsersDAOProvider);
   final authService = ref.watch(authServiceProvider);
   final revenueCatService = ref.watch(revenueCatServiceProvider);
-  return UserManager(ref: ref, firestoreDAO: firestoreDAO, authService: authService, revenueCatService: revenueCatService);
+
+  final userManager = UserManager(
+    ref: ref,
+    firestoreDAO: firestoreDAO,
+    authService: authService,
+    revenueCatService: revenueCatService,
+  );
+
+  // ⚡ Initialisation RevenueCat une seule fois
+  final uid = authService.getUserId();
+  if (uid != null) {
+    userManager.initRevenueCat(uid);
+  }
+
+  return userManager;
 });
+

@@ -1,13 +1,15 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class RevenueCatService {
 
-  static const String _apiKey = 'goog_yrvYeFcZAwKnCSkdHaMeUAIUPFb';
+  static const String _androidApiKey = 'goog_yrvYeFcZAwKnCSkdHaMeUAIUPFb';
+  static const String _webApiKey = 'rcb_sb_NQccqqpXcoNQongucDBbMULZZ';
 
   Future<void> initRevenueCat(String userId) async {
     await Purchases.setLogLevel(LogLevel.debug);
-    await Purchases.configure(PurchasesConfiguration(_apiKey)..appUserID = userId);
+    await Purchases.configure(PurchasesConfiguration(kIsWeb ? _webApiKey : _androidApiKey)..appUserID = userId);
   }
 
   Future<CustomerInfo> getCustomerInfo() async {

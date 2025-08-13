@@ -20,20 +20,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   String? errorMessage;
 
   Future<void> login() async {
-  try {
-    ref.read(userSyncStateProvider.notifier).state = false;
-
-    final userManager = ref.read(userManagerProvider);    
-    await userManager.login(emailController.text.trim(), passwordController.text.trim());
-    
-  } on FirebaseAuthException catch (e) {
-    if (!mounted) return;
-    setState(() => errorMessage = e.message ?? 'Erreur de connexion');
-  } catch (e) {
-    if (!mounted) return;
-    setState(() => errorMessage = 'Une erreur est survenue : $e');
+    try {
+      ref.read(userSyncStateProvider.notifier).state = false;
+      final userManager = ref.read(userManagerProvider);    
+      await userManager.login(emailController.text.trim(), passwordController.text.trim());
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      setState(() => errorMessage = e.message ?? 'Erreur de connexion');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => errorMessage = 'Une erreur est survenue : $e');
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
