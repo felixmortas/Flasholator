@@ -53,12 +53,14 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
-    ConsentManager.initialize();
-    ref.read(adServiceProvider).loadInterstitial();
 
-    if (!kIsWeb && Platform.isAndroid) {
+    if (!kIsWeb ) {
+      ConsentManager.initialize();
+      ref.read(adServiceProvider).loadInterstitial();
+      if(Platform.isAndroid) {
       requestPermissions();
       _handleTextIntent();
+      }
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
