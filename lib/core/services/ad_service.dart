@@ -19,12 +19,14 @@ class AdService {
 
   // ---------- INITIALISATION ----------
   static Future<void> initialize() async {
-    await MobileAds.instance.initialize();
+    if (!kIsWeb) {
+      await MobileAds.instance.initialize();
 
-    final config = RequestConfiguration(
-      testDeviceIds: ['E779AA37025CA3C4EE7B28A571BDA15A'], // Ton ID de test
-    );
-    await MobileAds.instance.updateRequestConfiguration(config);
+      final config = RequestConfiguration(
+        testDeviceIds: ['E779AA37025CA3C4EE7B28A571BDA15A'], // Ton ID de test
+      );
+      await MobileAds.instance.updateRequestConfiguration(config);
+    }
   }
 
   // ---------- INTERSTITIAL ----------
