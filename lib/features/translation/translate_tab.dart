@@ -17,7 +17,7 @@ import 'package:flasholator/l10n/app_localizations.dart';
 class TranslateTab extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
   final DeeplTranslator deeplTranslator;
-  final Function(Map<dynamic, dynamic>) addRow;
+  final Function(Map<String, dynamic>) addRow;
   final Function() updateQuestionText;
 
   const TranslateTab({

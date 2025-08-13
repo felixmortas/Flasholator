@@ -13,10 +13,9 @@ class StatsService {
 
     // Filtrage selon la période définie
     final filtered = flashcards.where((fc) {
-      final created = DateTime.parse(fc.addedDate);
-
-      if (startDate != null && created.isBefore(startDate)) return false;
-      if (endDate != null && created.isAfter(endDate)) return false;
+      final created = fc.addedDate;
+      if (startDate != null && created?.isBefore(startDate) == true) return false;
+      if (endDate != null && created?.isAfter(endDate) == true) return false;
       return true;
     }).toList();
 
@@ -52,9 +51,9 @@ class StatsService {
     for (final card in flashcards) {
       try {
         // Parse la date au format "2023-06-28"
-        final dateTime = DateTime.parse(card.addedDate);
+        final dateTime = card.addedDate;
         // Normalise la date (enlève heures/minutes/secondes)
-        final date = DateTime(dateTime.year, dateTime.month, dateTime.day);
+        final date = DateTime(dateTime!.year, dateTime.month, dateTime.day);
         // Compte chaque paire de flashcards (d'où le ~/ 2 plus bas)
         dailyCount[date] = (dailyCount[date] ?? 0) + 1;
       } catch (e) {

@@ -72,7 +72,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     });
   }
 
-  void addRow(Map<dynamic, dynamic> row) {
+  void addRow(Map<String, dynamic> row) {
     setState(() {
       data.add(row);
     });

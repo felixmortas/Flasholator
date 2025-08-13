@@ -4,7 +4,7 @@
 
 class SMTwo {
   // SuperMemo 2 algorithm
-  num easiness;
+  double easiness;
   int interval;
   int repetitions;
   DateTime reviewDate;

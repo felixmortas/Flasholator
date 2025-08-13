@@ -33,7 +33,7 @@ class _StatsPageState extends State<StatsPage> {
   Future<void> _initializeDateRange() async {
     final flashcards = await widget.flashcardsService.loadAllFlashcards();
     final dates = flashcards
-        .map((f) => DateTime.tryParse(f.addedDate))
+        .map((f) => f.addedDate)
         .where((d) => d != null)
         .cast<DateTime>()
         .toList();

@@ -1,22 +1,37 @@
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import 'package:flasholator/core/models/flashcard.dart';
 import 'package:flasholator/config/constants.dart';
-import 'db_wrapper.dart';
+import 'package:flasholator/core/services/db_wrapper.dart';
 
 class FlashcardsService {
-  final DatabaseWrapper<Flashcard> _db =
-      DatabaseWrapper<Flashcard>('flashcards_box');
+  final DatabaseWrapper _db = DatabaseWrapper();
+  bool _isInitialized = false;
 
-  FlashcardsService() {
-    _db.init();
+  Future<void> _ensureInitialized() async {
+    if (!_isInitialized) {
+      await _db.init();
+      _isInitialized = true;
+    }
   }
 
+
   Future<bool> canAddCard() async {
-    return _db.count() < MAX_CARDS;
+    await _ensureInitialized();
+    final count = await _db.count();
+    return count < MAX_CARDS;
+
   }
 
   Future<List<Flashcard>> loadAllFlashcards() async {
-    return await _db.getAll();
+    await _ensureInitialized();
+    // 1. On récupère les données brutes de Drift (`FlashcardData`)
+    final List<FlashcardData> rawData = await _db.getAll();
+
+    // 2. On les convertit en votre modèle `Flashcard`
+    // (Vous devrez implémenter cette fonction de conversion)
+    return rawData.map((data) => Flashcard.fromDrift(data)).toList();
+
   }
 
   Future<bool> addFlashcard(
@@ -25,6 +40,7 @@ class FlashcardsService {
     String sourceLang,
     String targetLang,
   ) async {
+    await _ensureInitialized();
     if (await checkIfFlashcardExists(front, back) || front.isEmpty || back.isEmpty) {
       debugPrint('Add flashcard: Skipped (exists or empty)');
       return false;
@@ -43,150 +59,130 @@ class FlashcardsService {
       targetLang: sourceLang,
     );
 
-    await _db.add(flashcard);
-    await _db.add(reversedFlashcard);
+    await _db.add(flashcard.toDriftCompanion());
+    await _db.add(reversedFlashcard.toDriftCompanion());
     debugPrint('Added flashcards: $front/$back and $back/$front');
     return true;
   }
   
   Future<void> editFlashcard(
-  String front,
-  String back,
-  String sourceLang,
-  String targetLang,
-  String newFront,
-  String newBack,
-  String newSourceLang,
-  String newTargetLang,
-) async {
-  // Chercher les deux cartes (normale + inversée)
-  final map = _db.toMap(); // Map<dynamic, Flashcard>
-  dynamic keyMain;
-  dynamic keyReversed;
-  Flashcard? mainCard;
-  Flashcard? reversedCard;
+    String front,
+    String back,
+    String sourceLang,
+    String targetLang,
+    String newFront,
+    String newBack,
+    String newSourceLang,
+    String newTargetLang,
+  ) async {
+    await _ensureInitialized();
 
-  map.forEach((key, value) {
-    if (value.front == front &&
-        value.back == back &&
-        value.sourceLang == sourceLang &&
-        value.targetLang == targetLang) {
-      keyMain = key;
-      mainCard = value;
-    } else if (value.front == back &&
-        value.back == front &&
-        value.sourceLang == targetLang &&
-        value.targetLang == sourceLang) {
-      keyReversed = key;
-      reversedCard = value;
+    final allCards = await _db.getAll();
+    
+    final mainCardData = allCards.firstWhereOrNull(
+      (c) => c.front == front && c.back == back,
+    );
+    final reversedCardData = allCards.firstWhereOrNull(
+      (c) => c.front == back && c.back == front,
+    );
+    
+    if (mainCardData != null) {
+      // 1. Mettre à jour l'objet de données Drift avec .copyWith
+      final updatedMainData = mainCardData.copyWith(
+        front: newFront,
+        back: newBack,
+        sourceLang: newSourceLang,
+        targetLang: newTargetLang,
+      );
+
+      // 2. Créer une instance de Flashcard à partir des données mises à jour
+      final updatedMainFlashcard = Flashcard.fromDrift(updatedMainData);
+
+      // 3. Persister en utilisant le Companion généré
+      await _db.put(updatedMainFlashcard.toDriftCompanion()); 
     }
-  });
 
-  // Mettre à jour la carte principale si trouvée
-  if (keyMain != null && mainCard != null) {
-    final updatedMain = Flashcard(
-      id: mainCard!.id,
-      front: newFront,
-      back: newBack,
-      sourceLang: newSourceLang,
-      targetLang: newTargetLang,
-      quality: mainCard!.quality,
-      easiness: mainCard!.easiness,
-      interval: mainCard!.interval,
-      repetitions: mainCard!.repetitions,
-      timesReviewed: mainCard!.timesReviewed,
-      lastReviewDate: mainCard!.lastReviewDate,
-      nextReviewDate: mainCard!.nextReviewDate,
-      addedDate: mainCard!.addedDate,
-    );
-    await _db.put(keyMain, updatedMain);
-  } else {
-    debugPrint('Edit flashcard: carte principale introuvable ($front/$back).');
+    if (reversedCardData != null) {
+      // 1. Mettre à jour l'objet de données Drift avec .copyWith
+      final updatedReversedData = reversedCardData.copyWith(
+        front: newBack, // Inversé
+        back: newFront, // Inversé
+        sourceLang: newTargetLang, // Inversé
+        targetLang: newSourceLang, // Inversé
+      );
+      
+      // 2. Créer une instance de Flashcard à partir des données mises à jour
+      final updatedReversedFlashcard = Flashcard.fromDrift(updatedReversedData);
+      
+      // 3. Persister en utilisant le Companion généré
+      await _db.put(updatedReversedFlashcard.toDriftCompanion());
+    }
+    
+    debugPrint('Edited flashcards: $front/$back -> $newFront/$newBack');
   }
 
-  // Mettre à jour la carte inversée si trouvée (si vous en stockez une)
-  if (keyReversed != null && reversedCard != null) {
-    final updatedReversed = Flashcard(
-      id: reversedCard!.id,
-      front: newBack,            // inversé
-      back: newFront,            // inversé
-      sourceLang: newTargetLang, // inversé
-      targetLang: newSourceLang, // inversé
-      quality: reversedCard!.quality,
-      easiness: reversedCard!.easiness,
-      interval: reversedCard!.interval,
-      repetitions: reversedCard!.repetitions,
-      timesReviewed: reversedCard!.timesReviewed,
-      lastReviewDate: reversedCard!.lastReviewDate,
-      nextReviewDate: reversedCard!.nextReviewDate,
-      addedDate: reversedCard!.addedDate,
-    );
-    await _db.put(keyReversed, updatedReversed);
-  } else {
-    debugPrint('Edit flashcard: carte inversée introuvable ($front/$back).');
-  }
-
-  debugPrint('Edited flashcards: $front/$back -> $newFront/$newBack');
-}
 
 
   Future<void> removeFlashcard(String front, String back) async {
-    final keysToRemove = _db
-        .toMap()
-        .entries
-        .where((e) =>
-            (e.value.front == front && e.value.back == back) ||
-            (e.value.front == back && e.value.back == front))
-        .map((e) => e.key)
+    await _ensureInitialized();
+
+    // 1. Récupérer les données brutes
+    final allCards = await _db.getAll();
+    // 2. Filtrer pour trouver les IDs à supprimer
+    final idsToRemove = allCards
+        .where((c) => (c.front == front && c.back == back) || (c.front == back && c.back == front))
+        .map((c) => c.id) // On ne récupère que les IDs
         .toList();
 
-    if (keysToRemove.isNotEmpty) {
-      await _db.deleteAll(keysToRemove);
+    if (idsToRemove.isNotEmpty) {
+      // 3. Appeler la méthode deleteAll du wrapper avec la liste d'IDs
+      await _db.deleteAll(idsToRemove);
       debugPrint('Removed flashcards for: $front/$back');
     }
   }
 
+
   Future<bool> checkIfFlashcardExists(String front, String back) async {
-    return _db.getAll().then((cards) =>
-        cards.any((c) => c.front == front && c.back == back));
+    await _ensureInitialized();
+    // On utilise notre nouvelle méthode optimisée !
+    return _db.cardExists(front, back);
   }
+
 
   /// Retourne toutes les flashcards échues, mélangées
   Future<List<Flashcard>> dueFlashcards() async {
-    // Récupérer toutes les flashcards
-    List<Flashcard> flashcards = await _db.getAll();
-
-    // Filtrer celles qui sont dues
-    List<Flashcard> due = flashcards.where((f) => f.isDue()).toList();
-
-    // Mélanger la liste pour la révision
-    due.shuffle();
-
-    return due;
+    await _ensureInitialized();
+    // On utilise notre nouvelle méthode optimisée !
+    final dueData = await _db.getDueFlashcards(DateTime.now());
+    dueData.shuffle();
+    // On n'oublie pas de convertir le résultat en notre modèle de domaine
+    return dueData.map((data) => Flashcard.fromDrift(data)).toList();
   }
 
+
   Future<void> review(String front, String back, int quality) async {
-    // Trouver la carte à réviser via le wrapper (clé dynamique)
-    dynamic keyToUpdate;
-    Flashcard? flashcardToUpdate;
+    await _ensureInitialized();
+    
+    // 1. Trouver la donnée brute de la carte à réviser
+    final allCards = await _db.getAll();
+    final cardDataToReview = allCards.firstWhereOrNull((c) => c.front == front && c.back == back);
 
-    _db.toMap().forEach((key, card) {
-      if (card.front == front && card.back == back) {
-        keyToUpdate = key;
-        flashcardToUpdate = card;
-      }
-    });
+    if (cardDataToReview != null) {
+      // 2. La convertir en notre modèle de domaine pour appliquer la logique métier
+      final flashcard = Flashcard.fromDrift(cardDataToReview);
 
-    if (keyToUpdate != null && flashcardToUpdate != null) {
-      // Appliquer l’algorithme de révision sur l’objet
-      flashcardToUpdate!.review(quality);
-
-      // Persister la carte mise à jour
-      await _db.put(keyToUpdate!, flashcardToUpdate!);
+      // 3. Appliquer l'algorithme de révision
+      flashcard.review(quality);
+      
+      // 4. Utiliser la méthode `toDriftCompanion()` pour créer un objet
+      //    qui peut être utilisé pour la mise à jour dans Drift.
+      final updatedFlashcardCompanion = flashcard.toDriftCompanion();
+      
+      // 5. Persister la carte mise à jour. La méthode `put` doit accepter un Companion.
+      await _db.put(updatedFlashcardCompanion);
       debugPrint('Reviewed flashcard: $front/$back with quality $quality');
     } else {
       debugPrint('Review flashcard: Card not found ($front/$back).');
     }
   }
-
 }

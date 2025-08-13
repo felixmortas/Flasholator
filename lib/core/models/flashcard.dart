@@ -1,6 +1,7 @@
-import 'package:intl/intl.dart';
+import 'package:drift/drift.dart' show Value; // IMPORTANT: Importer Value de Drift
 
 import 'package:flasholator/core/services/sm_two.dart';
+import 'package:flasholator/core/services/db_wrapper.dart'; // IMPORTANT: Importer db_wrapper.dart
 
 class Flashcard {
   int? id;
@@ -9,13 +10,13 @@ class Flashcard {
   String sourceLang;
   String targetLang;
   int? quality;
-  num easiness;
+  double easiness;
   int interval;
   int repetitions;
   int timesReviewed;
-  String? lastReviewDate;
-  String? nextReviewDate;
-  String addedDate;
+  DateTime? lastReviewDate;
+  DateTime? nextReviewDate;
+  DateTime? addedDate;
 
   Flashcard({
     required this.front,
@@ -24,19 +25,52 @@ class Flashcard {
     required this.targetLang,
     this.id,
     this.quality,
-    this.easiness = 2.5, // Assign default value here
-    this.interval = 1, // Assign default value here
-    this.repetitions = 0, // Assign default value here
-    this.timesReviewed = 0, // Assign default value here
+    this.easiness = 2.5,
+    this.interval = 1,
+    this.repetitions = 0,
+    this.timesReviewed = 0,
     this.lastReviewDate,
     this.nextReviewDate,
-    String? addedDate,
-  }) : addedDate = addedDate ??
-            DateFormat('yyyy-MM-dd').format(DateTime
-                .now()); // Assign default value here because the value assigned is the result of multiple commands
+    this.addedDate,
+  });
+
+  factory Flashcard.fromDrift(FlashcardData data) {
+    return Flashcard(
+      id: data.id,
+      front: data.front,
+      back: data.back,
+      sourceLang: data.sourceLang,
+      targetLang: data.targetLang,
+      quality: data.quality,
+      easiness: data.easiness,
+      interval: data.interval,
+      repetitions: data.repetitions,
+      timesReviewed: data.timesReviewed,
+      lastReviewDate: data.lastReviewDate,
+      nextReviewDate: data.nextReviewDate,
+      addedDate: data.addedDate,
+    );
+  }
+
+  FlashcardsCompanion toDriftCompanion() {
+    return FlashcardsCompanion(
+      id: id != null ? Value(id!) : const Value.absent(),
+      front: Value(front),
+      back: Value(back),
+      sourceLang: Value(sourceLang),
+      targetLang: Value(targetLang),
+      quality: quality != null ? Value(quality!) : const Value.absent(),
+      easiness: Value(easiness),
+      interval: Value(interval),
+      repetitions: Value(repetitions),
+      timesReviewed: Value(timesReviewed),
+      lastReviewDate: lastReviewDate != null ? Value(lastReviewDate!) : const Value.absent(),
+      nextReviewDate: nextReviewDate != null ? Value(nextReviewDate!) : const Value.absent(),
+      addedDate: addedDate != null ? Value(addedDate!) : const Value.absent(),
+    );
+  }
 
   factory Flashcard.fromMap(Map<String, dynamic> map) {
-    // Convert a map to a Flashcard object
     return Flashcard(
       id: map['id'],
       front: map['front'],
@@ -55,7 +89,6 @@ class Flashcard {
   }
 
   Map<String, dynamic> toMap() {
-    // Convert a Flashcard object to a map
     return {
       'id': id,
       'front': front,
@@ -74,7 +107,6 @@ class Flashcard {
   }
 
   void review(int quality) {
-    // Review a flashcard with SMTwo and update it
     this.quality = quality;
 
     final smTwo = repetitions == 0
@@ -89,17 +121,15 @@ class Flashcard {
     interval = smTwo.interval;
     repetitions = smTwo.repetitions;
     timesReviewed += 1;
-    lastReviewDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    lastReviewDate = DateTime.now();
     nextReviewDate = quality != 2
-        ? DateFormat('yyyy-MM-dd').format(smTwo.reviewDate)
-        : DateFormat('yyyy-MM-dd')
-            .format(smTwo.reviewDate.subtract(const Duration(days: 1)));
+        ? smTwo.reviewDate
+        : smTwo.reviewDate.subtract(const Duration(days: 1));
   }
 
   bool isDue() {
-    // Check if a flashcard is due for review
-    return lastReviewDate == null ||
-        DateTime.now().isAfter(DateTime.parse(nextReviewDate!)) ||
-        DateTime.now().isAtSameMomentAs(DateTime.parse(nextReviewDate!));
+    return nextReviewDate == null ||
+        DateTime.now().isAfter(nextReviewDate!) ||
+        DateTime.now().isAtSameMomentAs(nextReviewDate!);
   }
 }

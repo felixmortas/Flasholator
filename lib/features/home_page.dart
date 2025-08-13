@@ -184,7 +184,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  void dataTableTabFunction(Map<dynamic, dynamic> row) {
+  void dataTableTabFunction(Map<String, dynamic> row) {
     dataTableTabKey.currentState?.addRow(row);
   }
 

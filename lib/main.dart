@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/models/flashcard_adapter.dart';
 import 'package:flasholator/core/services/ad_service.dart';
 import 'package:flasholator/core/services/auth_gate.dart';
 
@@ -18,10 +16,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  await Hive.initFlutter(); // Initialiser Hive avec Flutter
-  // Enregistrer l'adapter personnalisé pour Flashcard (si utilisé)
-  Hive.registerAdapter(FlashcardAdapter());
 
   runApp(const ProviderScope(child: MyApp()));
 }
