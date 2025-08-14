@@ -158,7 +158,6 @@ class FlashcardsService {
     // On utilise notre nouvelle méthode optimisée !
     final dueData = await _db.getDueFlashcards(today);
     dueData.shuffle();
-    print("Cartes échues trouvées : ${dueData.length}");
 
     // On n'oublie pas de convertir le résultat en notre modèle de domaine
     return dueData.map((data) => Flashcard.fromDrift(data)).toList();
