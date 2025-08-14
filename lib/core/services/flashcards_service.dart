@@ -152,9 +152,14 @@ class FlashcardsService {
   /// Retourne toutes les flashcards échues, mélangées
   Future<List<Flashcard>> dueFlashcards() async {
     await _ensureInitialized();
+
+    final DateTime now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
     // On utilise notre nouvelle méthode optimisée !
-    final dueData = await _db.getDueFlashcards(DateTime.now());
+    final dueData = await _db.getDueFlashcards(today);
     dueData.shuffle();
+    print("Cartes échues trouvées : ${dueData.length}");
+
     // On n'oublie pas de convertir le résultat en notre modèle de domaine
     return dueData.map((data) => Flashcard.fromDrift(data)).toList();
   }
