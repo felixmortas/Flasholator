@@ -8,9 +8,15 @@ class RevenueCatService {
   static const String _androidApiKey = 'goog_yrvYeFcZAwKnCSkdHaMeUAIUPFb';
   static const String _webApiKey = 'rcb_sb_NQccqqpXcoNQongucDBbMULZZ';
 
+  bool _isInitialized = false;
+
   Future<void> initRevenueCat(String userId) async {
+    if (_isInitialized) return;
+
     await Purchases.setLogLevel(LogLevel.debug);
     await Purchases.configure(PurchasesConfiguration(kIsWeb ? _webApiKey : _androidApiKey)..appUserID = userId);
+
+    _isInitialized = true;
   }
 
   Future<CustomerInfo> getCustomerInfo() async {
