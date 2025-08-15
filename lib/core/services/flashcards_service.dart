@@ -153,26 +153,22 @@ class FlashcardsService {
   /// Retourne toutes les flashcards échues, mélangées
   Future<List<Flashcard>> dueFlashcards() async {
     await _ensureInitialized();
+    List<Flashcard> flashcards = await loadAllFlashcards();
+    List<Flashcard> dueFlashcards = flashcards.where((flashcard) => flashcard.isDue()).toList();
 
-    final DateTime now = DateTime.now();
-    final DateTime today = DateTime(now.year, now.month, now.day);
-    // On utilise notre nouvelle méthode optimisée !
-    final dueData = await _db.getDueFlashcards(today);
-    dueData.shuffle();
+    dueFlashcards.shuffle();
 
     // On n'oublie pas de convertir le résultat en notre modèle de domaine
-    return dueData.map((data) => Flashcard.fromDrift(data)).toList();
+    return dueFlashcards;
   }
 
 
   Future<void> review(String front, String back, int quality) async {
-    print("[DEBUG - flashcards_service] Reviewing flashcard: $front/$back with quality $quality");
     await _ensureInitialized();
     
     // 1. Trouver la donnée brute de la carte à réviser
     final allCards = await _db.getAll();
     final cardDataToReview = allCards.firstWhereOrNull((c) => c.front == front && c.back == back);
-    print("[DEBUG - flashcards_service] Card data found: $cardDataToReview");
 
     if (cardDataToReview != null) {
       // 2. La convertir en notre modèle de domaine pour appliquer la logique métier
@@ -184,7 +180,6 @@ class FlashcardsService {
       // 4. Utiliser la méthode `toDriftCompanion()` pour créer un objet
       //    qui peut être utilisé pour la mise à jour dans Drift.
       final updatedFlashcardCompanion = flashcard.toDriftCompanion();
-      print("[DEBUG - flashcards_service] Updated flashcard companion: $updatedFlashcardCompanion");
       
       // 5. Persister la carte mise à jour. La méthode `put` doit accepter un Companion.
       await _db.put(updatedFlashcardCompanion);

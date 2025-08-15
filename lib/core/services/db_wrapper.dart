@@ -121,13 +121,4 @@ class DatabaseWrapper {
     final result = await query.get();
     return result.isNotEmpty;
   }
-
-  /// Récupère uniquement les cartes échues depuis la base de données
-  Future<List<FlashcardData>> getDueFlashcards(DateTime now) async {
-    final query = _db.select(_db.flashcards)
-      ..where((tbl) => 
-        tbl.nextReviewDate.isNull() |
-        tbl.nextReviewDate.isSmallerOrEqualValue(now));
-    return await query.get();
-  }
 }
