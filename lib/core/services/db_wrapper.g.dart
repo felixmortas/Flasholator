@@ -40,6 +40,12 @@ class $FlashcardsTable extends Flashcards
   late final GeneratedColumn<String> targetLang = GeneratedColumn<String>(
       'target_lang', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _addedDateMeta =
+      const VerificationMeta('addedDate');
+  @override
+  late final GeneratedColumn<DateTime> addedDate = GeneratedColumn<DateTime>(
+      'added_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
   static const VerificationMeta _qualityMeta =
       const VerificationMeta('quality');
   @override
@@ -82,12 +88,6 @@ class $FlashcardsTable extends Flashcards
   late final GeneratedColumn<DateTime> nextReviewDate =
       GeneratedColumn<DateTime>('next_review_date', aliasedName, true,
           type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _addedDateMeta =
-      const VerificationMeta('addedDate');
-  @override
-  late final GeneratedColumn<DateTime> addedDate = GeneratedColumn<DateTime>(
-      'added_date', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -95,14 +95,14 @@ class $FlashcardsTable extends Flashcards
         back,
         sourceLang,
         targetLang,
+        addedDate,
         quality,
         easiness,
         interval,
         repetitions,
         timesReviewed,
         lastReviewDate,
-        nextReviewDate,
-        addedDate
+        nextReviewDate
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -144,6 +144,12 @@ class $FlashcardsTable extends Flashcards
               data['target_lang']!, _targetLangMeta));
     } else if (isInserting) {
       context.missing(_targetLangMeta);
+    }
+    if (data.containsKey('added_date')) {
+      context.handle(_addedDateMeta,
+          addedDate.isAcceptableOrUnknown(data['added_date']!, _addedDateMeta));
+    } else if (isInserting) {
+      context.missing(_addedDateMeta);
     }
     if (data.containsKey('quality')) {
       context.handle(_qualityMeta,
@@ -189,10 +195,6 @@ class $FlashcardsTable extends Flashcards
           nextReviewDate.isAcceptableOrUnknown(
               data['next_review_date']!, _nextReviewDateMeta));
     }
-    if (data.containsKey('added_date')) {
-      context.handle(_addedDateMeta,
-          addedDate.isAcceptableOrUnknown(data['added_date']!, _addedDateMeta));
-    }
     return context;
   }
 
@@ -212,6 +214,8 @@ class $FlashcardsTable extends Flashcards
           .read(DriftSqlType.string, data['${effectivePrefix}source_lang'])!,
       targetLang: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}target_lang'])!,
+      addedDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}added_date'])!,
       quality: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}quality']),
       easiness: attachedDatabase.typeMapping
@@ -226,8 +230,6 @@ class $FlashcardsTable extends Flashcards
           DriftSqlType.dateTime, data['${effectivePrefix}last_review_date']),
       nextReviewDate: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}next_review_date']),
-      addedDate: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}added_date']),
     );
   }
 
@@ -243,6 +245,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
   final String back;
   final String sourceLang;
   final String targetLang;
+  final DateTime addedDate;
   final int? quality;
   final double easiness;
   final int interval;
@@ -250,21 +253,20 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
   final int timesReviewed;
   final DateTime? lastReviewDate;
   final DateTime? nextReviewDate;
-  final DateTime? addedDate;
   const FlashcardData(
       {required this.id,
       required this.front,
       required this.back,
       required this.sourceLang,
       required this.targetLang,
+      required this.addedDate,
       this.quality,
       required this.easiness,
       required this.interval,
       required this.repetitions,
       required this.timesReviewed,
       this.lastReviewDate,
-      this.nextReviewDate,
-      this.addedDate});
+      this.nextReviewDate});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -273,6 +275,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
     map['back'] = Variable<String>(back);
     map['source_lang'] = Variable<String>(sourceLang);
     map['target_lang'] = Variable<String>(targetLang);
+    map['added_date'] = Variable<DateTime>(addedDate);
     if (!nullToAbsent || quality != null) {
       map['quality'] = Variable<int>(quality);
     }
@@ -286,9 +289,6 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
     if (!nullToAbsent || nextReviewDate != null) {
       map['next_review_date'] = Variable<DateTime>(nextReviewDate);
     }
-    if (!nullToAbsent || addedDate != null) {
-      map['added_date'] = Variable<DateTime>(addedDate);
-    }
     return map;
   }
 
@@ -299,6 +299,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       back: Value(back),
       sourceLang: Value(sourceLang),
       targetLang: Value(targetLang),
+      addedDate: Value(addedDate),
       quality: quality == null && nullToAbsent
           ? const Value.absent()
           : Value(quality),
@@ -312,9 +313,6 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       nextReviewDate: nextReviewDate == null && nullToAbsent
           ? const Value.absent()
           : Value(nextReviewDate),
-      addedDate: addedDate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(addedDate),
     );
   }
 
@@ -327,6 +325,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       back: serializer.fromJson<String>(json['back']),
       sourceLang: serializer.fromJson<String>(json['sourceLang']),
       targetLang: serializer.fromJson<String>(json['targetLang']),
+      addedDate: serializer.fromJson<DateTime>(json['addedDate']),
       quality: serializer.fromJson<int?>(json['quality']),
       easiness: serializer.fromJson<double>(json['easiness']),
       interval: serializer.fromJson<int>(json['interval']),
@@ -334,7 +333,6 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       timesReviewed: serializer.fromJson<int>(json['timesReviewed']),
       lastReviewDate: serializer.fromJson<DateTime?>(json['lastReviewDate']),
       nextReviewDate: serializer.fromJson<DateTime?>(json['nextReviewDate']),
-      addedDate: serializer.fromJson<DateTime?>(json['addedDate']),
     );
   }
   @override
@@ -346,6 +344,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       'back': serializer.toJson<String>(back),
       'sourceLang': serializer.toJson<String>(sourceLang),
       'targetLang': serializer.toJson<String>(targetLang),
+      'addedDate': serializer.toJson<DateTime>(addedDate),
       'quality': serializer.toJson<int?>(quality),
       'easiness': serializer.toJson<double>(easiness),
       'interval': serializer.toJson<int>(interval),
@@ -353,7 +352,6 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       'timesReviewed': serializer.toJson<int>(timesReviewed),
       'lastReviewDate': serializer.toJson<DateTime?>(lastReviewDate),
       'nextReviewDate': serializer.toJson<DateTime?>(nextReviewDate),
-      'addedDate': serializer.toJson<DateTime?>(addedDate),
     };
   }
 
@@ -363,20 +361,21 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
           String? back,
           String? sourceLang,
           String? targetLang,
+          DateTime? addedDate,
           Value<int?> quality = const Value.absent(),
           double? easiness,
           int? interval,
           int? repetitions,
           int? timesReviewed,
           Value<DateTime?> lastReviewDate = const Value.absent(),
-          Value<DateTime?> nextReviewDate = const Value.absent(),
-          Value<DateTime?> addedDate = const Value.absent()}) =>
+          Value<DateTime?> nextReviewDate = const Value.absent()}) =>
       FlashcardData(
         id: id ?? this.id,
         front: front ?? this.front,
         back: back ?? this.back,
         sourceLang: sourceLang ?? this.sourceLang,
         targetLang: targetLang ?? this.targetLang,
+        addedDate: addedDate ?? this.addedDate,
         quality: quality.present ? quality.value : this.quality,
         easiness: easiness ?? this.easiness,
         interval: interval ?? this.interval,
@@ -386,7 +385,6 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
             lastReviewDate.present ? lastReviewDate.value : this.lastReviewDate,
         nextReviewDate:
             nextReviewDate.present ? nextReviewDate.value : this.nextReviewDate,
-        addedDate: addedDate.present ? addedDate.value : this.addedDate,
       );
   FlashcardData copyWithCompanion(FlashcardsCompanion data) {
     return FlashcardData(
@@ -397,6 +395,7 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
           data.sourceLang.present ? data.sourceLang.value : this.sourceLang,
       targetLang:
           data.targetLang.present ? data.targetLang.value : this.targetLang,
+      addedDate: data.addedDate.present ? data.addedDate.value : this.addedDate,
       quality: data.quality.present ? data.quality.value : this.quality,
       easiness: data.easiness.present ? data.easiness.value : this.easiness,
       interval: data.interval.present ? data.interval.value : this.interval,
@@ -411,7 +410,6 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       nextReviewDate: data.nextReviewDate.present
           ? data.nextReviewDate.value
           : this.nextReviewDate,
-      addedDate: data.addedDate.present ? data.addedDate.value : this.addedDate,
     );
   }
 
@@ -423,14 +421,14 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
           ..write('back: $back, ')
           ..write('sourceLang: $sourceLang, ')
           ..write('targetLang: $targetLang, ')
+          ..write('addedDate: $addedDate, ')
           ..write('quality: $quality, ')
           ..write('easiness: $easiness, ')
           ..write('interval: $interval, ')
           ..write('repetitions: $repetitions, ')
           ..write('timesReviewed: $timesReviewed, ')
           ..write('lastReviewDate: $lastReviewDate, ')
-          ..write('nextReviewDate: $nextReviewDate, ')
-          ..write('addedDate: $addedDate')
+          ..write('nextReviewDate: $nextReviewDate')
           ..write(')'))
         .toString();
   }
@@ -442,14 +440,14 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
       back,
       sourceLang,
       targetLang,
+      addedDate,
       quality,
       easiness,
       interval,
       repetitions,
       timesReviewed,
       lastReviewDate,
-      nextReviewDate,
-      addedDate);
+      nextReviewDate);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -459,14 +457,14 @@ class FlashcardData extends DataClass implements Insertable<FlashcardData> {
           other.back == this.back &&
           other.sourceLang == this.sourceLang &&
           other.targetLang == this.targetLang &&
+          other.addedDate == this.addedDate &&
           other.quality == this.quality &&
           other.easiness == this.easiness &&
           other.interval == this.interval &&
           other.repetitions == this.repetitions &&
           other.timesReviewed == this.timesReviewed &&
           other.lastReviewDate == this.lastReviewDate &&
-          other.nextReviewDate == this.nextReviewDate &&
-          other.addedDate == this.addedDate);
+          other.nextReviewDate == this.nextReviewDate);
 }
 
 class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
@@ -475,6 +473,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
   final Value<String> back;
   final Value<String> sourceLang;
   final Value<String> targetLang;
+  final Value<DateTime> addedDate;
   final Value<int?> quality;
   final Value<double> easiness;
   final Value<int> interval;
@@ -482,13 +481,13 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
   final Value<int> timesReviewed;
   final Value<DateTime?> lastReviewDate;
   final Value<DateTime?> nextReviewDate;
-  final Value<DateTime?> addedDate;
   const FlashcardsCompanion({
     this.id = const Value.absent(),
     this.front = const Value.absent(),
     this.back = const Value.absent(),
     this.sourceLang = const Value.absent(),
     this.targetLang = const Value.absent(),
+    this.addedDate = const Value.absent(),
     this.quality = const Value.absent(),
     this.easiness = const Value.absent(),
     this.interval = const Value.absent(),
@@ -496,7 +495,6 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
     this.timesReviewed = const Value.absent(),
     this.lastReviewDate = const Value.absent(),
     this.nextReviewDate = const Value.absent(),
-    this.addedDate = const Value.absent(),
   });
   FlashcardsCompanion.insert({
     this.id = const Value.absent(),
@@ -504,6 +502,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
     required String back,
     required String sourceLang,
     required String targetLang,
+    required DateTime addedDate,
     this.quality = const Value.absent(),
     required double easiness,
     required int interval,
@@ -511,11 +510,11 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
     required int timesReviewed,
     this.lastReviewDate = const Value.absent(),
     this.nextReviewDate = const Value.absent(),
-    this.addedDate = const Value.absent(),
   })  : front = Value(front),
         back = Value(back),
         sourceLang = Value(sourceLang),
         targetLang = Value(targetLang),
+        addedDate = Value(addedDate),
         easiness = Value(easiness),
         interval = Value(interval),
         repetitions = Value(repetitions),
@@ -526,6 +525,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
     Expression<String>? back,
     Expression<String>? sourceLang,
     Expression<String>? targetLang,
+    Expression<DateTime>? addedDate,
     Expression<int>? quality,
     Expression<double>? easiness,
     Expression<int>? interval,
@@ -533,7 +533,6 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
     Expression<int>? timesReviewed,
     Expression<DateTime>? lastReviewDate,
     Expression<DateTime>? nextReviewDate,
-    Expression<DateTime>? addedDate,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -541,6 +540,7 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
       if (back != null) 'back': back,
       if (sourceLang != null) 'source_lang': sourceLang,
       if (targetLang != null) 'target_lang': targetLang,
+      if (addedDate != null) 'added_date': addedDate,
       if (quality != null) 'quality': quality,
       if (easiness != null) 'easiness': easiness,
       if (interval != null) 'interval': interval,
@@ -548,7 +548,6 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
       if (timesReviewed != null) 'times_reviewed': timesReviewed,
       if (lastReviewDate != null) 'last_review_date': lastReviewDate,
       if (nextReviewDate != null) 'next_review_date': nextReviewDate,
-      if (addedDate != null) 'added_date': addedDate,
     });
   }
 
@@ -558,20 +557,21 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
       Value<String>? back,
       Value<String>? sourceLang,
       Value<String>? targetLang,
+      Value<DateTime>? addedDate,
       Value<int?>? quality,
       Value<double>? easiness,
       Value<int>? interval,
       Value<int>? repetitions,
       Value<int>? timesReviewed,
       Value<DateTime?>? lastReviewDate,
-      Value<DateTime?>? nextReviewDate,
-      Value<DateTime?>? addedDate}) {
+      Value<DateTime?>? nextReviewDate}) {
     return FlashcardsCompanion(
       id: id ?? this.id,
       front: front ?? this.front,
       back: back ?? this.back,
       sourceLang: sourceLang ?? this.sourceLang,
       targetLang: targetLang ?? this.targetLang,
+      addedDate: addedDate ?? this.addedDate,
       quality: quality ?? this.quality,
       easiness: easiness ?? this.easiness,
       interval: interval ?? this.interval,
@@ -579,7 +579,6 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
       timesReviewed: timesReviewed ?? this.timesReviewed,
       lastReviewDate: lastReviewDate ?? this.lastReviewDate,
       nextReviewDate: nextReviewDate ?? this.nextReviewDate,
-      addedDate: addedDate ?? this.addedDate,
     );
   }
 
@@ -600,6 +599,9 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
     }
     if (targetLang.present) {
       map['target_lang'] = Variable<String>(targetLang.value);
+    }
+    if (addedDate.present) {
+      map['added_date'] = Variable<DateTime>(addedDate.value);
     }
     if (quality.present) {
       map['quality'] = Variable<int>(quality.value);
@@ -622,9 +624,6 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
     if (nextReviewDate.present) {
       map['next_review_date'] = Variable<DateTime>(nextReviewDate.value);
     }
-    if (addedDate.present) {
-      map['added_date'] = Variable<DateTime>(addedDate.value);
-    }
     return map;
   }
 
@@ -636,14 +635,14 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardData> {
           ..write('back: $back, ')
           ..write('sourceLang: $sourceLang, ')
           ..write('targetLang: $targetLang, ')
+          ..write('addedDate: $addedDate, ')
           ..write('quality: $quality, ')
           ..write('easiness: $easiness, ')
           ..write('interval: $interval, ')
           ..write('repetitions: $repetitions, ')
           ..write('timesReviewed: $timesReviewed, ')
           ..write('lastReviewDate: $lastReviewDate, ')
-          ..write('nextReviewDate: $nextReviewDate, ')
-          ..write('addedDate: $addedDate')
+          ..write('nextReviewDate: $nextReviewDate')
           ..write(')'))
         .toString();
   }
@@ -666,6 +665,7 @@ typedef $$FlashcardsTableCreateCompanionBuilder = FlashcardsCompanion Function({
   required String back,
   required String sourceLang,
   required String targetLang,
+  required DateTime addedDate,
   Value<int?> quality,
   required double easiness,
   required int interval,
@@ -673,7 +673,6 @@ typedef $$FlashcardsTableCreateCompanionBuilder = FlashcardsCompanion Function({
   required int timesReviewed,
   Value<DateTime?> lastReviewDate,
   Value<DateTime?> nextReviewDate,
-  Value<DateTime?> addedDate,
 });
 typedef $$FlashcardsTableUpdateCompanionBuilder = FlashcardsCompanion Function({
   Value<int> id,
@@ -681,6 +680,7 @@ typedef $$FlashcardsTableUpdateCompanionBuilder = FlashcardsCompanion Function({
   Value<String> back,
   Value<String> sourceLang,
   Value<String> targetLang,
+  Value<DateTime> addedDate,
   Value<int?> quality,
   Value<double> easiness,
   Value<int> interval,
@@ -688,7 +688,6 @@ typedef $$FlashcardsTableUpdateCompanionBuilder = FlashcardsCompanion Function({
   Value<int> timesReviewed,
   Value<DateTime?> lastReviewDate,
   Value<DateTime?> nextReviewDate,
-  Value<DateTime?> addedDate,
 });
 
 class $$FlashcardsTableFilterComposer
@@ -715,6 +714,9 @@ class $$FlashcardsTableFilterComposer
   ColumnFilters<String> get targetLang => $composableBuilder(
       column: $table.targetLang, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<DateTime> get addedDate => $composableBuilder(
+      column: $table.addedDate, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<int> get quality => $composableBuilder(
       column: $table.quality, builder: (column) => ColumnFilters(column));
 
@@ -737,9 +739,6 @@ class $$FlashcardsTableFilterComposer
   ColumnFilters<DateTime> get nextReviewDate => $composableBuilder(
       column: $table.nextReviewDate,
       builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get addedDate => $composableBuilder(
-      column: $table.addedDate, builder: (column) => ColumnFilters(column));
 }
 
 class $$FlashcardsTableOrderingComposer
@@ -766,6 +765,9 @@ class $$FlashcardsTableOrderingComposer
   ColumnOrderings<String> get targetLang => $composableBuilder(
       column: $table.targetLang, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get addedDate => $composableBuilder(
+      column: $table.addedDate, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get quality => $composableBuilder(
       column: $table.quality, builder: (column) => ColumnOrderings(column));
 
@@ -789,9 +791,6 @@ class $$FlashcardsTableOrderingComposer
   ColumnOrderings<DateTime> get nextReviewDate => $composableBuilder(
       column: $table.nextReviewDate,
       builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get addedDate => $composableBuilder(
-      column: $table.addedDate, builder: (column) => ColumnOrderings(column));
 }
 
 class $$FlashcardsTableAnnotationComposer
@@ -818,6 +817,9 @@ class $$FlashcardsTableAnnotationComposer
   GeneratedColumn<String> get targetLang => $composableBuilder(
       column: $table.targetLang, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get addedDate =>
+      $composableBuilder(column: $table.addedDate, builder: (column) => column);
+
   GeneratedColumn<int> get quality =>
       $composableBuilder(column: $table.quality, builder: (column) => column);
 
@@ -838,9 +840,6 @@ class $$FlashcardsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get nextReviewDate => $composableBuilder(
       column: $table.nextReviewDate, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get addedDate =>
-      $composableBuilder(column: $table.addedDate, builder: (column) => column);
 }
 
 class $$FlashcardsTableTableManager extends RootTableManager<
@@ -874,6 +873,7 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             Value<String> back = const Value.absent(),
             Value<String> sourceLang = const Value.absent(),
             Value<String> targetLang = const Value.absent(),
+            Value<DateTime> addedDate = const Value.absent(),
             Value<int?> quality = const Value.absent(),
             Value<double> easiness = const Value.absent(),
             Value<int> interval = const Value.absent(),
@@ -881,7 +881,6 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             Value<int> timesReviewed = const Value.absent(),
             Value<DateTime?> lastReviewDate = const Value.absent(),
             Value<DateTime?> nextReviewDate = const Value.absent(),
-            Value<DateTime?> addedDate = const Value.absent(),
           }) =>
               FlashcardsCompanion(
             id: id,
@@ -889,6 +888,7 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             back: back,
             sourceLang: sourceLang,
             targetLang: targetLang,
+            addedDate: addedDate,
             quality: quality,
             easiness: easiness,
             interval: interval,
@@ -896,7 +896,6 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             timesReviewed: timesReviewed,
             lastReviewDate: lastReviewDate,
             nextReviewDate: nextReviewDate,
-            addedDate: addedDate,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -904,6 +903,7 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             required String back,
             required String sourceLang,
             required String targetLang,
+            required DateTime addedDate,
             Value<int?> quality = const Value.absent(),
             required double easiness,
             required int interval,
@@ -911,7 +911,6 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             required int timesReviewed,
             Value<DateTime?> lastReviewDate = const Value.absent(),
             Value<DateTime?> nextReviewDate = const Value.absent(),
-            Value<DateTime?> addedDate = const Value.absent(),
           }) =>
               FlashcardsCompanion.insert(
             id: id,
@@ -919,6 +918,7 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             back: back,
             sourceLang: sourceLang,
             targetLang: targetLang,
+            addedDate: addedDate,
             quality: quality,
             easiness: easiness,
             interval: interval,
@@ -926,7 +926,6 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             timesReviewed: timesReviewed,
             lastReviewDate: lastReviewDate,
             nextReviewDate: nextReviewDate,
-            addedDate: addedDate,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

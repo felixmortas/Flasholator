@@ -9,6 +9,7 @@ class Flashcard {
   String back;
   String sourceLang;
   String targetLang;
+  DateTime addedDate;
   int? quality;
   double easiness;
   int interval;
@@ -16,13 +17,13 @@ class Flashcard {
   int timesReviewed;
   DateTime? lastReviewDate;
   DateTime? nextReviewDate;
-  DateTime? addedDate;
 
   Flashcard({
     required this.front,
     required this.back,
     required this.sourceLang,
     required this.targetLang,
+    required this.addedDate,
     this.id,
     this.quality,
     this.easiness = 2.5,
@@ -31,7 +32,6 @@ class Flashcard {
     this.timesReviewed = 0,
     this.lastReviewDate,
     this.nextReviewDate,
-    this.addedDate,
   });
 
   factory Flashcard.fromDrift(FlashcardData data) {
@@ -41,6 +41,7 @@ class Flashcard {
       back: data.back,
       sourceLang: data.sourceLang,
       targetLang: data.targetLang,
+      addedDate: data.addedDate,
       quality: data.quality,
       easiness: data.easiness,
       interval: data.interval,
@@ -48,7 +49,6 @@ class Flashcard {
       timesReviewed: data.timesReviewed,
       lastReviewDate: data.lastReviewDate,
       nextReviewDate: data.nextReviewDate,
-      addedDate: data.addedDate,
     );
   }
 
@@ -59,6 +59,7 @@ class Flashcard {
       back: Value(back),
       sourceLang: Value(sourceLang),
       targetLang: Value(targetLang),
+      addedDate: Value(addedDate),
       quality: quality != null ? Value(quality!) : const Value.absent(),
       easiness: Value(easiness),
       interval: Value(interval),
@@ -66,7 +67,6 @@ class Flashcard {
       timesReviewed: Value(timesReviewed),
       lastReviewDate: lastReviewDate != null ? Value(lastReviewDate!) : const Value.absent(),
       nextReviewDate: nextReviewDate != null ? Value(nextReviewDate!) : const Value.absent(),
-      addedDate: addedDate != null ? Value(addedDate!) : const Value.absent(),
     );
   }
 
@@ -77,6 +77,7 @@ class Flashcard {
       back: map['back'],
       sourceLang: map['sourceLang'],
       targetLang: map['targetLang'],
+      addedDate: map['addedDate'],
       quality: map['quality'],
       easiness: map['easiness'],
       interval: map['interval'],
@@ -84,7 +85,6 @@ class Flashcard {
       timesReviewed: map['timesReviewed'],
       lastReviewDate: map['lastReviewDate'],
       nextReviewDate: map['nextReviewDate'],
-      addedDate: map['addedDate'],
     );
   }
 
@@ -95,6 +95,7 @@ class Flashcard {
       'back': back,
       'sourceLang': sourceLang,
       'targetLang': targetLang,
+      'addedDate': addedDate,
       'quality': quality,
       'easiness': easiness,
       'interval': interval,
@@ -102,7 +103,6 @@ class Flashcard {
       'timesReviewed': timesReviewed,
       'lastReviewDate': lastReviewDate,
       'nextReviewDate': nextReviewDate,
-      'addedDate': addedDate,
     };
   }
 

@@ -15,6 +15,7 @@ class Flashcards extends Table {
   TextColumn get back => text()();
   TextColumn get sourceLang => text()();
   TextColumn get targetLang => text()();
+  DateTimeColumn get addedDate => dateTime()();
   IntColumn get quality => integer().nullable()();
   RealColumn get easiness => real()();
   IntColumn get interval => integer()();
@@ -22,7 +23,6 @@ class Flashcards extends Table {
   IntColumn get timesReviewed => integer()();
   DateTimeColumn get lastReviewDate => dateTime().nullable()();
   DateTimeColumn get nextReviewDate => dateTime().nullable()();
-  DateTimeColumn get addedDate => dateTime().nullable()();
 }
 
 
