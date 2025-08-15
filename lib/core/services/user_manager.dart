@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flasholator/core/providers/user_sync_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,9 +87,11 @@ class UserManager {
 
   Future<void> login(String email, String password) async {
     try {
+      ref.read(userSyncStateProvider.notifier).state = false;
       await _authService.login(email, password);
       await initRevenueCat();
       await syncLocalFromFirestore();
+      ref.read(userSyncStateProvider.notifier).state = true;
 
     } catch (e) {
       throw Exception('Failed to login and sync user: $e');
