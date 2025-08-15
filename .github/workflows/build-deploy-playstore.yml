@@ -8,8 +8,8 @@ permissions:
   packages: write
 
 env:
-  BUILD_NUMBER: 14
-  BUILD_NAME: 0.5.3
+  BUILD_NUMBER: 15
+  BUILD_NAME: 0.5.4
   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
   STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
@@ -62,3 +62,5 @@ jobs:
         releaseFiles: build/app/outputs/bundle/release/app-release.aab
         track: production
         status: completed
+        whatsNewDirectory: play_release_notes
+
