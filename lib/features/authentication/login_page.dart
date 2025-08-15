@@ -22,8 +22,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> login() async {
     try {
       ref.read(userSyncStateProvider.notifier).state = false;
-      final userManager = ref.read(userManagerProvider);    
+      final userManager = ref.read(userManagerProvider);
       await userManager.login(emailController.text.trim(), passwordController.text.trim());
+      ref.read(userSyncStateProvider.notifier).state = true;
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       setState(() => errorMessage = e.message ?? 'Erreur de connexion');

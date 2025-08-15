@@ -9,7 +9,6 @@ import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flasholator/core/services/revenuecat_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
-import 'package:flasholator/core/providers/user_sync_provider.dart';
 
 class UserManager {
   final FirestoreUsersDAO _firestoreDAO;
@@ -25,8 +24,9 @@ class UserManager {
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
-  void initRevenueCat(String userId) {
-    _revenueCatService.initRevenueCat(userId);
+  Future<void> initRevenueCat() async {
+    final uid = getUserId();
+    await _revenueCatService.initRevenueCat(uid);
   }
 
   Future<void> setCoupleLang(String sourceLang, String targetLang) async {
@@ -87,7 +87,8 @@ class UserManager {
   Future<void> login(String email, String password) async {
     try {
       await _authService.login(email, password);
-      await syncUser();
+      await initRevenueCat();
+      await syncLocalFromFirestore();
 
     } catch (e) {
       throw Exception('Failed to login and sync user: $e');
@@ -99,7 +100,7 @@ class UserManager {
     final userId = getUserId();
     await _revenueCatService.presentPaywall(userId);
     if(!wasSubscribed) {
-      final bool isSubscribed = await _revenueCatService.isSubscribed();
+      final bool isSubscribed = await isUserSubscribed();
       if (isSubscribed) {
         updateLocal({"isSubscribed": isSubscribed});
       }
@@ -126,17 +127,17 @@ class UserManager {
     }
   }
 
-  Future<void> syncNotifier() async {
+  Future<void> syncNotifierFromCache() async {
     final data = await UserPreferencesService.loadUserData();
-    userNotifier.update(data..['isSubscribed'] = await _revenueCatService.isSubscribed());
+    userNotifier.update(data..['isSubscribed'] = await isUserSubscribed());
   }
 
-  Future<void> syncUser() async {
+  Future<void> syncLocalFromFirestore() async {
     final userDoc = await getUserFromFirestore();
     final userDocData = userDoc.data() as Map<String, dynamic>;
     final bool canTranslate = userDocData['canTranslate'] ?? false;
     final String coupleLang = userDocData['coupleLang'] ?? '';
-    final bool isSubscribed = await _revenueCatService.isSubscribed();
+    final bool isSubscribed = await isUserSubscribed();
 
     final data = {
       'canTranslate': canTranslate,
@@ -145,7 +146,6 @@ class UserManager {
     };
 
     await updateLocal(data);
-    ref.read(userSyncStateProvider.notifier).state = true;
   }
 
 
@@ -166,7 +166,7 @@ class UserManager {
     return UserPreferencesService.isUserDataCached();
   }
 
-  Future<bool> isSubscribed() async {
+  Future<bool> isUserSubscribed() async {
     final isSubscribed = await _revenueCatService.isSubscribed();
     return isSubscribed;
   }
@@ -176,7 +176,7 @@ class UserManager {
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserFromFirestore() async {
-    final uid = _authService.getUserId();
+    final uid = getUserId();
     final userDoc = await _firestoreDAO.getUser(uid);
     return userDoc;
   }

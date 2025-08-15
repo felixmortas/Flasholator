@@ -94,8 +94,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _initUserState() async {
     final userManager = ref.read(userManagerProvider);
-    await userManager.syncNotifier();
-    
+    await userManager.initRevenueCat();
+    await userManager.syncNotifierFromCache();
+
     final coupleLang = ref.read(coupleLangProvider);
     final sourceLang = coupleLang.contains('-') ? coupleLang.split('-')[0] : '';
     final targetLang = coupleLang.contains('-') ? coupleLang.split('-')[1] : '';
