@@ -14,8 +14,8 @@ class StatsService {
     // Filtrage selon la période définie
     final filtered = flashcards.where((fc) {
       final created = fc.addedDate;
-      if (startDate != null && created?.isBefore(startDate) == true) return false;
-      if (endDate != null && created?.isAfter(endDate) == true) return false;
+      if (startDate != null && created.isBefore(startDate) == true) return false;
+      if (endDate != null && created.isAfter(endDate) == true) return false;
       return true;
     }).toList();
 
@@ -69,7 +69,7 @@ class StatsService {
       ..sort((a, b) => a.date.compareTo(b.date)); // Trie par date
   }
 
-  Map<String, double> _calculateAverages(
+  Map<String, num> _calculateAverages(
     List<Flashcard> flashcards,
     List<TimeSeriesData> series,
   ) {
@@ -82,9 +82,9 @@ class StatsService {
 
     return {
       'day': totalWords / totalDays,
-      'week': totalWords / (totalDays / 7),
-      'month': totalWords / (totalDays / 30),
-      'year': totalWords / (totalDays / 365),
+      'week': totalDays >= 7 ? totalWords / (totalDays / 7) : totalWords,
+      'month': totalDays >= 30 ? totalWords / (totalDays / 30) : totalWords,
+      'year': totalDays >= 365 ? totalWords / (totalDays / 365) : totalWords,
     };
   }
 

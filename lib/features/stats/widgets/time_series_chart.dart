@@ -20,18 +20,18 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
   Widget build(BuildContext context) {
     final aggregatedData = widget.data.aggregate(_selectedGranularity);
     final minY = aggregatedData.isNotEmpty
-        ? aggregatedData
-            .map((e) => e.count)
-            .reduce((a, b) => a < b ? a : b)
-            .toDouble()
-        : 0.0;
+    ? aggregatedData
+        .map((e) => e.count)
+        .reduce((a, b) => a < b ? a : b)
+        .toDouble()
+    : 0.0;
 
-    final maxY = aggregatedData.isNotEmpty
-        ? aggregatedData
-            .map((e) => e.count)
-            .reduce((a, b) => a > b ? a : b)
-            .toDouble()
-        : 1.0;
+final maxY = aggregatedData.isNotEmpty
+    ? aggregatedData
+        .map((e) => e.count)
+        .reduce((a, b) => a > b ? a : b)
+        .toDouble()
+    : 1.0;
     return Card(
       elevation: 4,
       child: Padding(
@@ -89,14 +89,11 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
                               reservedSize: 50,
                               getTitlesWidget: (value, meta) {
                                 final allX = aggregatedData
-                                    .map((e) => e.date.millisecondsSinceEpoch
-                                        .toDouble())
+                                    .map((e) => e.date.millisecondsSinceEpoch.toDouble())
                                     .toList();
 
-                                final minX =
-                                    allX.reduce((a, b) => a < b ? a : b);
-                                final maxX =
-                                    allX.reduce((a, b) => a > b ? a : b);
+                                final minX = allX.isEmpty ? 0 : allX.reduce((a, b) => a < b ? a : b);
+                                final maxX = allX.isEmpty ? 0 : allX.reduce((a, b) => a > b ? a : b);
 
                                 // Ne pas afficher les labels pour min et max X
                                 if (value == minX || value == maxX) {

@@ -27,10 +27,10 @@ class TimeSeriesData {
 class StatsData {
   final int totalWords;
   final int totalPairs;
-  final double dailyAverage;
-  final double weeklyAverage;
-  final double monthlyAverage;
-  final double yearlyAverage;
+  final num dailyAverage;
+  final num weeklyAverage;
+  final num monthlyAverage;
+  final num yearlyAverage;
   final List<TimeSeriesData> dailySeries;
   final List<RankingItem> mostReviewed;
   final List<RankingItem> mostSuccessful;
