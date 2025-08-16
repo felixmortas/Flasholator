@@ -138,48 +138,53 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     }
   }
 
-  Future<void> _addFlashcard() async {
+  Future<void> _checkIfCanAddFlashcard() async {
     final isSubscribed = ref.read(isSubscribedProvider);
     final canAddCard = await widget.flashcardsService.canAddCard();
     if(isSubscribed || canAddCard) {
+      _addFlashcard();
+    } else {
+      _openSubscribePopup();
+    }
+  }
 
-      if (_wordToTranslate != '' &&
-          _translatedWord != '' &&
-          _translatedWord != AppLocalizations.of(context)!.connectionError &&
-          !await widget.flashcardsService
-              .checkIfFlashcardExists(_wordToTranslate, _translatedWord)) {
-        _wordToTranslate = _wordToTranslate.toLowerCase()[0].toUpperCase() +
-            _wordToTranslate.toLowerCase().substring(1);
-        _translatedWord = _translatedWord.toLowerCase()[0].toUpperCase() +
-            _translatedWord.toLowerCase().substring(1);
+  Future<void> _addFlashcard() async {
+    if (_wordToTranslate != '' &&
+        _translatedWord != '' &&
+        _translatedWord != AppLocalizations.of(context)!.connectionError &&
+        !await widget.flashcardsService
+            .checkIfFlashcardExists(_wordToTranslate, _translatedWord)) {
+      _wordToTranslate = _wordToTranslate.toLowerCase()[0].toUpperCase() +
+          _wordToTranslate.toLowerCase().substring(1);
+      _translatedWord = _translatedWord.toLowerCase()[0].toUpperCase() +
+          _translatedWord.toLowerCase().substring(1);
 
-        widget.addRow({
-          'front': _wordToTranslate,
-          'back': _translatedWord,
-          'sourceLang': _sourceLanguage,
-          'targetLang': _targetLanguage,
-        });
-        Future<bool> isCardAdded = widget.flashcardsService.addFlashcard(
-            _wordToTranslate, _translatedWord, _sourceLanguage, _targetLanguage);
+      widget.addRow({
+        'front': _wordToTranslate,
+        'back': _translatedWord,
+        'sourceLang': _sourceLanguage,
+        'targetLang': _targetLanguage,
+      });
+      Future<bool> isCardAdded = widget.flashcardsService.addFlashcard(
+          _wordToTranslate, _translatedWord, _sourceLanguage, _targetLanguage);
 
-        widget.updateQuestionText();
-        setState(() {
-          isAddButtonDisabled = true;
-        });
+      widget.updateQuestionText();
+      setState(() {
+        isAddButtonDisabled = true;
+      });
 
-        // Confirm that the card was added
-        Fluttertoast.showToast(
-          msg: await isCardAdded
-              ? AppLocalizations.of(context)!.cardAdded
-              : AppLocalizations.of(context)!.cardAlreadyAdded,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
+      // Confirm that the card was added
+      Fluttertoast.showToast(
+        msg: await isCardAdded
+            ? AppLocalizations.of(context)!.cardAdded
+            : AppLocalizations.of(context)!.cardAlreadyAdded,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
 
     // open cancel dialog
@@ -236,7 +241,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                       });
                     }
                     : (val) {
-                      print("not subscribed");
+                      _openSubscribePopup();
                     },
                   ),
                 ),
@@ -265,7 +270,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                         languageSelection.targetLanguage = val!;
                       });
                     }: (val) {
-                      print("not subscribed");
+                      _openSubscribePopup();
                     },
                   ),
                 ),
@@ -280,7 +285,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                   decoration: InputDecoration(
                     hintText: AppLocalizations.of(context)!
                         .writeOrPasteYourTextHereForTranslation,
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     counterText: "",
                     hintStyle: TextStyle(
                         color: Colors.grey.withOpacity(
@@ -305,7 +310,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                     });
                     _updateButtonState();
                   },
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                 ),
               ],
             ),
@@ -335,7 +340,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                 const SizedBox(width: 16.0),
                 Expanded(
                     child: ElevatedButton(
-                  onPressed: isAddButtonDisabled ? null : _addFlashcard,
+                  onPressed: isAddButtonDisabled ? null : _checkIfCanAddFlashcard,
                   child: Text(AppLocalizations.of(context)!.add),
                 )),
               ],

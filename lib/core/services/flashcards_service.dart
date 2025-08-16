@@ -18,7 +18,7 @@ class FlashcardsService {
   Future<bool> canAddCard() async {
     await _ensureInitialized();
     final count = await _db.count();
-    return count < MAX_CARDS;
+    return count < MAX_CARDS*2;
 
   }
 

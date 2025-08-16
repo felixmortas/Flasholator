@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math';
 
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/config/constants.dart';
@@ -117,10 +118,16 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
 
   void _onQualityButtonPress(int quality) async {
     if (!ref.read(isSubscribedProvider)) {
-      if (adCounter % INTERSTITIAL_FREQUENCY == 0) {
+      // Show interstitial ad if the user is not subscribed and reached certain number of reviews
+      // if (adCounter % INTERSTITIAL_FREQUENCY == 0) {
+      //   ref.read(adServiceProvider).showInterstitial();
+      // }
+      // adCounter += 1;
+      
+      // Show interstitial 1 out of INTERSTITIAL_FREQUENCY
+      if (Random().nextInt(INTERSTITIAL_FREQUENCY) == 0) {
         ref.read(adServiceProvider).showInterstitial();
       }
-      adCounter += 1;
     }
     // Update the flashcard with the quality in the database then update the question text
     await widget.flashcardsService
