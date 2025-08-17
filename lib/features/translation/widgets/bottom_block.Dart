@@ -89,7 +89,7 @@ class BottomBlock extends StatelessWidget {
               ],
             ),
 
-            // -- Bouton "Coller" collé à gauche du widget parent
+            // -- Bouton "Coller"
             Align(
               alignment: Alignment.centerLeft,
               child: PasteButton(controller: controller),
@@ -107,6 +107,43 @@ class BottomBlock extends StatelessWidget {
                   fontSize: 18.0,
                   fontWeight: FontWeight.w500,
                 ),
+              ),
+            ),
+
+            // --- Boutons d'actions sur le texte : partager, alternative et écouter
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      // Action de volume
+                    },
+                    icon: const Icon(Icons.volume_up),
+                  ),
+                  OutlinedButton(
+                    onPressed: () {
+                      // Action de récupération d'autres traductions
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(width: 1.0, color: Colors.black),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2), // moins d’espace autour du texte
+                      minimumSize: Size.zero, // permet de supprimer la taille minimale par défaut
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // réduit l’espace pour le tap
+                    ),
+                    child: const Text("ALTERNATIVE"),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      // Action de partage
+                    },
+                    icon: const Icon(Icons.share),
+                  ),
+                ],
               ),
             ),
 
