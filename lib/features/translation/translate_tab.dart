@@ -14,6 +14,8 @@ import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
 import 'package:flasholator/features/shared/widgets/language_dropdown.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
+import 'package:flasholator/features/translation/widgets/bottom_block.dart';
+
 class TranslateTab extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
   final DeeplTranslator deeplTranslator;
@@ -220,130 +222,87 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     }
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      resizeToAvoidBottomInset:
+          true, // ⚡ important : permet au bloc de remonter avec le clavier
+      backgroundColor: Colors.grey[200],
+      body: SafeArea(
         child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: 
-                  LanguageDropdown(
-                    selectedLanguage: languageSelection.sourceLanguage,
-                    otherLanguage: languageSelection.targetLanguage,
-                    sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                  AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                    )).toList(),
-                    onChanged: isSubscribed
-                    ? (val) {
-                      setState(() {
-                        languageSelection.sourceLanguage = val!;
-                      });
-                    }
-                    : (val) {
-                      _openSubscribePopup();
-                    },
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: 
+                    LanguageDropdown(
+                      selectedLanguage: languageSelection.sourceLanguage,
+                      otherLanguage: languageSelection.targetLanguage,
+                      sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                    AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                      )).toList(),
+                      onChanged: isSubscribed
+                      ? (val) {
+                        setState(() {
+                          languageSelection.sourceLanguage = val!;
+                        });
+                      }
+                      : (val) {
+                        _openSubscribePopup();
+                      },
+                    ),
                   ),
-                ),
-                
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                            setState(() {
-                              _swapContent();
-                            });
-                          },
-                    child: const Icon(Icons.swap_horiz),
+                  
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                              setState(() {
+                                _swapContent();
+                              });
+                            },
+                      child: const Icon(Icons.swap_horiz),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: LanguageDropdown(
-                    selectedLanguage: languageSelection.targetLanguage,
-                    otherLanguage: languageSelection.sourceLanguage,
-                    sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                      AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                    )).toList(),
-                    onChanged: isSubscribed
-                    ? (val) {
-                      setState(() {
-                        languageSelection.targetLanguage = val!;
-                      });
-                    }: (val) {
-                      _openSubscribePopup();
-                    },
+                  Expanded(
+                    child: LanguageDropdown(
+                      selectedLanguage: languageSelection.targetLanguage,
+                      otherLanguage: languageSelection.sourceLanguage,
+                      sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                        AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                      )).toList(),
+                      onChanged: isSubscribed
+                      ? (val) {
+                        setState(() {
+                          languageSelection.targetLanguage = val!;
+                        });
+                      }: (val) {
+                        _openSubscribePopup();
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-            Stack(
-              alignment: Alignment.centerRight,
-              children: [
-                TextField(
-                  textAlign: TextAlign.left,
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!
-                        .writeOrPasteYourTextHereForTranslation,
-                    border: const OutlineInputBorder(),
-                    counterText: "",
-                    hintStyle: TextStyle(
-                        color: Colors.grey.withOpacity(
-                            0.5)), // Set hint text color to be more transparent
-                  ),
-                  maxLength: 100,
-                  onChanged: (value) {
-                    setState(() {
-                      _wordToTranslate = value;
-                    });
-                  },
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _controller.clear();
-                      _wordToTranslate = '';
-                      _translatedWord = '';
-                      _lastTranslatedWord = '';
-                      isTranslateButtonDisabled = true;
-                      isAddButtonDisabled = true;
-                    });
-                    _updateButtonState();
-                  },
-                  icon: const Icon(Icons.clear),
-                ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.centerLeft, // Align text to the left
-              child: Text(
-                _translatedWord,
-                textAlign: TextAlign.left,
-                style: const TextStyle(fontSize: 18.0),
+                ],
               ),
             ),
-            Expanded(
-              child: Container(),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                  onPressed: isTranslateButtonDisabled
-                      ? null
-                      : () async {
-                          _checkIfCanTranslate();
-                        },
-                  child: Text(AppLocalizations.of(context)!.translate),
-                )),
-                const SizedBox(width: 16.0),
-                Expanded(
-                    child: ElevatedButton(
-                  onPressed: isAddButtonDisabled ? null : _checkIfCanAddFlashcard,
-                  child: Text(AppLocalizations.of(context)!.add),
-                )),
-              ],
+            const Spacer(),
+            BottomBlock(
+              controller: _controller,
+              hintText: AppLocalizations.of(context)!.writeOrPasteYourTextHereForTranslation,
+              translatedWord: _translatedWord,
+              isTranslateButtonDisabled: isTranslateButtonDisabled,
+              isAddButtonDisabled: isAddButtonDisabled,
+              onClear: () {
+                setState(() {
+                  _controller.clear();
+                  _wordToTranslate = '';
+                  _translatedWord = '';
+                  _lastTranslatedWord = '';
+                  isTranslateButtonDisabled = true;
+                  isAddButtonDisabled = true;
+                });
+                _updateButtonState();
+              },
+              onTranslate: _checkIfCanTranslate,
+              onAdd: _checkIfCanAddFlashcard,
             ),
           ],
         ),
