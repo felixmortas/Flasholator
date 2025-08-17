@@ -34,7 +34,12 @@ __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :
 ### Fonctionnalités :
+- Barre de progression pour les cartes à réviser aujourd'hui
+- Monnaie virtuelle permettant d'acheter un mot à ajouter (10 pièces = 1 mot)
+- Bouton possible de regarder une vidéo et gagner une pièce 
+- Système de récompense quand cartes révisées tous les jours
 - Notifications de rappel cartes à réviser
+- Achat de thèmes avec monnaie virtuelle
 - Plusieurs résultats lors de la traduction.
 - Prononciation
 - Une ou deux langues fun translator
@@ -46,7 +51,6 @@ __[Ajouter captures d'écran et tuto]__
 - Ajout messages de remerciement et motivation
 - Modification de la dynamique des boutons de qualité pour glisser 1 unique bouton vers la qualité correspondante
 - Offrir une option de personnalisation des boutons de qualité (premium, payant ?)
-- Ajout barre de progression pour les cartes à réviser aujourd'hui
 - Ajout indicateur carte nouvelle ou déjà révisée
 - Tutoriel long et engageant pour l'utilisateur
 - Ajouter popup fonction Android native traduire avec Flasholator et ajouter une carte depuis une autre appliation
