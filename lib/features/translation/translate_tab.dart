@@ -11,9 +11,10 @@ import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
-import 'package:flasholator/features/shared/widgets/language_dropdown.dart';
+import 'package:flasholator/features/translation/widgets/language_dropdown.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
+import 'package:flasholator/features/translation/widgets/switch_lang_button.dart';
 import 'package:flasholator/features/translation/widgets/bottom_block.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
@@ -254,13 +255,12 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                   
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: ElevatedButton(
+                    child: SwitchLangButton(
                       onPressed: () {
                               setState(() {
                                 _swapContent();
                               });
                             },
-                      child: const Icon(Icons.swap_horiz),
                     ),
                   ),
                   Expanded(

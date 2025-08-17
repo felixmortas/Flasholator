@@ -1,6 +1,6 @@
 // widgets/language_selection_popup.dart
 import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
-import 'package:flasholator/features/shared/widgets/language_dropdown.dart';
+import 'package:flasholator/features/translation/widgets/language_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
