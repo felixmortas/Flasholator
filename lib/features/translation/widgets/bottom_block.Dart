@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flasholator/features/shared/widgets/paste_button.dart';
+
 class BottomBlock extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -69,10 +71,8 @@ class BottomBlock extends StatelessWidget {
                   textAlign: TextAlign.left,
                   controller: controller,
                   decoration: InputDecoration(
+                    border: InputBorder.none,
                     hintText: hintText,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                     counterText: "",
                     hintStyle: TextStyle(
                       color: Colors.grey.withOpacity(0.5),
@@ -87,6 +87,12 @@ class BottomBlock extends StatelessWidget {
                   icon: const Icon(Icons.clear),
                 ),
               ],
+            ),
+
+            // -- Bouton "Coller" collé à gauche du widget parent
+            Align(
+              alignment: Alignment.centerLeft,
+              child: PasteButton(controller: controller),
             ),
 
             const SizedBox(height: 12),
