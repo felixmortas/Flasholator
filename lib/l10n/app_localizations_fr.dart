@@ -193,7 +193,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get renewal => 'Renouvellement';
 
   @override
-  String get activateSubscription => 'Activer abonnement';
+  String get activateSubscription => 'Mettre à niveau';
 
   @override
   String get deleteMyAccount => 'Supprimer mon compte';

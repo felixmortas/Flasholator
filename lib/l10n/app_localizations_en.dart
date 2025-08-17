@@ -190,7 +190,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get renewal => 'Renewal';
 
   @override
-  String get activateSubscription => 'Activate subscription';
+  String get activateSubscription => 'Upgrade';
 
   @override
   String get deleteMyAccount => 'Delete my account';

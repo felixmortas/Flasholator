@@ -192,7 +192,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get renewal => 'Renovación';
 
   @override
-  String get activateSubscription => 'Activar suscripción';
+  String get activateSubscription => 'Actualizar';
 
   @override
   String get deleteMyAccount => 'Eliminar mi cuenta';

@@ -451,7 +451,7 @@ abstract class AppLocalizations {
   /// No description provided for @activateSubscription.
   ///
   /// In en, this message translates to:
-  /// **'Activate subscription'**
+  /// **'Upgrade'**
   String get activateSubscription;
 
   /// No description provided for @deleteMyAccount.

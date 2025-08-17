@@ -10,6 +10,8 @@ import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 
+import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
+
 class ProfilePage extends ConsumerStatefulWidget {
 
   const ProfilePage({
@@ -194,9 +196,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 const Divider(height: 32),
                 _infoRow(AppLocalizations.of(context)!.subscription, abonnementLabel),
                 const SizedBox(height: 8),
-                ElevatedButton(
+                SubscribeButton(
                   onPressed: () => _subscribe(),
-                  child: Text(AppLocalizations.of(context)!.activateSubscription),
                 ),
                 const SizedBox(height: 12),
                 if (_showPrivacyButton)

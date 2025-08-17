@@ -23,6 +23,9 @@ import 'package:flasholator/features/shared/dialogs/language_selection_popup.dar
 import 'package:flasholator/features/shared/widgets/ad_banner_widget.dart';
 import 'package:flasholator/features/authentication/profile_page.dart';
 
+import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
+
+
 class HomePage extends ConsumerStatefulWidget {
 
   const HomePage({
@@ -231,27 +234,34 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userManager = ref.read(userManagerProvider);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.account_circle),
+            onPressed: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ProfilePage()),
+              )
+            },
+          ),
           title: const Text('Flasholator'),
           actions: [
             IconButton(
-              icon: const Icon(Icons.account_circle),
-              onPressed: () => {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => ProfilePage()),
-                )
+              icon: const Icon(Icons.money),
+              onPressed: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (_) => MoneyPage()),
+                // );
               },
             ),
-            IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {
-                  _openSettings();
-                },
-              ),
+            SubscribeButton(
+              onPressed: () => userManager.subscribeUser(),
+            ),
           ],
         ),
         body: Column(
