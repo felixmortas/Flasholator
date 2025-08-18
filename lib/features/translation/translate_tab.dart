@@ -115,6 +115,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   Future<void> _translate(bool isSubscribed) async {
     isTranslateButtonDisabled = true;
     try {
+      _wordToTranslate = _controller.text.trim();
       String translation = await widget.deeplTranslator.translate(
         _wordToTranslate,
         languageSelection.targetLanguage,
