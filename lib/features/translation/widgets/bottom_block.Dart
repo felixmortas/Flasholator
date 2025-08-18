@@ -154,7 +154,13 @@ class BottomBlock extends StatelessWidget {
               )
             ),
 
+            const SizedBox(height: 12),
+
+            // Divider line
+            const Divider(),
+
             const SizedBox(height: 16),
+
             // --- Boutons
             Row(
               children: [
