@@ -81,6 +81,9 @@ class BottomBlock extends StatelessWidget {
                         horizontal: 12, vertical: 12),
                   ),
                   maxLength: 100,
+                  style: const TextStyle(
+                    fontSize: 24.0,
+                  ),
                 ),
                 IconButton(
                   onPressed: onClear,
@@ -117,8 +120,7 @@ class BottomBlock extends StatelessWidget {
                 translatedWord,
                 textAlign: TextAlign.left,
                 style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 24.0,
                 ),
               ),
             ),
@@ -140,6 +142,9 @@ class BottomBlock extends StatelessWidget {
                         // Action de volume
                       },
                       icon: const Icon(Icons.volume_up),
+                      iconSize: 18,
+                      padding: EdgeInsets.zero, // enlève l’espace interne
+                      constraints: const BoxConstraints(), // enlève les contraintes par défaut
                     ),
                     OutlinedButton(
                       onPressed: () {
@@ -154,7 +159,7 @@ class BottomBlock extends StatelessWidget {
                         minimumSize: Size.zero, // permet de supprimer la taille minimale par défaut
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap, // réduit l’espace pour le tap
                       ),
-                      child: const Text("ALTERNATIVE"),
+                      child: const Text("ALTERNATIVE", style: TextStyle(fontSize: 12)),
                     ),
                     IconButton(
                       onPressed: () {
