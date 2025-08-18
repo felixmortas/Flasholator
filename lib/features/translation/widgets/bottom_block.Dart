@@ -110,45 +110,51 @@ class BottomBlock extends StatelessWidget {
               ),
             ),
 
-            // --- Boutons d'actions sur le texte : partager, alternative et écouter
-            Align(
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      // Action de volume
-                    },
-                    icon: const Icon(Icons.volume_up),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      // Action de récupération d'autres traductions
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(width: 1.0, color: Colors.black),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2), // moins d’espace autour du texte
-                      minimumSize: Size.zero, // permet de supprimer la taille minimale par défaut
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // réduit l’espace pour le tap
+            // --- Boutons d'actions sur le texte traduit : partager, alternative et écouter
+            Visibility(
+              visible: translatedWord.isNotEmpty,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+
+              child : Align(
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        // Action de volume
+                      },
+                      icon: const Icon(Icons.volume_up),
                     ),
-                    child: const Text("ALTERNATIVE"),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      // Action de partage
-                    },
-                    icon: const Icon(Icons.share),
-                  ),
-                ],
-              ),
+                    OutlinedButton(
+                      onPressed: () {
+                        // Action de récupération d'autres traductions
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(width: 1.0, color: Colors.black),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2), // moins d’espace autour du texte
+                        minimumSize: Size.zero, // permet de supprimer la taille minimale par défaut
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap, // réduit l’espace pour le tap
+                      ),
+                      child: const Text("ALTERNATIVE"),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        // Action de partage
+                      },
+                      icon: const Icon(Icons.share),
+                    ),
+                  ],
+                ),
+              )
             ),
 
-            const SizedBox(height: 20),
-
+            const SizedBox(height: 16),
             // --- Boutons
             Row(
               children: [
