@@ -1,4 +1,4 @@
-import 'package:flasholator/features/review/widgets/edit_answer_overlay.dart';
+import 'package:flasholator/features/review/widgets/answer_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
@@ -174,61 +174,71 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
         clipBehavior: Clip.none, // Permet à l'overlay de dépasser si nécessaire
         children: [
           Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (isSubscribed)
-              AllLanguagesSwitch(
-                isAllLanguagesToggledNotifier:
-                    widget.isAllLanguagesToggledNotifier,
-                onToggle: (newValue) {
-                  updateSwitchState(newValue);
-                  updateQuestionText(newValue);
-                },
-              ),
-            WordsDisplay(
-              questionLang: _questionLang,
-              questionText: _questionText,
-              responseLang: _responseLang,
-              responseText: _responseText,
-              isResponseHidden: isResponseHidden,
-              isDue: isDue,
-              onDisplayAnswer: _displayAnswer,
-            ),
-            const Spacer(),
-            ReviewControls(
-              isResponseHidden: isResponseHidden,
-              isDue: isDue,
-              onDisplayAnswer: _displayAnswer,
-              onQualityPress: (q) {
-                _onQualityButtonPress(q);
-              },
-              overrideDisplayWithResult:
-                  isEditing && !isResponseHidden && overrideQuality != null,
-              overrideQuality: overrideQuality,
-              isEditAnswerExpanded: isEditing,
-                onToggleEditAnswer: () {
-                  setState(() {
-                    isEditing = !isEditing;
-                    if (!isEditing) {
-                      overrideQuality = null;
-                    }
-                  });
-                },
-            ),
-            // Overlay pour EditAnswer
-            if (isSubscribed && isDue)
-              const SizedBox(height: 12),
-              Positioned(
-                bottom: -1,
-                left: 0,
-                right: 0,
-                child: EditAnswerOverlay(
-                  isExpanded: isEditing,
-                  controller: editingController,
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                WordsDisplay(
+                  questionLang: _questionLang,
+                  questionText: _questionText,
+                  responseLang: _responseLang,
+                  responseText: _responseText,
+                  isResponseHidden: isResponseHidden,
+                  isDue: isDue,
+                  onDisplayAnswer: _displayAnswer,
                 ),
-              ),
+                const Spacer(),
+                ReviewControls(
+                  isResponseHidden: isResponseHidden,
+                  onQualityPress: (q) {
+                    _onQualityButtonPress(q);
+                  },
+                  overrideDisplayWithResult:
+                      isEditing && !isResponseHidden && overrideQuality != null,
+                  overrideQuality: overrideQuality,
+                ),
+
+                const SizedBox(height: 32),
+                const Divider(),
+
+                if (isDue && isSubscribed)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      AllLanguagesSwitch(
+                        isAllLanguagesToggledNotifier:
+                            widget.isAllLanguagesToggledNotifier,
+                        onToggle: (newValue) {
+                          updateSwitchState(newValue);
+                          updateQuestionText(newValue);
+                        },
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            isEditing = !isEditing;
+                            if (!isEditing) {
+                              overrideQuality = null;
+                            }
+                          });
+                        },
+                        icon: Icon(isEditing ? Icons.keyboard_arrow_down : Icons.edit),
+                      ),
+                    ],
+                  ),
+
+                // Overlay pour EditAnswer
+                if (isSubscribed && isDue)
+                  const SizedBox(height: 12),
+                  Positioned(
+                    bottom: -1,
+                    left: 0,
+                    right: 0,
+                    child: AnswerOverlay(
+                      isExpanded: isEditing,
+                      controller: editingController,
+                    ),
+                  ),
               ],
             ),
           ),

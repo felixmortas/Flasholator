@@ -3,25 +3,17 @@ import 'package:flasholator/l10n/app_localizations.dart';
 
 class ReviewControls extends StatefulWidget {
   final bool isResponseHidden;
-  final bool isDue;
   final bool overrideDisplayWithResult;
   final int? overrideQuality;
-  final VoidCallback onDisplayAnswer;
   final void Function(int) onQualityPress;
-  final bool isEditAnswerExpanded;
-  final VoidCallback onToggleEditAnswer;
 
 
   const ReviewControls({
     Key? key,
     required this.isResponseHidden,
-    required this.isDue,
     required this.overrideDisplayWithResult,
     required this.overrideQuality,
-    required this.onDisplayAnswer,
     required this.onQualityPress,
-    required this.isEditAnswerExpanded,
-    required this.onToggleEditAnswer,
 
   }) : super(key: key);
 
@@ -100,15 +92,6 @@ class _ReviewControlsState extends State<ReviewControls> {
               ),
             ],
           ),
-          if (widget.isDue)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                onPressed: widget.onToggleEditAnswer,
-                icon: Icon(widget.isEditAnswerExpanded ? Icons.keyboard_arrow_down : Icons.edit),
-              ),
-            ),
-
       ],
     );
   }
