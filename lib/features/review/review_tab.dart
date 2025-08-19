@@ -171,6 +171,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
 
     return Scaffold(
       body: Stack(
+        clipBehavior: Clip.none, // Permet à l'overlay de dépasser si nécessaire
         children: [
           Padding(
         padding: const EdgeInsets.all(16.0),
@@ -220,7 +221,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
             if (isSubscribed && isDue)
               const SizedBox(height: 12),
               Positioned(
-                bottom: 0,
+                bottom: -1,
                 left: 0,
                 right: 0,
                 child: EditAnswerOverlay(

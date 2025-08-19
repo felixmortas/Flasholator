@@ -13,14 +13,8 @@ class EditAnswerOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-      constraints: BoxConstraints(
-        minHeight: 20,
-        maxHeight: isExpanded ? 120 : 20,
-      ),
-      width: double.infinity,
+    return Container(
+      clipBehavior: Clip.hardEdge, // Force le clipping pour éviter l'overflow
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
@@ -32,46 +26,54 @@ class EditAnswerOverlay extends StatelessWidget {
           ),
         ],
       ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Barre de drag handle
-          Center(
-            child: Container(
-              width: 40,
-              height: 5,
-              margin: EdgeInsets.only(top: 8, bottom: isExpanded ? 16 : 7),
-              decoration: BoxDecoration(
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-          
-          if (isExpanded) ...[
-            Flexible(
-                child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: AppLocalizations.of(context)!.writeYourResponseHere,
-                  hintStyle: TextStyle(
-                    color: Colors.grey.withOpacity(0.5),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        height: isExpanded ? 120 : 20,
+        width: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Drag handle
+                Container(
+                  width: 40,
+                  height: 5,
+                  margin: const EdgeInsets.only(top: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 8),
                 ),
-                style: const TextStyle(fontSize: 18.0),
-              ),
-            ),),
-          ],
-        ],
-      ),),
+                
+                // Contenu du TextField avec contrôle strict de la hauteur
+                if (constraints.maxHeight > 25) // Seulement si assez d'espace
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+                      child: TextField(
+                        controller: controller,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: AppLocalizations.of(context)!.writeYourResponseHere,
+                          hintStyle: TextStyle(
+                            color: Colors.grey.withOpacity(0.5),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          isDense: true, // Réduit la hauteur du TextField
+                        ),
+                        style: const TextStyle(fontSize: 18.0),
+                        maxLines: 2, // Limite le nombre de lignes
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }
