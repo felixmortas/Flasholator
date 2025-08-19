@@ -16,7 +16,10 @@ class EditAnswerOverlay extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
-      height: isExpanded ? 120 : 20,
+      constraints: BoxConstraints(
+        minHeight: 20,
+        maxHeight: isExpanded ? 120 : 20,
+      ),
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -29,7 +32,9 @@ class EditAnswerOverlay extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: SafeArea(
+        top: false,
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -38,7 +43,7 @@ class EditAnswerOverlay extends StatelessWidget {
             child: Container(
               width: 40,
               height: 5,
-              margin: const EdgeInsets.only(top: 8, bottom: 16),
+              margin: EdgeInsets.only(top: 8, bottom: isExpanded ? 16 : 7),
               decoration: BoxDecoration(
                 color: Colors.grey[400],
                 borderRadius: BorderRadius.circular(10),
@@ -47,7 +52,8 @@ class EditAnswerOverlay extends StatelessWidget {
           ),
           
           if (isExpanded) ...[
-            Padding(
+            Flexible(
+                child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
                 controller: controller,
@@ -58,14 +64,14 @@ class EditAnswerOverlay extends StatelessWidget {
                     color: Colors.grey.withOpacity(0.5),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 12),
+                      horizontal: 12, vertical: 8),
                 ),
                 style: const TextStyle(fontSize: 18.0),
               ),
-            ),
+            ),),
           ],
         ],
-      ),
+      ),),
     );
   }
 }
