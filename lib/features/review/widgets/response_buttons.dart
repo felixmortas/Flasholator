@@ -22,14 +22,7 @@ class ReviewControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        if (isResponseHidden && isDue && !overrideDisplayWithResult)
-          ElevatedButton(
-            onPressed: onDisplayAnswer,
-            child: Text(AppLocalizations.of(context)!.displayAnswer),
-          ),
-
-        // This is the modified section
+      children: [        // This is the modified section
         if (overrideDisplayWithResult && overrideQuality != null)
           // Case: Written answer is incorrect
           if (overrideQuality == 2)

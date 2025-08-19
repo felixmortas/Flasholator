@@ -8,6 +8,7 @@ class WordsDisplay extends StatelessWidget {
   final String responseText;
   final bool isResponseHidden;
   final bool isDue;
+  final VoidCallback onDisplayAnswer;
 
   const WordsDisplay({
     Key? key,
@@ -17,6 +18,7 @@ class WordsDisplay extends StatelessWidget {
     required this.responseText,
     required this.isResponseHidden,
     required this.isDue,
+    required this.onDisplayAnswer,
   }) : super(key: key);
 
 @override
@@ -81,7 +83,9 @@ Widget build(BuildContext context) {
         child: SizedBox(
           width: cardWidth,
           height: cardHeight,
-          child: Card(
+          child: GestureDetector( // Ajout du GestureDetector
+            onTap: (isResponseHidden && isDue) ? onDisplayAnswer : null,
+            child: Card(
             child: Stack(
               children: [
                 // langTag positionné en haut à gauche, peu visible
@@ -120,10 +124,20 @@ Widget build(BuildContext context) {
                     ),
                   ),
                 ),
+                if (isResponseHidden && isDue)
+                    const Center(
+                      child: Icon(
+                        Icons.touch_app,
+                        size: 48.0,
+                        color: Colors.grey,
+                      ),
+                    ),
+
               ],
             ),
           ),
         ),
+      ),
       ),
       ],
     );

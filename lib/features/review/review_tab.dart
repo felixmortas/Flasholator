@@ -190,6 +190,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
               responseText: _responseText,
               isResponseHidden: isResponseHidden,
               isDue: isDue,
+              onDisplayAnswer: _displayAnswer,
             ),
             const Spacer(),
             if (isSubscribed)
