@@ -125,35 +125,6 @@ Widget build(BuildContext context) {
           ),
         ),
       ),
-
-        Row(
-          children: [
-            Visibility(
-              visible: isDue,
-              child: Text(
-                responseLang,
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Arial',
-                  color: Color.fromARGB(255, 238, 220, 245),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8.0),
-            Expanded(
-              child: Center(
-                child: Visibility(
-                  visible: !isResponseHidden,
-                  child: Text(
-                    responseText,
-                    style: const TextStyle(fontSize: 18.0),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
