@@ -1,3 +1,4 @@
+import 'package:flasholator/features/review/widgets/edit_answer_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
@@ -169,7 +170,9 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
     final isSubscribed = ref.watch(isSubscribedProvider);
 
     return Scaffold(
-      body: Padding(
+      body: Stack(
+        children: [
+          Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -193,21 +196,6 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
               onDisplayAnswer: _displayAnswer,
             ),
             const Spacer(),
-            if (isSubscribed)
-              EditableAnswerField(
-                isDue: isDue,
-                isEditing: isEditing,
-                onToggleEditing: () {
-                  setState(() {
-                    isEditing = !isEditing;
-                    if (!isEditing) {
-                      overrideQuality = null;
-                    }
-                  });
-                },
-                controller: editingController,
-              ),
-            const SizedBox(height: 12),
             ReviewControls(
               isResponseHidden: isResponseHidden,
               isDue: isDue,
@@ -218,9 +206,32 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
               overrideDisplayWithResult:
                   isEditing && !isResponseHidden && overrideQuality != null,
               overrideQuality: overrideQuality,
+              isEditAnswerExpanded: isEditing,
+                onToggleEditAnswer: () {
+                  setState(() {
+                    isEditing = !isEditing;
+                    if (!isEditing) {
+                      overrideQuality = null;
+                    }
+                  });
+                },
             ),
-          ],
-        ),
+            // Overlay pour EditAnswer
+            if (isSubscribed && isDue)
+              const SizedBox(height: 12),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: EditAnswerOverlay(
+                  isExpanded: isEditing,
+                  controller: editingController,
+                ),
+              ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
-class ReviewControls extends StatelessWidget {
+class ReviewControls extends StatefulWidget {
   final bool isResponseHidden;
   final bool isDue;
   final bool overrideDisplayWithResult;
   final int? overrideQuality;
   final VoidCallback onDisplayAnswer;
   final void Function(int) onQualityPress;
+  final bool isEditAnswerExpanded;
+  final VoidCallback onToggleEditAnswer;
+
 
   const ReviewControls({
     Key? key,
@@ -17,24 +20,32 @@ class ReviewControls extends StatelessWidget {
     required this.overrideQuality,
     required this.onDisplayAnswer,
     required this.onQualityPress,
+    required this.isEditAnswerExpanded,
+    required this.onToggleEditAnswer,
+
   }) : super(key: key);
 
   @override
+  State<ReviewControls> createState() => _ReviewControlsState();
+}
+
+class _ReviewControlsState extends State<ReviewControls> {
+  @override
   Widget build(BuildContext context) {
     return Column(
-      children: [        // This is the modified section
-        if (overrideDisplayWithResult && overrideQuality != null)
+      children: [
+        if (widget.overrideDisplayWithResult && widget.overrideQuality != null)
           // Case: Written answer is incorrect
-          if (overrideQuality == 2)
+          if (widget.overrideQuality == 2)
             ElevatedButton(
-              onPressed: () => onQualityPress(overrideQuality!),
+              onPressed: () => widget.onQualityPress(widget.overrideQuality!),
               style: ElevatedButton.styleFrom(
-                backgroundColor: _getColorForQuality(overrideQuality!),
+                backgroundColor: _getColorForQuality(widget.overrideQuality!),
               ),
-              child: Text(_getLabelForQuality(context, overrideQuality!)),
+              child: Text(_getLabelForQuality(context, widget.overrideQuality!)),
             )
           // Case: Written answer is correct
-          else if (overrideQuality == 4)
+          else if (widget.overrideQuality == 4)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -42,24 +53,24 @@ class ReviewControls extends StatelessWidget {
                   context,
                   AppLocalizations.of(context)!.hard,
                   Colors.grey,
-                  () => onQualityPress(3), // Quality 3 for 'hard'
+                  () => widget.onQualityPress(3), // Quality 3 for 'hard'
                 ),
                 _buildQualityButton(
                   context,
                   AppLocalizations.of(context)!.correct,
                   Colors.green,
-                  () => onQualityPress(4), // Quality 4 for 'correct'
+                  () => widget.onQualityPress(4), // Quality 4 for 'correct'
                 ),
                 _buildQualityButton(
                   context,
                   AppLocalizations.of(context)!.easy,
                   Colors.blue,
-                  () => onQualityPress(5), // Quality 5 for 'easy'
+                  () => widget.onQualityPress(5), // Quality 5 for 'easy'
                 ),
               ],
             ),
 
-        if (!isResponseHidden && !overrideDisplayWithResult)
+        if (!widget.isResponseHidden && !widget.overrideDisplayWithResult)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -67,28 +78,37 @@ class ReviewControls extends StatelessWidget {
                 context,
                 AppLocalizations.of(context)!.again,
                 Colors.red,
-                () => onQualityPress(2),
+                () => widget.onQualityPress(2),
               ),
               _buildQualityButton(
                 context,
                 AppLocalizations.of(context)!.hard,
                 Colors.grey,
-                () => onQualityPress(3),
+                () => widget.onQualityPress(3),
               ),
               _buildQualityButton(
                 context,
                 AppLocalizations.of(context)!.correct,
                 Colors.green,
-                () => onQualityPress(4),
+                () => widget.onQualityPress(4),
               ),
               _buildQualityButton(
                 context,
                 AppLocalizations.of(context)!.easy,
                 Colors.blue,
-                () => onQualityPress(5),
+                () => widget.onQualityPress(5),
               ),
             ],
           ),
+          if (widget.isDue)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                onPressed: widget.onToggleEditAnswer,
+                icon: Icon(widget.isEditAnswerExpanded ? Icons.keyboard_arrow_down : Icons.edit),
+              ),
+            ),
+
       ],
     );
   }
