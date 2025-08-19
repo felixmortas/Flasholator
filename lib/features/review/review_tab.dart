@@ -1,4 +1,4 @@
-import 'package:flasholator/features/review/widgets/answer_overlay.dart';
+import 'package:flasholator/features/review/widgets/answer_answer_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
@@ -234,7 +234,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
                     bottom: -1,
                     left: 0,
                     right: 0,
-                    child: AnswerOverlay(
+                    child: EditAnswerOverlay(
                       isExpanded: isEditing,
                       controller: editingController,
                     ),

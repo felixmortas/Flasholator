@@ -1,11 +1,11 @@
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class AnswerOverlay extends StatelessWidget {
+class EditAnswerOverlay extends StatelessWidget {
   final bool isExpanded;
   final TextEditingController controller;
 
-  const AnswerOverlay({
+  const EditAnswerOverlay({
     Key? key,
     required this.isExpanded,
     required this.controller,
