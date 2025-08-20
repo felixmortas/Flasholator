@@ -156,6 +156,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
 
   void _displayAnswer() {
     if (isEditing) {
+      FocusScope.of(context).unfocus();
       _evaluateWrittenAnswer();
     }
     setState(() {
