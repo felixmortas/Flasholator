@@ -13,7 +13,7 @@ import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/review/widgets/all_languages_switch.dart';
 import 'package:flasholator/features/review/widgets/response_buttons.dart';
 import 'package:flasholator/features/review/widgets/words_display.dart';
-import 'package:flasholator/features/review/widgets/editable_answer_field.dart';
+import 'package:flasholator/features/shared/utils/measure_child_size.dart';
 
 class ReviewTab extends ConsumerStatefulWidget {
   // The ReviewTab widget is a StatefulWidget because it needs to be able to update its state
@@ -47,6 +47,8 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   String _responseLang = "";
 
   int adCounter = 0;
+
+  double _overlayHeight = 0.0;
 
   set currentFlashcard(Flashcard currentFlashcard) {
     _currentFlashcard = currentFlashcard;
@@ -168,80 +170,113 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   @override
   Widget build(BuildContext context) {
     final isSubscribed = ref.watch(isSubscribedProvider);
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardOpen = bottomInset > 0;
+
+    // Si l'overlay est développé ET que le clavier est fermé,
+    // on réserve un padding bottom égal à la hauteur mesurée de l'overlay.
+    // Sinon on ne réserve rien (important pour ne pas "pousser" le layout quand le clavier s'ouvre).
+    final extraBottomPadding = (isEditing && !isKeyboardOpen) ? _overlayHeight : 0.0;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false, // Empêche le push du layout quand le clavier s'ouvre
       body: Stack(
-        clipBehavior: Clip.none, // Permet à l'overlay de dépasser si nécessaire
+        // clipBehavior: Clip.none, // Permet à l'overlay de dépasser si nécessaire
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                WordsDisplay(
-                  questionLang: _questionLang,
-                  questionText: _questionText,
-                  responseLang: _responseLang,
-                  responseText: _responseText,
-                  isResponseHidden: isResponseHidden,
-                  isDue: isDue,
-                  onDisplayAnswer: _displayAnswer,
-                ),
-                const Spacer(),
-                ReviewControls(
-                  isResponseHidden: isResponseHidden,
-                  onQualityPress: (q) {
-                    _onQualityButtonPress(q);
-                  },
-                  overrideDisplayWithResult:
-                      isEditing && !isResponseHidden && overrideQuality != null,
-                  overrideQuality: overrideQuality,
-                ),
-
-                const SizedBox(height: 32),
-                const Divider(),
-
-                if (isDue && isSubscribed)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      AllLanguagesSwitch(
-                        isAllLanguagesToggledNotifier:
-                            widget.isAllLanguagesToggledNotifier,
-                        onToggle: (newValue) {
-                          updateSwitchState(newValue);
-                          updateQuestionText(newValue);
-                        },
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            isEditing = !isEditing;
-                            if (!isEditing) {
-                              overrideQuality = null;
-                            }
-                          });
-                        },
-                        icon: Icon(isEditing ? Icons.keyboard_arrow_down : Icons.edit),
-                      ),
-                    ],
+          SafeArea(
+            child: AnimatedPadding(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              // On part de EdgeInsets.all(16) et on ajoute le padding bottom mesuré.
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + extraBottomPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  WordsDisplay(
+                    questionLang: _questionLang,
+                    questionText: _questionText,
+                    responseLang: _responseLang,
+                    responseText: _responseText,
+                    isResponseHidden: isResponseHidden,
+                    isDue: isDue,
+                    onDisplayAnswer: _displayAnswer,
+                  ),
+                  const Spacer(),
+                  ReviewControls(
+                    isResponseHidden: isResponseHidden,
+                    onQualityPress: (q) {
+                      _onQualityButtonPress(q);
+                    },
+                    overrideDisplayWithResult:
+                        isEditing && !isResponseHidden && overrideQuality != null,
+                    overrideQuality: overrideQuality,
                   ),
 
-                // Overlay pour EditAnswer
-                if (isSubscribed && isDue)
-                  const SizedBox(height: 12),
-                  Positioned(
-                    bottom: -1,
-                    left: 0,
-                    right: 0,
-                    child: EditAnswerOverlay(
-                      isExpanded: isEditing,
-                      controller: editingController,
+                  const SizedBox(height: 32),
+                  const Divider(),
+
+                  if (isDue && isSubscribed)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AllLanguagesSwitch(
+                          isAllLanguagesToggledNotifier:
+                              widget.isAllLanguagesToggledNotifier,
+                          onToggle: (newValue) {
+                            updateSwitchState(newValue);
+                            updateQuestionText(newValue);
+                          },
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isEditing = !isEditing;
+                              if (!isEditing) {
+                                overrideQuality = null;
+                              }
+                            });
+                          },
+                          icon: Icon(isEditing ? Icons.keyboard_arrow_down : Icons.edit),
+                        ),
+                      ],
                     ),
-                  ),
-              ],
+                  ],
+              ),
             ),
           ),
+          // Overlay pour EditAnswer
+          if (isSubscribed && isDue)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: AnimatedPadding(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+              // Quand le clavier est ouvert, on pousse l'overlay au-dessus du clavier.
+              // Quand il est fermé, padding bottom = 0 (on utilise l'espace réservé dans le body).
+              padding: EdgeInsets.only(bottom: isKeyboardOpen ? bottomInset : 0),
+              // On entoure l'overlay de MeasureSize pour obtenir sa hauteur.
+              child: MeasureSize(
+                onChange: (size) {
+                  // Met à jour la hauteur uniquement si elle change (optimisation).
+                  final newHeight = size.height;
+                  if ((_overlayHeight - newHeight).abs() > 0.5) {
+                    // seuil pour éviter setState à chaque pixel
+                    if (mounted) {
+                      setState(() {
+                        _overlayHeight = newHeight;
+                      });
+                    }
+                  }
+                },
+                child: EditAnswerOverlay(
+                  isExpanded: isEditing,
+                  controller: editingController,
+                ),
+              ),
+              )
+            ),
         ],
       ),
     );
