@@ -10,6 +10,7 @@ import 'package:flasholator/core/models/flashcard.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
+import 'package:flasholator/features/review/review_empty_page.dart';
 import 'package:flasholator/features/review/widgets/all_languages_switch.dart';
 import 'package:flasholator/features/review/widgets/response_buttons.dart';
 import 'package:flasholator/features/review/widgets/words_display.dart';
@@ -177,7 +178,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
     final extraBottomPadding = (isEditing && !isKeyboardOpen) ? _overlayHeight : 0.0;
 
     if(!isDue) {
-      return const Text('hello');
+      return const ReviewPageEmpty();
     }
 
     return Scaffold(
