@@ -155,16 +155,13 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   }
 
   void _displayAnswer() {
-    if (!isEditing) {
-      setState(() {
-        isResponseHidden = false;
-      });
-    } else {
+    if (isEditing) {
       _evaluateWrittenAnswer();
-      setState(() {
-        isResponseHidden = false;
-      });
     }
+    setState(() {
+      isResponseHidden = false;
+    });
+
   }
 
   @override
