@@ -29,12 +29,16 @@ class _ReviewControlsState extends State<ReviewControls> {
         if (widget.overrideDisplayWithResult && widget.overrideQuality != null)
           // Case: Written answer is incorrect
           if (widget.overrideQuality == 2)
-            ElevatedButton(
-              onPressed: () => widget.onQualityPress(widget.overrideQuality!),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _getColorForQuality(widget.overrideQuality!),
-              ),
-              child: Text(_getLabelForQuality(context, widget.overrideQuality!)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildQualityButton(
+                  context,
+                  AppLocalizations.of(context)!.again,
+                  Colors.red,
+                  () => widget.onQualityPress(2),
+                ),
+              ],
             )
           // Case: Written answer is correct
           else if (widget.overrideQuality == 4)
@@ -127,35 +131,5 @@ class _ReviewControlsState extends State<ReviewControls> {
         },
       ),
     );
-  }
-
-  Color _getColorForQuality(int quality) {
-    switch (quality) {
-      case 2:
-        return Colors.red;
-      case 3:
-        return Colors.grey;
-      case 4:
-        return Colors.green;
-      case 5:
-        return Colors.blue;
-      default:
-        return Colors.black;
-    }
-  }
-
-  String _getLabelForQuality(BuildContext context, int quality) {
-    switch (quality) {
-      case 2:
-        return AppLocalizations.of(context)!.again;
-      case 3:
-        return AppLocalizations.of(context)!.hard;
-      case 4:
-        return AppLocalizations.of(context)!.correct;
-      case 5:
-        return AppLocalizations.of(context)!.easy;
-      default:
-        return '';
-    }
   }
 }
