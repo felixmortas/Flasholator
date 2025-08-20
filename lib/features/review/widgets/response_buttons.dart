@@ -103,19 +103,28 @@ class _ReviewControlsState extends State<ReviewControls> {
     VoidCallback onPressed,
   ) {
     return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(backgroundColor: color),
-          child: Text(
-            label,
-            style: const TextStyle(color: Colors.white),
-            softWrap: false,
-            overflow: TextOverflow.visible,
-            maxLines: 1,
-          ),
-        ),
+      child: DragTarget<int>(
+        onWillAcceptWithDetails: (data) => data == 1, // accepte seulement les cartes réponses
+        onAcceptWithDetails: (_) => onPressed(),
+        builder: (context, candidateData, rejectedData) {
+          final isHovered = candidateData.isNotEmpty;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: ElevatedButton(
+              onPressed: null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isHovered ? color.withOpacity(0.7) : color,
+              ),
+              child: Text(
+                label,
+                style: const TextStyle(color: Colors.white),
+                softWrap: false,
+                overflow: TextOverflow.visible,
+                maxLines: 1,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
