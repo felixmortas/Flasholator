@@ -176,6 +176,10 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
     // Sinon on ne réserve rien (important pour ne pas "pousser" le layout quand le clavier s'ouvre).
     final extraBottomPadding = (isEditing && !isKeyboardOpen) ? _overlayHeight : 0.0;
 
+    if(!isDue) {
+      return const Text('hello');
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false, // Empêche le push du layout quand le clavier s'ouvre
       body: Stack(
@@ -196,7 +200,6 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
                     responseLang: _responseLang,
                     responseText: _responseText,
                     isResponseHidden: isResponseHidden,
-                    isDue: isDue,
                     onDisplayAnswer: _displayAnswer,
                   ),
                   const Spacer(),
@@ -213,7 +216,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
                   const SizedBox(height: 32),
                   const Divider(),
 
-                  if (isDue && isSubscribed)
+                  if (isSubscribed)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -243,7 +246,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
             ),
           ),
           // Overlay pour EditAnswer
-          if (isSubscribed && isDue)
+          if (isSubscribed)
             Positioned(
               bottom: 0,
               left: 0,

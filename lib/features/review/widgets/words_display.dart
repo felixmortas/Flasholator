@@ -7,7 +7,6 @@ class WordsDisplay extends StatelessWidget {
   final String responseLang;
   final String responseText;
   final bool isResponseHidden;
-  final bool isDue;
   final VoidCallback onDisplayAnswer;
 
   const WordsDisplay({
@@ -17,7 +16,6 @@ class WordsDisplay extends StatelessWidget {
     required this.responseLang,
     required this.responseText,
     required this.isResponseHidden,
-    required this.isDue,
     required this.onDisplayAnswer,
   }) : super(key: key);
 
@@ -117,24 +115,21 @@ class WordsDisplay extends StatelessWidget {
                 ),
               ),
               child: GestureDetector( // Ajout du GestureDetector
-                onTap: (isResponseHidden && isDue) ? onDisplayAnswer : null,
+                onTap: isResponseHidden ? onDisplayAnswer : null,
                 child: Card(
                   child: Stack(
                     children: [
                       // langTag positionné en haut à gauche, peu visible
-                      Visibility(
-                        visible: isDue,
-                        child: Positioned(
-                          top: 8.0,
-                          left: 8.0,
-                          child: Text(
-                            responseLang,
-                            style: const TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w300,
-                              fontFamily: 'Arial',
-                              color: Color.fromARGB(100, 150, 150, 150), // Très peu visible
-                            ),
+                      Positioned(
+                        top: 8.0,
+                        left: 8.0,
+                        child: Text(
+                          responseLang,
+                          style: const TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.w300,
+                            fontFamily: 'Arial',
+                            color: Color.fromARGB(100, 150, 150, 150), // Très peu visible
                           ),
                         ),
                       ),
@@ -157,7 +152,7 @@ class WordsDisplay extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (isResponseHidden && isDue)
+                      if (isResponseHidden)
                         const Center(
                           child: Icon(
                             Icons.touch_app,
