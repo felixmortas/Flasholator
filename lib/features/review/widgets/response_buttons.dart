@@ -104,14 +104,14 @@ class _ReviewControlsState extends State<ReviewControls> {
   ) {
     return Expanded(
       child: DragTarget<int>(
-        onWillAcceptWithDetails: (data) => data == 1, // accepte seulement les cartes réponses
-        onAcceptWithDetails: (_) => onPressed(),
+        onWillAccept: (data) => data == 1, // accepte seulement les cartes réponses
+        onAccept: (_) => onPressed(),
         builder: (context, candidateData, rejectedData) {
           final isHovered = candidateData.isNotEmpty;
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: ElevatedButton(
-              onPressed: null,
+              onPressed: onPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: isHovered ? color.withOpacity(0.7) : color,
               ),
