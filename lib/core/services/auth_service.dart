@@ -101,4 +101,12 @@ class AuthService {
       print("Error logging in: $e");
     }
   }
+
+  DateTime getSignupDate() {
+    final user = _firebaseAuth.currentUser;
+    if (user != null && user.metadata.creationTime != null) {
+      return user.metadata.creationTime!;
+    }
+    return DateTime.now(); // Fallback to current time if creation time is not available
+  }
 }

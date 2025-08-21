@@ -21,7 +21,7 @@ import 'package:flasholator/features/data/data_table_tab.dart';
 import 'package:flasholator/features/shared/dialogs/settings_dialog.dart';
 import 'package:flasholator/features/shared/dialogs/language_selection_popup.dart';
 import 'package:flasholator/features/shared/widgets/ad_banner_widget.dart';
-import 'package:flasholator/features/authentication/profile_page.dart';
+import 'package:flasholator/features/profile/profile_page.dart';
 
 import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
 
@@ -244,7 +244,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             onPressed: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => ProfilePage()),
+                MaterialPageRoute(builder: (_) => ProfilePage(flashcardsService: flashcardsService,)),
               )
             },
           ),

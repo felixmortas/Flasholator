@@ -1,8 +1,12 @@
+import 'package:flasholator/core/services/flashcards_service.dart';
+import 'package:flasholator/features/stats/stats_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/features/authentication/widgets/change_password_dialog.dart';
 import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
@@ -14,7 +18,10 @@ import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
 
+  final FlashcardsService flashcardsService;
+
   const ProfilePage({
+    required this.flashcardsService,
     Key? key,
   }) : super(key: key);
 
@@ -167,8 +174,33 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     });
   }
 
+    void _changeEmail(BuildContext context) {
+    // TODO: implement email change
+  }
+
+  void _toggleNotifications(bool val) {
+    // TODO: implement notifications toggle
+  }
+  
+  void _rateApp() {}
+
+  void _openChangelog() {
+  }
+
+  void _openMentions() {
+  }
+
+  void _openCGV() {
+  }
+
+  void _openPrivacy() {
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    final String userName = userManager.getUserName();
+
     return FutureBuilder<bool>(
       future: userManager.isUserDataCached(),
       builder: (context, snapshot) {
@@ -182,63 +214,145 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             : AppLocalizations.of(context)!.free;
 
         return Scaffold(
-          appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile)),
-          body: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _infoRow(AppLocalizations.of(context)!.username,
-                    userManager.getUserName()),
-                const SizedBox(height: 16),
-                _infoRow(AppLocalizations.of(context)!.password, '********',
-                    action: () => _changePassword(context)),
-                const Divider(height: 32),
-                _infoRow(AppLocalizations.of(context)!.subscription, abonnementLabel),
-                const SizedBox(height: 8),
-                SubscribeButton(
-                  onPressed: () => _subscribe(),
-                ),
-                const SizedBox(height: 12),
-                if (_showPrivacyButton)
-                  TextButton(
-                    onPressed: () => updateConsent(),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size(0, 30),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      alignment: Alignment.centerLeft,
-                    ),
+          appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.help_outline),
+                onPressed: () async {
+                  final Uri emailLaunchUri = Uri(
+                    scheme: 'mailto',
+                    path: 'support@tonapp.com',
+                    query: 'subject=Support Profil',
+                  );
+                  if (await canLaunchUrl(emailLaunchUri)) {
+                    await launchUrl(emailLaunchUri);
+                  }
+                },
+              ),
+            ],
+          ),
+        
+          body: SingleChildScrollView(
+          padding: EdgeInsets.all(16 * GOLDEN_NUMBER),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Identité
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
                     child: Text(
-                      AppLocalizations.of(context)!.modifyPrivacyPreferences,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                        decoration: TextDecoration.underline,
-                      ),
+                      userName[0],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                const Spacer(),
-                ElevatedButton.icon(
-                  onPressed: () => _signOut(context),
-                  icon: const Icon(Icons.logout),
-                  label: Text(AppLocalizations.of(context)!.logOut),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                  SizedBox(width: 12 * GOLDEN_NUMBER),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(userName,
+                            style: Theme.of(context).textTheme.titleMedium),
+                        Text(
+                          "Utilisateur depuis ${userManager.getSignupDate()}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16 * GOLDEN_NUMBER),
+
+              // CTA Premium
+              ElevatedButton(
+                onPressed: () {}, // TODO: implémenter partage
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
                 ),
-                const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: () => _deleteAccount(context),
-                  icon: const Icon(Icons.delete_forever),
-                  label: Text(AppLocalizations.of(context)!.deleteMyAccount),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                ),
-              ],
-            ),
+                child: const Text("Invitez vos proches, obtenez du premium gratuitement"),
+              ),
+              SizedBox(height: 24 * GOLDEN_NUMBER),
+
+              // Section Stats
+              _sectionTitle("Stats"),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => StatsPage(flashcardsService: widget.flashcardsService),
+                    ),
+                  );
+                }, // navigate to stats page
+                child: Text("Statistiques"),
+              ),
+              SizedBox(height: 24 * GOLDEN_NUMBER),
+
+              // Section Mon Compte
+              _sectionTitle("Mon Compte"),
+              _infoRow("Email", userManager.getUserEmail(),
+                  action: () => _changeEmail(context)),
+              _infoRow("Mot de passe", "********",
+                  action: () => _changePassword(context)),
+              SwitchListTile(
+                value: true, // ref.watch(notificationsProvider),
+                onChanged: (val) => _toggleNotifications(val),
+                title: const Text("Notifications cartes à réviser"),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(isSubscribed ? "Abonnement : Abonné" : "Abonnement : Non abonné", style: const TextStyle(fontSize: 16)),
+                  ),
+                  if (!isSubscribed)
+                    SubscribeButton(onPressed: _subscribe)
+                ],
+              ),
+              SizedBox(height: 24 * GOLDEN_NUMBER),
+
+              // Section Social
+              _sectionTitle("Social"),
+              ListTile(
+                leading: const Icon(Icons.star_rate_outlined),
+                title: const Text("Noter l’app"),
+                onTap: () => _rateApp(),
+              ),
+              SizedBox(height: 24 * GOLDEN_NUMBER),
+
+              // Section A propos
+              _sectionTitle("À propos"),
+              _linkTile("Changelog", _openChangelog),
+              _linkTile("Mentions légales", _openMentions),
+              _linkTile("CGV", _openCGV),
+              if(_showPrivacyButton)
+                _linkTile("Confidentialité", updateConsent),
+              SizedBox(height: 32 * GOLDEN_NUMBER),
+
+              // Logout / Delete
+              ElevatedButton.icon(
+                onPressed: () => _signOut(context),
+                icon: const Icon(Icons.logout),
+                label: Text(AppLocalizations.of(context)!.logOut),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () => _deleteAccount(context),
+                icon: const Icon(Icons.delete_forever),
+                label: Text(AppLocalizations.of(context)!.deleteMyAccount),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              ),
+            ],
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   Widget _infoRow(String label, String value, {VoidCallback? action}) {
     return Row(
@@ -254,4 +368,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ],
     );
   }
+}
+
+// Helpers
+
+Widget _sectionTitle(String text) {
+  return Padding(
+    padding: EdgeInsets.only(bottom: 8 * GOLDEN_NUMBER),
+    child: Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+  );
+}
+
+Widget _linkTile(String label, VoidCallback action) {
+  return ListTile(
+    title: Text(label),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: action,
+  );
 }

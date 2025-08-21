@@ -196,4 +196,8 @@ class UserManager {
     return _authService.getUserId();
   }
 
+  DateTime getSignupDate() {
+    return _authService.getSignupDate();
+  }
+
 }
