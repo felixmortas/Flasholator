@@ -1,3 +1,4 @@
+import 'package:flasholator/features/shared/widgets/paste_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +16,7 @@ import 'package:flasholator/features/translation/widgets/language_dropdown.dart'
 import 'package:flasholator/l10n/app_localizations.dart';
 
 import 'package:flasholator/features/translation/widgets/switch_lang_button.dart';
-import 'package:flasholator/features/translation/widgets/bottom_overlay.dart';
+import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
@@ -71,6 +72,18 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     super.dispose();
   }
 
+  void _clearTextInput() {
+    setState(() {
+      _controller.clear();
+      _wordToTranslate = '';
+      _translatedWord = '';
+      _lastTranslatedWord = '';
+      isTranslateButtonDisabled = true;
+      isAddButtonDisabled = true;
+    });
+    _updateButtonState();
+  }
+
   void _updateButtonState() {
     setState(() {
       isTranslateButtonDisabled =
@@ -79,13 +92,20 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     });
   }
 
-  void _onLanguageChange(String newValue) {
-    setState(() {
-      _translatedWord = '';
-      _lastTranslatedWord = '';
-      isAddButtonDisabled = true;
-      _updateButtonState();
-    });
+  void _onLanguageChange(String? newValue) {
+    if(ref.read(isSubscribedProvider)) {
+      setState(() {
+        languageSelection.targetLanguage = newValue!;
+        _translatedWord = '';
+        _lastTranslatedWord = '';
+        isAddButtonDisabled = true;
+        _updateButtonState();
+      });
+
+    } else {
+      _openSubscribePopup();
+    }
+    
   }
 
   void _swapContent() {
@@ -210,8 +230,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   @override
   Widget build(BuildContext context) {
-    final isSubscribed = ref.watch(isSubscribedProvider);
-
     final coupleLang = ref.watch(coupleLangProvider);
 
     if (coupleLang != _lastCoupleLang) {
@@ -223,91 +241,255 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
       }
     }
 
-    return Scaffold(
-      resizeToAvoidBottomInset:
-          true, // ⚡ important : permet au bloc de remonter avec le clavier
-      backgroundColor: Colors.grey[200],
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: 
-                    LanguageDropdown(
-                      selectedLanguage: languageSelection.sourceLanguage,
-                      otherLanguage: languageSelection.targetLanguage,
-                      sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                    AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                      )).toList(),
-                      onChanged: isSubscribed
-                      ? (val) {
-                        setState(() {
-                          languageSelection.sourceLanguage = val!;
-                        });
-                      }
-                      : (val) {
-                        _openSubscribePopup();
-                      },
-                    ),
-                  ),
-                  
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: SwitchLangButton(
-                      onPressed: () {
-                              setState(() {
-                                _swapContent();
-                              });
-                            },
-                    ),
-                  ),
-                  Expanded(
-                    child: LanguageDropdown(
-                      selectedLanguage: languageSelection.targetLanguage,
-                      otherLanguage: languageSelection.sourceLanguage,
-                      sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                        AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                      )).toList(),
-                      onChanged: isSubscribed
-                      ? (val) {
-                        setState(() {
-                          languageSelection.targetLanguage = val!;
-                        });
-                      }: (val) {
-                        _openSubscribePopup();
-                      },
-                    ),
-                  ),
-                ],
+return Scaffold(
+  resizeToAvoidBottomInset: true,
+  backgroundColor: Colors.grey[200],
+  body: SafeArea(
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: 
+                LanguageDropdown(
+                  selectedLanguage: languageSelection.sourceLanguage,
+                  otherLanguage: languageSelection.targetLanguage,
+                  sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                  )).toList(),
+                  onChanged: _onLanguageChange,
+                ),
               ),
-            ),
-            const Spacer(),
-            BottomBlock(
+                                
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SwitchLangButton(
+                  onPressed: _swapContent,
+                ),
+              ),
+              Expanded(
+                child: LanguageDropdown(
+                  selectedLanguage: languageSelection.targetLanguage,
+                  otherLanguage: languageSelection.sourceLanguage,
+                  sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                    AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                  )).toList(),
+                  onChanged: _onLanguageChange,
+                ),
+              ),
+
+            ],
+          ),
+        ),
+
+        const Spacer(),
+        AnimatedPadding(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: BottomBlock(
+          showDragHandle: true,
+          children: [
+            _InputFieldWithClear(
               controller: _controller,
-              hintText: AppLocalizations.of(context)!.writeOrPasteYourTextHereForTranslation,
+              onClear: _clearTextInput
+            ),
+            _PasteAndCameraRow(controller: _controller),
+            const Divider(),
+            const SizedBox(height: 12),
+            _TranslatedText(
               translatedWord: _translatedWord,
-              isTranslateButtonDisabled: isTranslateButtonDisabled,
-              isAddButtonDisabled: isAddButtonDisabled,
-              onClear: () {
-                setState(() {
-                  _controller.clear();
-                  _wordToTranslate = '';
-                  _translatedWord = '';
-                  _lastTranslatedWord = '';
-                  isTranslateButtonDisabled = true;
-                  isAddButtonDisabled = true;
-                });
-                _updateButtonState();
-              },
+              onVolumePressed: () {},
+              onAlternativePressed: () {},
+              onSharePressed: () {},
+            ),
+            const SizedBox(height: 16),
+            _ActionButtons(
+              isTranslateDisabled: isTranslateButtonDisabled,
+              isAddDisabled: isAddButtonDisabled,
               onTranslate: _checkIfCanTranslate,
               onAdd: _checkIfCanAddFlashcard,
             ),
           ],
         ),
+        ),
+      ],
+    ),
+  ),
+);  
+  }
+}
+
+class _InputFieldWithClear extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onClear;
+
+  const _InputFieldWithClear({
+    required this.controller,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.centerRight,
+      children: [
+        TextField(
+          key: const Key('input_textfield'),
+          controller: controller,
+          maxLength: 100,
+          style: const TextStyle(fontSize: 24.0),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: AppLocalizations.of(context)!
+                .writeOrPasteYourTextHereForTranslation,
+            hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5)),
+            counterText: "",
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
+          ),
+        ),
+        IconButton(
+          key: const Key('clear_input_button'),
+          onPressed: onClear,
+          icon: const Icon(Icons.clear),
+        ),
+      ],
+    );
+  }
+}
+
+class _PasteAndCameraRow extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _PasteAndCameraRow({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Row(
+        children: [
+          PasteButton(controller: controller),
+          IconButton(
+            onPressed: () {
+              // TODO: action caméra
+            },
+            icon: const Icon(Icons.camera_alt),
+          ),
+        ],
       ),
     );
   }
 }
+
+class _TranslatedText extends StatelessWidget {
+  final String translatedWord;
+  final VoidCallback onVolumePressed;
+  final VoidCallback onAlternativePressed;
+  final VoidCallback onSharePressed;
+
+  const _TranslatedText({
+    required this.translatedWord,
+    required this.onVolumePressed,
+    required this.onAlternativePressed,
+    required this.onSharePressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          translatedWord,
+          style: const TextStyle(fontSize: 24.0),
+        ),
+        if (translatedWord.isNotEmpty)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: onVolumePressed,
+                  icon: const Icon(Icons.volume_up),
+                  iconSize: 18,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                OutlinedButton(
+                  onPressed: onAlternativePressed,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(width: 1.0, color: Colors.black),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text("ALTERNATIVE", style: TextStyle(fontSize: 12)),
+                ),
+                IconButton(
+                  onPressed: onSharePressed,
+                  icon: const Icon(Icons.share),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ActionButtons extends StatelessWidget {
+  final bool isTranslateDisabled;
+  final bool isAddDisabled;
+  final VoidCallback onTranslate;
+  final VoidCallback onAdd;
+
+  const _ActionButtons({
+    required this.isTranslateDisabled,
+    required this.isAddDisabled,
+    required this.onTranslate,
+    required this.onAdd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: isTranslateDisabled ? null : onTranslate,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text("Traduire"),
+          ),
+        ),
+        const SizedBox(width: 16.0),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: isAddDisabled ? null : onAdd,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text("Ajouter"),
+          ),
+        ),
+      ],
+    );
+  }
+}
+

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'widgets/empty_page_overlay.dart';
+import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
 
 import 'package:flasholator/config/constants.dart';
 
@@ -94,9 +94,37 @@ class ReviewPageEmpty extends StatelessWidget {
             ),
           ),
           // Bloc bas
-          const BottomEmptyReviewOverlay(
-            content:
-                "Ce bloc te permet de voir les détails ou conseils pour améliorer ton apprentissage.",
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                // minHeight pour qu’il soit visible
+                minHeight: 100,
+                // maxHeight = 32% de l’écran
+                maxHeight: screenHeight * 0.35,
+              ),
+              child: BottomBlock(
+                showDragHandle: true,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20 * GOLDEN_NUMBER)
+                              .copyWith(bottom: 20 * GOLDEN_NUMBER),
+                      child: const Text(
+                        "Fonctionnalité cool à venir ...",
+                        style: TextStyle(
+                          fontSize: 16 * GOLDEN_NUMBER,
+                          color: Colors.black87,
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
