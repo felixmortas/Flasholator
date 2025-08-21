@@ -178,12 +178,13 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
               ValueListenableBuilder<bool>(
                 valueListenable: widget.isAllLanguagesToggledNotifier,
                 builder: (context, value, child) {
-                  return Switch(
-                    value: value,
+                  return SwitchListTile(
+                    value: value, // ref.watch(notificationsProvider),
                     onChanged: (bool newValue) {
                       widget.isAllLanguagesToggledNotifier.value = newValue;
                       _fetchData(newValue);
                     },
+                    title: const Text("Sélectionner toutes les langues"),
                   );
                 },
               ),
