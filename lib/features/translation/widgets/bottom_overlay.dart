@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/features/shared/widgets/paste_button.dart';
 
 class BottomBlock extends StatelessWidget {
@@ -36,7 +37,7 @@ class BottomBlock extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(25 * GOLDEN_NUMBER)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),

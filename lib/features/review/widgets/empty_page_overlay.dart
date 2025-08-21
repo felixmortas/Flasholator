@@ -10,12 +10,17 @@ class BottomEmptyReviewOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final overlayHeight = screenHeight / 2; // moitié de l'écran
 
     return Align(
       alignment: Alignment.bottomCenter,
-      child: Container(
-        height: overlayHeight,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          // minHeight pour qu’il soit visible
+          minHeight: 100,
+          // maxHeight = 32% de l’écran
+          maxHeight: screenHeight * 0.35,
+        ),
+        child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -43,19 +48,25 @@ class BottomEmptyReviewOverlay extends StatelessWidget {
             ),
             SizedBox(height: 16 * GOLDEN_NUMBER),
             // Contenu
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20 * GOLDEN_NUMBER),
-              child: Text(
-                content,
-                style: TextStyle(
-                  fontSize: 16 * GOLDEN_NUMBER,
-                  color: Colors.black87,
+            Expanded(
+                child: SingleChildScrollView(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20 * GOLDEN_NUMBER)
+                          .copyWith(bottom: 20 * GOLDEN_NUMBER),
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 16 * GOLDEN_NUMBER,
+                      color: Colors.black87,
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                textAlign: TextAlign.center,
               ),
-            ),
           ],
         ),
+      ),
       ),
     );
   }

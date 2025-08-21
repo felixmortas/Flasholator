@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'widgets/bottom_overlay_block.dart';
+import 'widgets/empty_page_overlay.dart';
 
 import 'package:flasholator/config/constants.dart';
 
@@ -20,38 +20,37 @@ class ReviewPageEmpty extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 40 * GOLDEN_NUMBER),
                   // Message encourageant
                   Text(
                     "Bravo pour ton travail !",
                     style: TextStyle(
-                      fontSize: 28 * GOLDEN_NUMBER,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 20 * GOLDEN_NUMBER),
+                  SizedBox(height: 20),
                   // Annonce pas de carte
                   Text(
                     "Tu n'as plus de carte à réviser pour le moment.",
                     style: TextStyle(
-                      fontSize: 18 * GOLDEN_NUMBER,
+                      fontSize: 18,
                       color: Colors.black54,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 30 * GOLDEN_NUMBER),
+                  SizedBox(height: 30),
                   // Call to action
                   Text(
                     "Continue à progresser : traduis et ajoute de nouveaux mots !",
                     style: TextStyle(
-                      fontSize: 16 * GOLDEN_NUMBER,
+                      fontSize: 16,
                       color: Colors.black87,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 30 * GOLDEN_NUMBER),
+                  SizedBox(height: 30),
                   // Boutons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -60,23 +59,23 @@ class ReviewPageEmpty extends StatelessWidget {
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 24 * GOLDEN_NUMBER,
-                              vertical: 14 * GOLDEN_NUMBER),
+                              horizontal: 24,
+                              vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: Text(
                           "Traduire",
-                          style: TextStyle(fontSize: 16 * GOLDEN_NUMBER),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 24 * GOLDEN_NUMBER,
-                              vertical: 14 * GOLDEN_NUMBER),
+                              horizontal: 24,
+                              vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -84,7 +83,7 @@ class ReviewPageEmpty extends StatelessWidget {
                         ),
                         child: Text(
                           "Ajouter des mots",
-                          style: TextStyle(fontSize: 16 * GOLDEN_NUMBER),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
                     ],

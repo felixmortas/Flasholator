@@ -15,7 +15,7 @@ import 'package:flasholator/features/translation/widgets/language_dropdown.dart'
 import 'package:flasholator/l10n/app_localizations.dart';
 
 import 'package:flasholator/features/translation/widgets/switch_lang_button.dart';
-import 'package:flasholator/features/translation/widgets/bottom_block.dart';
+import 'package:flasholator/features/translation/widgets/bottom_overlay.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
