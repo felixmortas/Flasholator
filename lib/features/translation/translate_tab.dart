@@ -62,7 +62,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-      sortedLanguageEntries = getSortedLanguageEntries(context, LANGUAGE_KEYS);;
+      sortedLanguageEntries = getSortedLanguageEntries(context, LANGUAGE_KEYS);
   }
 
   @override
@@ -92,10 +92,14 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     });
   }
 
-  void _onLanguageChange(String? newValue) {
+  void _onLanguageChange(String? newValue, bool isSourceLanguage) {
     if(ref.read(isSubscribedProvider)) {
       setState(() {
-        languageSelection.targetLanguage = newValue!;
+        if (isSourceLanguage) {
+          languageSelection.sourceLanguage = newValue!;
+        } else {
+          languageSelection.targetLanguage = newValue!;
+        }
         _translatedWord = '';
         _lastTranslatedWord = '';
         isAddButtonDisabled = true;
@@ -259,7 +263,9 @@ return Scaffold(
                   sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
                 AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
                   )).toList(),
-                  onChanged: _onLanguageChange,
+                  onChanged: (String? newValue) {
+                    _onLanguageChange(newValue, true);
+                  },
                 ),
               ),
                                 
@@ -276,7 +282,9 @@ return Scaffold(
                   sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
                     AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
                   )).toList(),
-                  onChanged: _onLanguageChange,
+                  onChanged: (String? newValue) {
+                    _onLanguageChange(newValue, false);
+                  },
                 ),
               ),
 
