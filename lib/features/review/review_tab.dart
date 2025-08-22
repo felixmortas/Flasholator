@@ -55,6 +55,8 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
     _currentFlashcard = currentFlashcard;
   }
 
+  bool isDraggingAccepted = false;
+
   @override
   void initState() {
     // The initState() method is called when the stateful widget is inserted into the widget tree
@@ -90,10 +92,10 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
       if (dueFlashcards.isNotEmpty) {
         _currentFlashcard = dueFlashcards[0];
         setState(() {
-          _questionText = _currentFlashcard.front;
-          _questionLang = _currentFlashcard.sourceLang;
           isResponseHidden = true;
           isDue = true;
+          _questionText = _currentFlashcard.front;
+          _questionLang = _currentFlashcard.sourceLang;
           _responseText = _currentFlashcard.back;
           _responseLang = _currentFlashcard.targetLang;
           overrideQuality = null;
@@ -128,15 +130,26 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
       // }
       // adCounter += 1;
       
-      // Show interstitial 1 out of INTERSTITIAL_FREQUENCY
+      // Show interstitial with a probability of 1/INTERSTITIAL_FREQUENCY
       if (Random().nextInt(INTERSTITIAL_FREQUENCY) == 0) {
         ref.read(adServiceProvider).showInterstitial();
       }
     }
+    setState(() {
+      isDraggingAccepted = true; // empêche le retour visuel de la carte
+    });
+
     // Update the flashcard with the quality in the database then update the question text
     await widget.flashcardsService
         .review(_currentFlashcard.front, _currentFlashcard.back, quality);
     updateQuestionText(widget.isAllLanguagesToggledNotifier.value);
+
+    if (mounted) {
+      setState(() {
+        isDraggingAccepted = false; // réactive l’affichage normal
+      });
+    }
+
   }
 
   void _evaluateWrittenAnswer() {
@@ -202,6 +215,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
                     responseText: _responseText,
                     isResponseHidden: isResponseHidden,
                     onDisplayAnswer: _displayAnswer,
+                    isDraggingAccepted: isDraggingAccepted,
                   ),
                   const Spacer(),
                   ReviewControls(

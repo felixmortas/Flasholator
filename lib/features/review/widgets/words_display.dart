@@ -8,6 +8,7 @@ class WordsDisplay extends StatelessWidget {
   final String responseText;
   final bool isResponseHidden;
   final VoidCallback onDisplayAnswer;
+  final bool isDraggingAccepted;
 
   const WordsDisplay({
     Key? key,
@@ -17,6 +18,7 @@ class WordsDisplay extends StatelessWidget {
     required this.responseText,
     required this.isResponseHidden,
     required this.onDisplayAnswer,
+    required this.isDraggingAccepted,
   }) : super(key: key);
 
   @override
@@ -116,7 +118,17 @@ class WordsDisplay extends StatelessWidget {
               ),
               child: GestureDetector( // Ajout du GestureDetector
                 onTap: isResponseHidden ? onDisplayAnswer : null,
-                child: Card(
+                child: isDraggingAccepted
+                  ? const Card(
+                  child: Center(
+                    child: Icon(
+                      Icons.touch_app,
+                      size: 48.0,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ) // cache totalement la carte en attendant
+                  : Card(
                   child: Stack(
                     children: [
                       // langTag positionné en haut à gauche, peu visible
