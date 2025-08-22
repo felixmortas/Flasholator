@@ -193,10 +193,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _openCGV() {
   }
 
-  void _openPrivacy() {
-  }
-
-
   @override
   Widget build(BuildContext context) {
     final String userName = userManager.getUserName();
@@ -209,9 +205,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         }
 
         final isSubscribed = ref.watch(isSubscribedProvider);
-        final abonnementLabel = isSubscribed
-            ? AppLocalizations.of(context)!.premium
-            : AppLocalizations.of(context)!.free;
 
         return Scaffold(
           appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile),

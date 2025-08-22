@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,7 +17,6 @@ import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
 import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
-import 'package:flasholator/features/shared/dialogs/settings_dialog.dart';
 import 'package:flasholator/features/shared/dialogs/language_selection_popup.dart';
 import 'package:flasholator/features/shared/widgets/ad_banner_widget.dart';
 import 'package:flasholator/features/profile/profile_page.dart';
@@ -207,29 +205,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     } else {
       // Permission denied
     }
-  }
-
-  void _launchEmail() async {
-    String email = Uri.encodeComponent("felix.mortas@hotmail.fr");
-    String subject = Uri.encodeComponent("Feedback pour Flasholator");
-    String body = Uri.encodeComponent(
-        "Bonjour, Les 2 fonctionnalités principales de cette application sont traduire puis réviser ce qu'on a traduit. Nous aimerions avoir ton avis sur l'application: nouveau nom, fonctionnalités, design, bugs, améliorations, zones d'ombre, idées, langues, intégration, accessibilité, lisibilité, ergonomie, etc. Merci d'avance pour ton retour ! L'équipe de Flasholator");
-    Uri mail = Uri.parse("mailto:$email?subject=$subject&body=$body");
-    if (await launchUrl(mail)) {
-      //email app opened
-    } else {
-      //email app is not opened
-    }
-  }
-
-  void _openSettings() {
-    showDialog(
-      context: context,
-      builder: (context) => SettingsDialog(
-        launchEmail: _launchEmail,
-        flashcardsService: flashcardsService,
-      ),
-    );
   }
 
   @override
