@@ -4,15 +4,19 @@ import 'package:flasholator/config/constants.dart';
 
 class EditFlashcardPopup extends StatefulWidget {
   final Map<dynamic, dynamic> row;
-  final Function(Map<String, String>, Map<dynamic, dynamic>) onEdit;
-  final Function(Map<dynamic, dynamic>) onDelete;
   final bool languageDropdownEnabled;
+  final bool isEditPopup;
+  final Function(Map<String, String>, Map<dynamic, dynamic>)? onEdit;
+  final Function(Map<dynamic, dynamic>)? onDelete;
+  final Function(Map<String, dynamic>)? onAdd;
 
   EditFlashcardPopup({
     required this.row,
-    required this.onEdit,
-    required this.onDelete,
     required this.languageDropdownEnabled,
+    required this.isEditPopup,
+    this.onEdit,
+    this.onDelete,
+    this.onAdd,
   });
 
   @override
@@ -34,10 +38,30 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
     _targetLanguage = widget.row['targetLang'];
   }
 
+  void _setConfirmButton(String text) {
+    if(text=='edit') {
+      widget.onEdit!({
+        'sourceLang': _sourceLanguage,
+        'front': _word,
+        'back': _translation,
+        'targetLang': _targetLanguage,
+      }, widget.row);
+    } else if(text=='delete') {
+      widget.onDelete!(widget.row);
+    } else if(text=='add') {
+      widget.onAdd!({
+        'sourceLang': _sourceLanguage,
+        'front': _word,
+        'back': _translation,
+        'targetLang': _targetLanguage,
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.editTheRow),
+      title: Text(widget.isEditPopup ? AppLocalizations.of(context)!.editTheRow : 'Ajouter une nouvelle carte'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -60,22 +84,17 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
       actions: [
         TextButton(
           onPressed: () {
-            widget.onDelete(widget.row);
+            _setConfirmButton(widget.isEditPopup ? 'delete' : 'cancel');
             Navigator.of(context).pop();
           },
-          child: Text(AppLocalizations.of(context)!.remove),
+          child: Text(widget.isEditPopup ? AppLocalizations.of(context)!.remove : 'Annuler'),
         ),
         TextButton(
           onPressed: () {
-            widget.onEdit({
-              'sourceLang': _sourceLanguage,
-              'front': _word,
-              'back': _translation,
-              'targetLang': _targetLanguage,
-            }, widget.row);
+            _setConfirmButton(widget.isEditPopup ? 'edit' : 'add');
             Navigator.of(context).pop();
           },
-          child: const Text('Modifier'),
+          child: Text(widget.isEditPopup ? 'Modifier' : 'Ajouter'),
         ),
       ],
     );

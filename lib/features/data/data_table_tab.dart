@@ -9,7 +9,6 @@ import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/features/data/widgets/all_languages_table.dart';
 import 'package:flasholator/features/data/widgets/couple_languages_table.dart';
 import 'package:flasholator/features/data/widgets/edit_flashcard_popup.dart';
-import 'package:flasholator/features/data/widgets/add_flashcard_popup.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 
@@ -73,9 +72,22 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   }
 
   void addRow(Map<String, dynamic> row) {
-    setState(() {
-      data.add(row);
-    });
+    print("enter add row in data table");
+    final front = row['front'];
+    final back = row['back'];
+    final sourceLanguage = row['sourceLang'];
+    final targetLanguage = row['targetLang'];
+
+    if (!data.contains(row)) {
+      print("Adding row to db: $row");
+      widget.flashcardsService.addFlashcard(front, back, sourceLanguage, targetLanguage);
+      setState(() {
+        print("add row to table");
+        data.add(row);
+        print("row added to db and table !");
+      });
+      widget.updateQuestionText();
+    }
   }
 
   void removeRow(Map<dynamic, dynamic> row) {
@@ -120,6 +132,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
           onEdit: editRow,
           onDelete: removeRow,
           languageDropdownEnabled: widget.isAllLanguagesToggledNotifier.value,
+          isEditPopup: true,
         );
       },
     );
@@ -141,19 +154,23 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     }
   }
 
-  void _addFlashcard(String front, String back) {
-    widget.flashcardsService.addFlashcard(front, back,
-          languageSelection.sourceLanguage, languageSelection.targetLanguage);
-    addRow({'front': front, 'back': back});
-  }
-
   void _openAddFlashcardPopup() {
+    Map<dynamic, dynamic> newRowData = {
+      'front': '',
+      'back': '',
+      'sourceLang': languageSelection.sourceLanguage,
+      'targetLang': languageSelection.targetLanguage
+    };
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AddFlashcardPopup(
-          onAdd: (String front, String back) {
-            _addFlashcard(front, back);
+        return EditFlashcardPopup(
+          row: newRowData,
+          languageDropdownEnabled: widget.isAllLanguagesToggledNotifier.value,
+          isEditPopup: false,
+          onAdd: (Map<String, dynamic> row) {
+            addRow(row);
           },
         );
       },
