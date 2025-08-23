@@ -133,6 +133,8 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
         isCardConsumed = false;
       });
     }
+    // ouvre le clavier
+    FocusScope.of(context).requestFocus();
 
   }
 
