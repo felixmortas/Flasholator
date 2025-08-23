@@ -45,29 +45,30 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   }
 
   void updateSwitchState(bool newValue) {
-    setState(() {
-      widget.isAllLanguagesToggledNotifier.value = newValue;
-    });
+    _fetchData(newValue);
   }
 
   Future<void> _fetchData(bool isAllLanguagesToggled) async {
     final flashcards = await widget.flashcardsService.loadAllFlashcards();
-    
-    // On convertit chaque Flashcard en Map<String, dynamic>
     final fetchedData = flashcards.map((f) => f.toMap()).toList();
 
+    List<Map<dynamic, dynamic>> newData;
+
+    if (isAllLanguagesToggled) {
+      newData = fetchedData
+          .where((row) => fetchedData.indexOf(row) % 2 == 0)
+          .toList();
+    } else {
+      newData = fetchedData
+          .where((row) =>
+              row['sourceLang'] == languageSelection.sourceLanguage &&
+              row['targetLang'] == languageSelection.targetLanguage)
+          .toList();
+    }
+
     setState(() {
-      if (isAllLanguagesToggled) {
-        data = fetchedData
-            .where((row) => fetchedData.indexOf(row) % 2 == 0)
-            .toList();
-      } else {
-        data = fetchedData
-            .where((row) =>
-                row['sourceLang'] == languageSelection.sourceLanguage &&
-                row['targetLang'] == languageSelection.targetLanguage)
-            .toList();
-      }
+      data = newData;
+      widget.isAllLanguagesToggledNotifier.value = isAllLanguagesToggled;
     });
   }
 
@@ -198,8 +199,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
                   return SwitchListTile(
                     value: value, // ref.watch(notificationsProvider),
                     onChanged: (bool newValue) {
-                      widget.isAllLanguagesToggledNotifier.value = newValue;
-                      _fetchData(newValue);
+                      updateSwitchState(newValue);
                     },
                     title: const Text("Sélectionner toutes les langues"),
                   );
