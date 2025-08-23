@@ -152,15 +152,24 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
     }
   }
 
-  void _displayAnswer() {
+  void _displayAnswer() async {
     if (isEditing) {
       FocusScope.of(context).unfocus();
       _evaluateWrittenAnswer();
+      
+      // Attendre que le clavier se cache
+      await Future.delayed(const Duration(milliseconds: 300));
+      
+      if (mounted) {
+        setState(() {
+          isResponseHidden = false;
+        });
+      }
+    } else {
+      setState(() {
+        isResponseHidden = false;
+      });
     }
-    setState(() {
-      isResponseHidden = false;
-    });
-
   }
 
 @override
