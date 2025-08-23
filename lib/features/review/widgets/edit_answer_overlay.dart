@@ -46,7 +46,7 @@ class EditAnswerOverlay extends StatelessWidget {
           // TextField (affiché seulement si expanded)
           if (isExpanded)
             Expanded(
-              child: Padding(
+              child: Container(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
                 child: TextField(
                   controller: controller,
@@ -61,7 +61,12 @@ class EditAnswerOverlay extends StatelessWidget {
                     isDense: true,
                   ),
                   style: const TextStyle(fontSize: 18.0),
-                  maxLines: 2,
+                  maxLines: null, // Permet plusieurs lignes
+                  textInputAction: TextInputAction.done,
+                  onTap: () {
+                    // S'assurer que le TextField est focalisé correctement
+                    FocusScope.of(context).requestFocus();
+                  },
                 ),
               ),
             ),

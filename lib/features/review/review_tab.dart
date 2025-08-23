@@ -163,73 +163,98 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
 
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isSubscribed = ref.watch(isSubscribedProvider);
+@override
+Widget build(BuildContext context) {
+  final isSubscribed = ref.watch(isSubscribedProvider);
+  final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    if(!isDue) {
-      return const ReviewPageEmpty();
-    }
-
-    return Scaffold(
-      // resizeToAvoidBottomInset: true est la valeur par défaut, ce qui est parfait pour nous.
-      // Le contenu va automatiquement se redimensionner pour laisser la place au clavier.
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 1. La partie haute prend tout l'espace disponible
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: WordsDisplay(
-                  questionLang: _questionLang,
-                  questionText: _questionText,
-                  responseLang: _responseLang,
-                  responseText: _responseText,
-                  isResponseHidden: isResponseHidden,
-                  onDisplayAnswer: _displayAnswer,
-                  isCardConsumed: isCardConsumed,
-                ),
-              ),
-            ),
-
-            // 2. La partie basse avec les contrôles
-            // Ces widgets seront poussés vers le haut par le clavier.
-            
-            // Les boutons de qualité, qui s'affichent quand la réponse est visible
-            ReviewControls(
-              isResponseHidden: isResponseHidden,
-              onQualityPress: (q) {
-                _onQualityButtonPress(q);
-              },
-              overrideDisplayWithResult:
-                  isEditing && !isResponseHidden && overrideQuality != null,
-              overrideQuality: overrideQuality,
-            ),
-            
-            // La section d'édition qui est toujours visible (si l'utilisateur est abonné)
-            if (isSubscribed)
-              EditableAnswerSection(
-                isEditing: isEditing,
-                editingController: editingController,
-                onToggleEditing: () {
-                  setState(() {
-                    isEditing = !isEditing;
-                    if (!isEditing) {
-                      overrideQuality = null;
-                    }
-                  });
-                },
-                // Assure-toi de passer les vrais notifiers et callbacks ici
-                isAllLanguagesToggledNotifier: widget.isAllLanguagesToggledNotifier,
-                onLanguageToggle: (newValue) {
-                  updateSwitchState(newValue);
-                  updateQuestionText(newValue);
-                },
-              ),
-          ],
-        ),
-      ),
-    );
+  if (!isDue) {
+    return const ReviewPageEmpty();
   }
+
+  return Scaffold(
+    resizeToAvoidBottomInset: false, // On gère manuellement le clavier
+    body: SafeArea(
+      child: Stack(
+        children: [
+          // Contenu principal qui occupe tout l'écran
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: WordsDisplay(
+                questionLang: _questionLang,
+                questionText: _questionText,
+                responseLang: _responseLang,
+                responseText: _responseText,
+                isResponseHidden: isResponseHidden,
+                onDisplayAnswer: _displayAnswer,
+                isCardConsumed: isCardConsumed,
+              ),
+            ),
+          ),
+
+          // Contrôles en bas qui bougent avec le clavier
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: keyboardHeight, // Se positionne au-dessus du clavier
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Boutons de qualité qui apparaissent sous le clavier quand on clique sur la carte
+                if (!isResponseHidden && keyboardHeight > 0)
+                  Container(
+                    color: Colors.white.withOpacity(0.95),
+                    child: ReviewControls(
+                      isResponseHidden: isResponseHidden,
+                      onQualityPress: (q) {
+                        _onQualityButtonPress(q);
+                      },
+                      overrideDisplayWithResult:
+                          isEditing && !isResponseHidden && overrideQuality != null,
+                      overrideQuality: overrideQuality,
+                    ),
+                  ),
+
+                // Boutons de qualité normaux (quand pas de clavier)
+                if (!isResponseHidden && keyboardHeight == 0)
+                  ReviewControls(
+                    isResponseHidden: isResponseHidden,
+                    onQualityPress: (q) {
+                      _onQualityButtonPress(q);
+                    },
+                    overrideDisplayWithResult:
+                        isEditing && !isResponseHidden && overrideQuality != null,
+                    overrideQuality: overrideQuality,
+                  ),
+
+                // Section d'édition
+                if (isSubscribed)
+                  EditableAnswerSection(
+                    isEditing: isEditing,
+                    editingController: editingController,
+                    onToggleEditing: () {
+                      setState(() {
+                        isEditing = !isEditing;
+                        if (!isEditing) {
+                          overrideQuality = null;
+                          // Fermer le clavier quand on ferme l'édition
+                          FocusScope.of(context).unfocus();
+                        }
+                      });
+                    },
+                    isAllLanguagesToggledNotifier: widget.isAllLanguagesToggledNotifier,
+                    onLanguageToggle: (newValue) {
+                      updateSwitchState(newValue);
+                      updateQuestionText(newValue);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 }

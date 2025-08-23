@@ -1,6 +1,6 @@
 import 'package:flasholator/features/review/widgets/all_languages_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:flasholator/features/review/widgets/edit_answer_overlay.dart'; // Assure-toi que le chemin est correct
+import 'package:flasholator/features/review/widgets/edit_answer_overlay.dart';
 
 class EditableAnswerSection extends StatelessWidget {
   final bool isEditing;
@@ -21,13 +21,13 @@ class EditableAnswerSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Enveloppe dans un Container pour un futur style si besoin (ex: couleur de fond)
+      color: Colors.white, // Fond blanc pour éviter la transparence
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Divider(height: 1),
-          // --- Boutons en haut de l’overlay ---
-          Padding(
+          // Boutons de contrôle
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -38,13 +38,16 @@ class EditableAnswerSection extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: onToggleEditing,
-                  icon: Icon(isEditing ? Icons.keyboard_arrow_down : Icons.edit),
+                  icon: Icon(
+                    isEditing ? Icons.keyboard_arrow_down : Icons.edit,
+                    size: 28,
+                  ),
                 ),
               ],
             ),
           ),
 
-          // --- Overlay avec TextField ---
+          // Overlay avec TextField
           EditAnswerOverlay(
             isExpanded: isEditing,
             controller: editingController,
