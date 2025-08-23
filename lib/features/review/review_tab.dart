@@ -55,7 +55,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
     _currentFlashcard = currentFlashcard;
   }
 
-  bool isDraggingAccepted = false;
+  bool isCardConsumed = false;
 
   @override
   void initState() {
@@ -136,7 +136,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
       }
     }
     setState(() {
-      isDraggingAccepted = true; // empêche le retour visuel de la carte
+      isCardConsumed = true; // empêche d'afficher la carte actuelle à nouveau
     });
 
     // Update the flashcard with the quality in the database then update the question text
@@ -146,7 +146,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
 
     if (mounted) {
       setState(() {
-        isDraggingAccepted = false; // réactive l’affichage normal
+        isCardConsumed = false;
       });
     }
 
@@ -215,7 +215,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
                     responseText: _responseText,
                     isResponseHidden: isResponseHidden,
                     onDisplayAnswer: _displayAnswer,
-                    isDraggingAccepted: isDraggingAccepted,
+                    isCardConsumed: isCardConsumed,
                   ),
                   const Spacer(),
                   ReviewControls(

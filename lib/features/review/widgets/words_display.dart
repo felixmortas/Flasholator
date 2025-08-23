@@ -8,7 +8,7 @@ class WordsDisplay extends StatelessWidget {
   final String responseText;
   final bool isResponseHidden;
   final VoidCallback onDisplayAnswer;
-  final bool isDraggingAccepted;
+  final bool isCardConsumed;
 
   const WordsDisplay({
     Key? key,
@@ -18,7 +18,7 @@ class WordsDisplay extends StatelessWidget {
     required this.responseText,
     required this.isResponseHidden,
     required this.onDisplayAnswer,
-    required this.isDraggingAccepted,
+    required this.isCardConsumed,
   }) : super(key: key);
 
   @override
@@ -104,34 +104,14 @@ class WordsDisplay extends StatelessWidget {
                   ),
                 ),
               ),
-              childWhenDragging: const Opacity(
-                opacity: 0.3,
-                child: Card(
-                  child: Center(
-                    child: Icon(
-                      Icons.touch_app,
-                      size: 48.0,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-              child: GestureDetector( // Ajout du GestureDetector
+              childWhenDragging: const SizedBox.shrink(),
+              child: isCardConsumed
+              ? const SizedBox.shrink() // 👈 slot vide définitif après drop
+              : GestureDetector(
                 onTap: isResponseHidden ? onDisplayAnswer : null,
-                child: isDraggingAccepted
-                  ? const Card(
-                  child: Center(
-                    child: Icon(
-                      Icons.touch_app,
-                      size: 48.0,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ) // cache totalement la carte en attendant
-                  : Card(
-                  child: Stack(
-                    children: [
-                      // langTag positionné en haut à gauche, peu visible
+                child: Card(child: 
+                  Stack(children: 
+                    [
                       Positioned(
                         top: 8.0,
                         left: 8.0,
@@ -141,17 +121,16 @@ class WordsDisplay extends StatelessWidget {
                             fontSize: 12.0,
                             fontWeight: FontWeight.w300,
                             fontFamily: 'Arial',
-                            color: Color.fromARGB(100, 150, 150, 150), // Très peu visible
+                            color: Color.fromARGB(100, 150, 150, 150),
                           ),
                         ),
                       ),
-                      // Mot centré au milieu de la carte
                       Center(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Visibility(
                             visible: !isResponseHidden,
-                            child:Text(
+                            child: Text(
                               responseText,
                               style: const TextStyle(
                                 fontSize: 24.0,
@@ -166,11 +145,8 @@ class WordsDisplay extends StatelessWidget {
                       ),
                       if (isResponseHidden)
                         const Center(
-                          child: Icon(
-                            Icons.touch_app,
-                            size: 48.0,
-                            color: Colors.grey,
-                          ),
+                          child: Icon(Icons.touch_app,
+                              size: 48.0, color: Colors.grey),
                         ),
                     ],
                   ),
