@@ -88,8 +88,6 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
                     flashcard.targetLang == languageSelection.sourceLanguage))
             .toList();
       }
-
-      if (dueFlashcards.isNotEmpty) {
         _currentFlashcard = dueFlashcards[0];
         setState(() {
           isResponseHidden = true;
@@ -100,17 +98,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
           _responseLang = _currentFlashcard.targetLang;
           overrideQuality = null;
           editingController.clear();
-
         });
-      } else {
-        setState(() {
-          _questionText = AppLocalizations.of(context)!.noCardToReviewToday;
-          _questionLang = "";
-          isResponseHidden = true;
-          isDue = false;
-          overrideQuality = null;
-        });
-      }
     } else {
       setState(() {
         _questionText = AppLocalizations.of(context)!.noCardToReviewToday;
