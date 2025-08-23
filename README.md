@@ -49,7 +49,6 @@ __[Ajouter captures d'écran et tuto]__
 - Mettre tous les boutons dans la thumb zone
 - Ajout d'un Call To Action (titre, texte, image animée, bouton) pour ajouter de nouveaux mots quand plus de mots à réviser
 - Ajout messages de remerciement et motivation
-- Modification de la dynamique des boutons de qualité pour glisser 1 unique bouton vers la qualité correspondante
 - Offrir une option de personnalisation des boutons de qualité (premium, payant ?)
 - Ajout indicateur carte nouvelle ou déjà révisée
 - Tutoriel long et engageant pour l'utilisateur
