@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/services/ad_service.dart';
 import 'package:flasholator/core/services/auth_gate.dart';
+import 'package:flasholator/style/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Initialize the binding
@@ -29,10 +30,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // locale: Locale('en'), // Test UI language
       title: 'Flasholator',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
