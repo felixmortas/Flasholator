@@ -1,3 +1,4 @@
+import 'package:flasholator/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class GridBackground extends StatelessWidget {
@@ -16,6 +17,10 @@ class GridBackground extends StatelessWidget {
 class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
+    final Paint backgroundPaint = Paint()
+      ..color = AppColors.sheetBackground;
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
+
     final Paint gridPaint = Paint()
       ..color = Colors.blue.shade200
       ..strokeWidth = 0.5;

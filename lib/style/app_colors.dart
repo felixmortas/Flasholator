@@ -10,6 +10,7 @@ class AppColors {
   
   // Couleurs de fond
   static const Color background = Color(0xFFFAFAF8); // Blanc cassé : FAFAF8 ou Beige sable très clair : F7F3E9
+  static const Color sheetBackground = Color(0xFFF0F0F0); // Gris très clair pour les cartes
   
   // Couleurs de texte
   static const Color textDark = Color(0xFF333333); // Texte foncé
