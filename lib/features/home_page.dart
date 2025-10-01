@@ -1,5 +1,6 @@
 
 import 'dart:io';
+import 'package:flasholator/style/app_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -267,12 +268,15 @@ class _HomePageState extends ConsumerState<HomePage> {
             )
           ]
         ),
-        bottomNavigationBar: const TabBar(
-          tabs: [
-            Tab(icon: Icon(Icons.translate)),
-            Tab(icon: Icon(Icons.replay)),
-            Tab(icon: Icon(Icons.folder)),
-          ],
+        bottomNavigationBar: const Material(
+          color: AppColors.background,
+          child: TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.translate)),
+              Tab(icon: Icon(Icons.replay)),
+              Tab(icon: Icon(Icons.folder)),
+            ],
+          ),
         ),
       ),
     );
