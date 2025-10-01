@@ -1,3 +1,4 @@
+import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -187,58 +188,61 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     final isSubscribed = ref.watch(isSubscribedProvider);
 
     return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      return Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (isSubscribed)
-              ValueListenableBuilder<bool>(
-                valueListenable: widget.isAllLanguagesToggledNotifier,
-                builder: (context, value, child) {
-                  return SwitchListTile(
-                    value: value, // ref.watch(notificationsProvider),
-                    onChanged: (bool newValue) {
-                      updateSwitchState(newValue);
-                    },
-                    title: const Text("Sélectionner toutes les langues"),
-                  );
-                },
-              ),
-            Expanded(
-              child: ValueListenableBuilder<bool>(
-                valueListenable: widget.isAllLanguagesToggledNotifier,
-                builder: (context, isAllLanguagesToggled, child) {
-                  if (isAllLanguagesToggled) {
-                    return AllLanguagesTable(
-                      data: data,
-                      onCellTap:
-                          _openEditFlashcardPopup, // Modified to pass only rowData
-                      languages: localizedLanguageMap,
+      builder: (BuildContext context, BoxConstraints constraints) {
+      return GridBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isSubscribed)
+                ValueListenableBuilder<bool>(
+                  valueListenable: widget.isAllLanguagesToggledNotifier,
+                  builder: (context, value, child) {
+                    return SwitchListTile(
+                      value: value, // ref.watch(notificationsProvider),
+                      onChanged: (bool newValue) {
+                        updateSwitchState(newValue);
+                      },
+                      title: const Text("Sélectionner toutes les langues"),
                     );
-                  } else {
-                    return CoupleLanguagesTable(
-                      data: data,
-                      sourceLanguage: localizedLanguageMap[
-                          languageSelection.sourceLanguage]!,
-                      targetLanguage: localizedLanguageMap[
-                          languageSelection.targetLanguage]!,
-
-                      onCellTap:
-                          _openEditFlashcardPopup, // Modified to pass only rowData
-                    );
-                  }
-                },
+                  },
+                ),
+              Expanded(
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: widget.isAllLanguagesToggledNotifier,
+                  builder: (context, isAllLanguagesToggled, child) {
+                    if (isAllLanguagesToggled) {
+                      return AllLanguagesTable(
+                        data: data,
+                        onCellTap:
+                            _openEditFlashcardPopup, // Modified to pass only rowData
+                        languages: localizedLanguageMap,
+                      );
+                    } else {
+                      return CoupleLanguagesTable(
+                        data: data,
+                        sourceLanguage: localizedLanguageMap[
+                            languageSelection.sourceLanguage]!,
+                        targetLanguage: localizedLanguageMap[
+                            languageSelection.targetLanguage]!,
+        
+                        onCellTap:
+                            _openEditFlashcardPopup, // Modified to pass only rowData
+                      );
+                    }
+                  },
+                ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: _checkIfCanAddCard,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
+              ElevatedButton(
+                onPressed: _checkIfCanAddCard,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: Text(AppLocalizations.of(context)!.addAWord),
               ),
-              child: Text(AppLocalizations.of(context)!.addAWord),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     });

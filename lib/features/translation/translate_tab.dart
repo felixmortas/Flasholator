@@ -18,6 +18,8 @@ import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/features/translation/widgets/switch_lang_button.dart';
 import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
 
+import 'package:flasholator/style/grid_background_painter.dart';
+
 class TranslateTab extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
   final DeeplTranslator deeplTranslator;
@@ -245,90 +247,91 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
       }
     }
 
-return Scaffold(
-  resizeToAvoidBottomInset: true,
-  backgroundColor: Colors.grey[200],
-  body: SafeArea(
-    child: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
+    return GridBackground(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.transparent, 
+        body: SafeArea(
+          child: Column(
             children: [
-              Expanded(
-                child: 
-                LanguageDropdown(
-                  selectedLanguage: languageSelection.sourceLanguage,
-                  otherLanguage: languageSelection.targetLanguage,
-                  sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                  )).toList(),
-                  onChanged: (String? newValue) {
-                    _onLanguageChange(newValue, true);
-                  },
-                ),
-              ),
-                                
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: SwitchLangButton(
-                  onPressed: _swapContent,
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: 
+                      LanguageDropdown(
+                        selectedLanguage: languageSelection.sourceLanguage,
+                        otherLanguage: languageSelection.targetLanguage,
+                        sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                      AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                        )).toList(),
+                        onChanged: (String? newValue) {
+                          _onLanguageChange(newValue, true);
+                        },
+                      ),
+                    ),
+                                      
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SwitchLangButton(
+                        onPressed: _swapContent,
+                      ),
+                    ),
+                    Expanded(
+                      child: LanguageDropdown(
+                        selectedLanguage: languageSelection.targetLanguage,
+                        otherLanguage: languageSelection.sourceLanguage,
+                        sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
+                          AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
+                        )).toList(),
+                        onChanged: (String? newValue) {
+                          _onLanguageChange(newValue, false);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Expanded(
-                child: LanguageDropdown(
-                  selectedLanguage: languageSelection.targetLanguage,
-                  otherLanguage: languageSelection.sourceLanguage,
-                  sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                    AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                  )).toList(),
-                  onChanged: (String? newValue) {
-                    _onLanguageChange(newValue, false);
-                  },
+      
+              const Spacer(),
+              AnimatedPadding(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: BottomBlock(
+                  showDragHandle: true,
+                  children: [
+                    _InputFieldWithClear(
+                      controller: _controller,
+                      onClear: _clearTextInput
+                    ),
+                    _PasteAndCameraRow(controller: _controller),
+                    const Divider(),
+                    const SizedBox(height: 12),
+                    _TranslatedText(
+                      translatedWord: _translatedWord,
+                      onVolumePressed: () {},
+                      onAlternativePressed: () {},
+                      onSharePressed: () {},
+                    ),
+                    const SizedBox(height: 16),
+                    _ActionButtons(
+                      isTranslateDisabled: isTranslateButtonDisabled,
+                      isAddDisabled: isAddButtonDisabled,
+                      onTranslate: _checkIfCanTranslate,
+                      onAdd: _checkIfCanAddFlashcard,
+                    ),
+                  ],
                 ),
               ),
-
             ],
           ),
         ),
-
-        const Spacer(),
-        AnimatedPadding(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: BottomBlock(
-          showDragHandle: true,
-          children: [
-            _InputFieldWithClear(
-              controller: _controller,
-              onClear: _clearTextInput
-            ),
-            _PasteAndCameraRow(controller: _controller),
-            const Divider(),
-            const SizedBox(height: 12),
-            _TranslatedText(
-              translatedWord: _translatedWord,
-              onVolumePressed: () {},
-              onAlternativePressed: () {},
-              onSharePressed: () {},
-            ),
-            const SizedBox(height: 16),
-            _ActionButtons(
-              isTranslateDisabled: isTranslateButtonDisabled,
-              isAddDisabled: isAddButtonDisabled,
-              onTranslate: _checkIfCanTranslate,
-              onAdd: _checkIfCanAddFlashcard,
-            ),
-          ],
-        ),
-        ),
-      ],
-    ),
-  ),
-);  
+    );  
   }
 }
 

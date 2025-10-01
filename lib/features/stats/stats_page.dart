@@ -1,4 +1,5 @@
 import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/core/models/stats_model.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
@@ -76,37 +77,40 @@ class _StatsPageState extends State<StatsPage> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.statistics)),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: DateRangePickerRow(
-              startDate: _startDate!,
-              endDate: _endDate,
-              onStartDateChanged: _onStartDateChanged,
-              onEndDateChanged: _onEndDateChanged,
+    return GridBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.statistics)),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: DateRangePickerRow(
+                startDate: _startDate!,
+                endDate: _endDate,
+                onStartDateChanged: _onStartDateChanged,
+                onEndDateChanged: _onEndDateChanged,
+              ),
             ),
-          ),
-          Expanded(
-            child: FutureBuilder<StatsData>(
-              future: _statsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                      child: Text(
-                          '${AppLocalizations.of(context)!.error}: ${snapshot.error}'));
-                }
-                final data = snapshot.data!;
-                return _StatsView(data: data);
-              },
+            Expanded(
+              child: FutureBuilder<StatsData>(
+                future: _statsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                        child: Text(
+                            '${AppLocalizations.of(context)!.error}: ${snapshot.error}'));
+                  }
+                  final data = snapshot.data!;
+                  return _StatsView(data: data);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

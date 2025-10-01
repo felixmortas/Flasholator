@@ -1,3 +1,4 @@
+import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
@@ -183,40 +184,55 @@ Widget build(BuildContext context) {
     return const ReviewPageEmpty();
   }
 
-  return Scaffold(
-    resizeToAvoidBottomInset: false, // On gère manuellement le clavier
-    body: SafeArea(
-      child: Stack(
-        children: [
-          // Contenu principal qui occupe tout l'écran
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: WordsDisplay(
-                questionLang: _questionLang,
-                questionText: _questionText,
-                responseLang: _responseLang,
-                responseText: _responseText,
-                isResponseHidden: isResponseHidden,
-                onDisplayAnswer: _displayAnswer,
-                isCardConsumed: isCardConsumed,
+  return GridBackground(
+    child: Scaffold(
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false, // On gère manuellement le clavier
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Contenu principal qui occupe tout l'écran
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: WordsDisplay(
+                  questionLang: _questionLang,
+                  questionText: _questionText,
+                  responseLang: _responseLang,
+                  responseText: _responseText,
+                  isResponseHidden: isResponseHidden,
+                  onDisplayAnswer: _displayAnswer,
+                  isCardConsumed: isCardConsumed,
+                ),
               ),
             ),
-          ),
-
-          // Contrôles en bas qui bougent avec le clavier
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: keyboardHeight, // Se positionne au-dessus du clavier
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Boutons de qualité qui apparaissent sous le clavier quand on clique sur la carte
-                if (!isResponseHidden && keyboardHeight > 0)
-                  Container(
-                    color: Colors.white.withOpacity(0.95),
-                    child: ReviewControls(
+    
+            // Contrôles en bas qui bougent avec le clavier
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: keyboardHeight, // Se positionne au-dessus du clavier
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Boutons de qualité qui apparaissent sous le clavier quand on clique sur la carte
+                  if (!isResponseHidden && keyboardHeight > 0)
+                    Container(
+                      color: Colors.white.withOpacity(0.95),
+                      child: ReviewControls(
+                        isResponseHidden: isResponseHidden,
+                        onQualityPress: (q) {
+                          _onQualityButtonPress(q);
+                        },
+                        overrideDisplayWithResult:
+                            isEditing && !isResponseHidden && overrideQuality != null,
+                        overrideQuality: overrideQuality,
+                      ),
+                    ),
+    
+                  // Boutons de qualité normaux (quand pas de clavier)
+                  if (!isResponseHidden && keyboardHeight == 0)
+                    ReviewControls(
                       isResponseHidden: isResponseHidden,
                       onQualityPress: (q) {
                         _onQualityButtonPress(q);
@@ -225,45 +241,33 @@ Widget build(BuildContext context) {
                           isEditing && !isResponseHidden && overrideQuality != null,
                       overrideQuality: overrideQuality,
                     ),
-                  ),
-
-                // Boutons de qualité normaux (quand pas de clavier)
-                if (!isResponseHidden && keyboardHeight == 0)
-                  ReviewControls(
-                    isResponseHidden: isResponseHidden,
-                    onQualityPress: (q) {
-                      _onQualityButtonPress(q);
-                    },
-                    overrideDisplayWithResult:
-                        isEditing && !isResponseHidden && overrideQuality != null,
-                    overrideQuality: overrideQuality,
-                  ),
-
-                // Section d'édition
-                if (isSubscribed)
-                  EditableAnswerSection(
-                    isEditing: isEditing,
-                    editingController: editingController,
-                    onToggleEditing: () {
-                      setState(() {
-                        isEditing = !isEditing;
-                        if (!isEditing) {
-                          overrideQuality = null;
-                          // Fermer le clavier quand on ferme l'édition
-                          FocusScope.of(context).unfocus();
-                        }
-                      });
-                    },
-                    isAllLanguagesToggledNotifier: widget.isAllLanguagesToggledNotifier,
-                    onLanguageToggle: (newValue) {
-                      updateSwitchState(newValue);
-                      updateQuestionText(newValue);
-                    },
-                  ),
-              ],
+    
+                  // Section d'édition
+                  if (isSubscribed)
+                    EditableAnswerSection(
+                      isEditing: isEditing,
+                      editingController: editingController,
+                      onToggleEditing: () {
+                        setState(() {
+                          isEditing = !isEditing;
+                          if (!isEditing) {
+                            overrideQuality = null;
+                            // Fermer le clavier quand on ferme l'édition
+                            FocusScope.of(context).unfocus();
+                          }
+                        });
+                      },
+                      isAllLanguagesToggledNotifier: widget.isAllLanguagesToggledNotifier,
+                      onLanguageToggle: (newValue) {
+                        updateSwitchState(newValue);
+                        updateQuestionText(newValue);
+                      },
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );

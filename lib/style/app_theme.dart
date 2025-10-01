@@ -9,7 +9,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       primaryColor: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: Colors.transparent,
       fontFamily: 'Poppins', // Assurez-vous d'ajouter cette police à votre pubspec.yaml
 
       // Thème pour l'AppBar
