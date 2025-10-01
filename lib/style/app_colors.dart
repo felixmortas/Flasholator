@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Couleurs principales
-  static const Color primary = Color(0xFFEF4B81); // Rose principal des boutons
+  static const Color primary = Color(0xFFF6C61E); // Rose principal des boutons
   static const Color secondary = Color(0xFF5E5CE5); // Une couleur secondaire (non visible mais bon à avoir)
   
   // Couleurs de fond
-  static const Color background = Color(0xFFF5F5F7); // Gris très clair de l'arrière-plan
+  static const Color background = Color(0xFFFAFAF8); // Blanc cassé : FAFAF8 ou Beige sable très clair : F7F3E9
   
   // Couleurs de texte
   static const Color textDark = Color(0xFF333333); // Texte foncé
