@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flasholator/style/bottom_overlay_styles.dart';
 
 import 'package:flasholator/config/constants.dart';
 
@@ -8,6 +9,7 @@ class BottomBlock extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final double borderRadius;
   final bool showDragHandle;
+  final Color borderColor;
 
   const BottomBlock({
     super.key,
@@ -16,54 +18,44 @@ class BottomBlock extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     this.borderRadius = 25 * GOLDEN_NUMBER,
     this.showDragHandle = true,
+    this.borderColor = BottomBlockStyles.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        key: const Key('BottomBlock'),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(borderRadius)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          key: const Key('BottomBlock'),
+          width: double.infinity,
+          decoration: BottomBlockStyles.outerDecoration(
+            color: borderColor,
+            radius: borderRadius,
+          ),
+          padding: BottomBlockStyles.borderPadding,
+          child: Container(
+            decoration: BottomBlockStyles.innerDecoration(
+              backgroundColor: backgroundColor,
+              radius: borderRadius,
             ),
-          ],
+            padding: padding,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ...children,
+              ],
+            ),
+          ),
         ),
-        padding: padding,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (showDragHandle) const _DragHandle(),
-            ...children,
-          ],
-        ),
-      
-    );
-  }
-}
-
-class _DragHandle extends StatelessWidget {
-  const _DragHandle();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        key: const Key('BottomBlockDragHandle'),
-        width: 40,
-        height: 5,
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+        // Poignée centrale en haut
+        if (showDragHandle) TopHandle(backgroundColor: borderColor),
+        
+        // Coins protecteurs
+        CornerProtection(isLeft: true, color: borderColor),
+        CornerProtection(isLeft: false, color: borderColor),
+      ],
     );
   }
 }
