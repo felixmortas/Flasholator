@@ -388,12 +388,12 @@ class _PasteAndCameraRow extends StatelessWidget {
       child: Row(
         children: [
           PasteButton(controller: controller),
-          IconButton(
-            onPressed: () {
-              // TODO: action caméra
-            },
-            icon: const Icon(Icons.camera_alt),
-          ),
+          // IconButton(
+          //   onPressed: () {
+          //     // TODO: action caméra
+          //   },
+          //   icon: const Icon(Icons.camera_alt),
+          // ),
         ],
       ),
     );
