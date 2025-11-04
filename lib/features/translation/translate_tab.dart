@@ -428,23 +428,23 @@ class _TranslatedText extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  onPressed: onVolumePressed,
-                  icon: const Icon(Icons.volume_up),
-                  iconSize: 18,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-                OutlinedButton(
-                  onPressed: onAlternativePressed,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(width: 1.0, color: Colors.black),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text("ALTERNATIVE", style: TextStyle(fontSize: 12)),
-                ),
+                // IconButton(
+                //   onPressed: onVolumePressed,
+                //   icon: const Icon(Icons.volume_up),
+                //   iconSize: 18,
+                //   padding: EdgeInsets.zero,
+                //   constraints: const BoxConstraints(),
+                // ),
+                // OutlinedButton(
+                //   onPressed: onAlternativePressed,
+                //   style: OutlinedButton.styleFrom(
+                //     side: const BorderSide(width: 1.0, color: Colors.black),
+                //     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                //     minimumSize: Size.zero,
+                //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                //   ),
+                //   child: const Text("ALTERNATIVE", style: TextStyle(fontSize: 12)),
+                // ),
                 IconButton(
                   onPressed: onSharePressed,
                   icon: const Icon(Icons.share),
