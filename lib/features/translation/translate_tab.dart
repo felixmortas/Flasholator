@@ -485,28 +485,30 @@ class _ActionButtons extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: ElevatedButton(
+          child: _EraserButton(
             onPressed: isTranslateDisabled ? null : onTranslate,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text("Traduire"),
+            label: AppLocalizations.of(context)!.translate,
+            gradientColors: [
+              Colors.pink.shade200,
+              Colors.pink.shade100,
+            ],
+            iconColor: Colors.pink.shade700,
+            textColor: Colors.pink.shade900,
+            isDisabled: isTranslateDisabled,
           ),
         ),
         const SizedBox(width: 16.0),
         Expanded(
-          child: ElevatedButton(
+          child: _EraserButton(
             onPressed: isAddDisabled ? null : onAdd,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text("Ajouter"),
+            label: AppLocalizations.of(context)!.add,
+            gradientColors: [
+              Colors.pink.shade200,
+              Colors.pink.shade100,
+            ],
+            iconColor: Colors.pink.shade700,
+            textColor: Colors.pink.shade900,
+            isDisabled: isAddDisabled,
           ),
         ),
       ],
@@ -514,3 +516,65 @@ class _ActionButtons extends StatelessWidget {
   }
 }
 
+class _EraserButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final String label;
+  final List<Color> gradientColors;
+  final Color iconColor;
+  final Color textColor;
+  final bool isDisabled;
+
+  const _EraserButton({
+    required this.onPressed,
+    required this.label,
+    required this.gradientColors,
+    required this.iconColor,
+    required this.textColor,
+    this.isDisabled = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        // Dégradé de couleur pastel comme une gomme
+        gradient: isDisabled
+            ? LinearGradient(
+                colors: [
+                  Colors.grey.shade300,
+                  Colors.grey.shade200,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : LinearGradient(
+                colors: gradientColors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        // Bordure arrondie douce
+        borderRadius: BorderRadius.circular(16),
+        
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            alignment: Alignment.center,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isDisabled ? Colors.grey.shade500 : textColor,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
