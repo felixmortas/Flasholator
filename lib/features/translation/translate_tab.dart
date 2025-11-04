@@ -2,6 +2,7 @@ import 'package:flasholator/features/shared/widgets/paste_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
@@ -315,7 +316,16 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                       translatedWord: _translatedWord,
                       onVolumePressed: () {},
                       onAlternativePressed: () {},
-                      onSharePressed: () {},
+                      onSharePressed: () {
+                        if (_translatedWord.isNotEmpty) {
+                          Share.share(
+                            'Grâce à Flasholator, je vais pouvoir retenir éternellement ce mot que je viens de traduire : $_translatedWord\n\n'
+                            '📱 Toi aussi télécharge Flasholator pour avoir une mémoire d\'éléphant !',
+                            subject: 'Apprendre avec Flasholator',
+                          );
+                        }
+
+                      },
                     ),
                     const SizedBox(height: 16),
                     _ActionButtons(
