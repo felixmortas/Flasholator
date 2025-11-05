@@ -21,13 +21,12 @@ class EditableAnswerSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white, // Fond blanc pour éviter la transparence
+      color: Colors.transparent, // Fond transparent
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Divider(height: 1),
-          // Boutons de contrôle
           Container(
+            color: Colors.transparent,
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
