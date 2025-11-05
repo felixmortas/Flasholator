@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flasholator/config/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flasholator/style/app_colors.dart';
 
 class WordsDisplay extends StatelessWidget {
   final String questionLang;
@@ -21,137 +23,199 @@ class WordsDisplay extends StatelessWidget {
     required this.isCardConsumed,
   }) : super(key: key);
 
+  Widget _buildPostItCard({
+    required String langTag,
+    required String text,
+    required double width,
+    required double height,
+    required bool showText,
+    required Color postItColor,
+    required double rotation,
+    Widget? overlayIcon,
+  }) {
+    return Transform(
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001)
+        ..rotateX(-0.015)
+        ..rotateZ(rotation),
+      alignment: Alignment.bottomRight,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: postItColor,
+          borderRadius: BorderRadius.circular(4),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 4,
+              offset: const Offset(2, 3),
+              spreadRadius: -1,
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Bande adhésive en haut
+            Container(
+              height: 12,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _getDarkerShade(postItColor, 0.4),
+                    _getDarkerShade(postItColor, 0.25),
+                    _getDarkerShade(postItColor, 0.1),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(4),
+                  topRight: Radius.circular(4),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: _getDarkerShade(postItColor, 0.15),
+                    blurRadius: 1,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+            ),
+            // Contenu du post-it
+            Expanded(
+              child: Stack(
+                children: [
+                  // Tag de langue en haut à gauche
+                  Positioned(
+                    top: 8.0,
+                    left: 12.0,
+                    child: Text(
+                      langTag,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.grey.shade500,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  // Texte centré
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 16.0,
+                      ),
+                      child: showText
+                          ? Text(
+                              text,
+                              style: GoogleFonts.poppins(
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey.shade800,
+                                letterSpacing: 0.3,
+                                height: 1.3,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ),
+                  // Icône overlay si fournie
+                  if (overlayIcon != null)
+                    Center(child: overlayIcon),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getDarkerShade(Color color, double opacity) {
+    final hsl = HSLColor.fromColor(color);
+    final darkened = hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0));
+    return darkened.toColor().withOpacity(opacity);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Calculer la largeur optimale basée sur le ratio d'or
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = screenWidth / GOLDEN_NUMBER;
-    
-    // Proportions d'une carte à jouer standard (environ 2.5:3.5 ou 5:7)
     final cardHeight = cardWidth / 1.4;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Carte question (post-it bleu/cyan)
         Center(
-          child: SizedBox(
+          child: _buildPostItCard(
+            langTag: questionLang,
+            text: questionText,
             width: cardWidth,
             height: cardHeight,
-            child: Card(
-              child: Stack(
-                children: [
-                  // langTag positionné en haut à gauche, peu visible
-                  Positioned(
-                    top: 8.0,
-                    left: 8.0,
-                    child: Text(
-                      questionLang,
-                      style: const TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.w300,
-                        fontFamily: 'Arial',
-                        color: Color.fromARGB(100, 150, 150, 150), // Très peu visible
-                      ),
-                    ),
-                  ),
-                  // Mot centré au milieu de la carte
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        questionText,
-                        style: const TextStyle(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            showText: true,
+            postItColor: AppColors.postit, // Bleu clair post-it
+            rotation: -0.008, // Légère rotation à gauche
           ),
         ),
-    
+
         const SizedBox(height: 16.0),
-        Container(height: 1.0, color: Colors.grey),
+        Container(height: 1.0, color: Colors.grey.shade300),
         const SizedBox(height: 16.0),
-        
+
+        // Carte réponse (post-it rose/pêche)
         Center(
           child: SizedBox(
             width: cardWidth,
             height: cardHeight,
             child: Draggable<int>(
-              data: 1, // identifiant générique, peu importe ici
+              data: 1,
               maxSimultaneousDrags: isResponseHidden ? 0 : 1,
               feedback: Material(
                 color: Colors.transparent,
-                child: Card(
-                  elevation: 8,
-                  child: SizedBox(
-                    width: cardWidth,
-                    height: cardHeight,
-                    child: Center(
-                      child: Text(
-                        responseText,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                child: _buildPostItCard(
+                  langTag: responseLang,
+                  text: responseText,
+                  width: cardWidth,
+                  height: cardHeight,
+                  showText: true,
+                  postItColor: AppColors.postit, // Rose/pêche
+                  rotation: 0.012, // Rotation à droite
                 ),
               ),
               childWhenDragging: const SizedBox.shrink(),
               child: isCardConsumed
-              ? const SizedBox.shrink() // 👈 slot vide définitif après drop
-              : GestureDetector(
-                onTap: isResponseHidden ? onDisplayAnswer : null,
-                child: Card(child: 
-                  Stack(children: 
-                    [
-                      Positioned(
-                        top: 8.0,
-                        left: 8.0,
-                        child: Text(
-                          responseLang,
-                          style: const TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.w300,
-                            fontFamily: 'Arial',
-                            color: Color.fromARGB(100, 150, 150, 150),
-                          ),
-                        ),
+                  ? const SizedBox.shrink()
+                  : GestureDetector(
+                      onTap: isResponseHidden ? onDisplayAnswer : null,
+                      child: _buildPostItCard(
+                        langTag: responseLang,
+                        text: responseText,
+                        width: cardWidth,
+                        height: cardHeight,
+                        showText: !isResponseHidden,
+                        postItColor: AppColors.postit, // Rose/pêche
+                        rotation: 0.012,
+                        overlayIcon: isResponseHidden
+                            ? Icon(
+                                Icons.touch_app,
+                                size: 48.0,
+                                color: Colors.grey.shade600,
+                              )
+                            : null,
                       ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Visibility(
-                            visible: !isResponseHidden,
-                            child: Text(
-                              responseText,
-                              style: const TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (isResponseHidden)
-                        const Center(
-                          child: Icon(Icons.touch_app,
-                              size: 48.0, color: Colors.grey),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             ),
           ),
         ),
