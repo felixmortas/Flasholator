@@ -269,7 +269,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ]
         ),
         bottomNavigationBar: const Material(
-          color: AppColors.background,
+          color: AppColors.white,
           child: TabBar(
             tabs: [
               Tab(icon: Icon(Icons.translate)),
