@@ -16,62 +16,34 @@ class EditAnswerOverlay extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      height: isExpanded ? 120 : 20,
+      height: isExpanded ? 100 : 0,
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Drag handle
-          Container(
-            width: 40,
-            height: 5,
-            margin: const EdgeInsets.only(top: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-
-          // TextField (affiché seulement si expanded)
-          if (isExpanded)
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                child: TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: AppLocalizations.of(context)!.writeYourResponseHere,
-                    hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.5),
-                    ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    isDense: true,
-                  ),
-                  style: const TextStyle(fontSize: 18.0),
-                  maxLines: null, // Permet plusieurs lignes
-                  textInputAction: TextInputAction.done,
-                  onTap: () {
-                    // S'assurer que le TextField est focalisé correctement
-                    FocusScope.of(context).requestFocus();
-                  },
-                ),
+      child: isExpanded
+          ? Container(
+              margin: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),                
               ),
-            ),
-        ],
-      ),
+              child: TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,  
+                  enabledBorder: InputBorder.none,
+                  hintText: AppLocalizations.of(context)!.writeYourResponseHere,
+                  hintStyle: TextStyle(
+                    color: Colors.grey.withOpacity(0.5),
+                  ),
+                  isDense: true,
+                ),
+                style: const TextStyle(fontSize: 18.0),
+                maxLines: null,
+                textInputAction: TextInputAction.done,
+              ),
+            )
+          : const SizedBox.shrink(),
     );
   }
 }

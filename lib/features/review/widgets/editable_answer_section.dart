@@ -1,6 +1,8 @@
 import 'package:flasholator/features/review/widgets/all_languages_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/features/review/widgets/edit_answer_overlay.dart';
+import 'package:flasholator/style/bottom_overlay_styles.dart';
+import 'package:flasholator/config/constants.dart';
 
 class EditableAnswerSection extends StatelessWidget {
   final bool isEditing;
@@ -20,14 +22,20 @@ class EditableAnswerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent, // Fond transparent
+    const double borderRadius = 25 * GOLDEN_NUMBER;
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            color: Colors.transparent,
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          // Row avec switch et bouton edit - maintenant au-dessus
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -40,16 +48,45 @@ class EditableAnswerSection extends StatelessWidget {
                   icon: Icon(
                     isEditing ? Icons.keyboard_arrow_down : Icons.edit,
                     size: 28,
+                    color: Colors.black,
                   ),
                 ),
               ],
             ),
           ),
 
-          // Overlay avec TextField
-          EditAnswerOverlay(
-            isExpanded: isEditing,
-            controller: editingController,
+          // Widget ardoise avec overlay
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Container extérieur (bordure)
+              Container(
+                width: double.infinity,
+                decoration: BottomBlockStyles.outerDecoration(
+                  color: BottomBlockStyles.borderColor,
+                  radius: borderRadius,
+                ),
+                padding: BottomBlockStyles.borderPadding,
+                child: Container(
+                  decoration: BottomBlockStyles.innerDecoration(
+                    backgroundColor: Colors.white,
+                    radius: borderRadius,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                  child: EditAnswerOverlay(
+                    isExpanded: isEditing,
+                    controller: editingController,
+                  ),
+                ),
+              ),
+
+              // Poignée centrale en haut
+              TopHandle(backgroundColor: BottomBlockStyles.borderColor),
+
+              // Coins protecteurs
+              CornerProtection(isLeft: true, color: BottomBlockStyles.borderColor),
+              CornerProtection(isLeft: false, color: BottomBlockStyles.borderColor),
+            ],
           ),
         ],
       ),
