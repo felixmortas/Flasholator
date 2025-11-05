@@ -207,19 +207,62 @@ class WordsDisplay extends StatelessWidget {
                         showText: !isResponseHidden,
                         postItColor: AppColors.postit, // Rose/pêche
                         rotation: 0.012,
-                        overlayIcon: isResponseHidden
-                            ? Icon(
-                                Icons.touch_app,
-                                size: 48.0,
-                                color: Colors.grey.shade600,
-                              )
-                            : null,
+                        overlayIcon: isResponseHidden ? const _PulsingTouchIcon() : null,
                       ),
                     ),
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PulsingTouchIcon extends StatefulWidget {
+  const _PulsingTouchIcon();
+
+  @override
+  State<_PulsingTouchIcon> createState() => _PulsingTouchIconState();
+}
+
+class _PulsingTouchIconState extends State<_PulsingTouchIcon>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 809),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _animation = Tween<double>(begin: 0.9, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _animation.value,
+          child: Icon(
+            Icons.touch_app,
+            size: 48.0,
+            color: Colors.grey.shade600,
+          ),
+        );
+      },
     );
   }
 }
