@@ -9,6 +9,20 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get congratulationsOnYourWork => 'Bravo pour ton travail !';
+
+  @override
+  String get noCardsToReview =>
+      'Tu n\'as plus de carte à réviser pour le moment.';
+
+  @override
+  String get keepProgressing =>
+      'Continue à progresser : traduis et ajoute de nouveaux mots !';
+
+  @override
+  String get coolAIFeatureComingSoon => 'Fonctionnalité IA cool à venir ...';
+
+  @override
   String get chooseYourLanguagePair => 'Choisissez votre couple de langues';
 
   @override
@@ -268,9 +282,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get edit => 'Modifier';
-
-  @override
-  String get noCardToReviewToday => 'Pas de carte à réviser aujourd\'hui';
 
   @override
   String get displayAnswer => 'Afficher la réponse';

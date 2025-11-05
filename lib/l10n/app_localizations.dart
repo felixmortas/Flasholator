@@ -100,6 +100,30 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @congratulationsOnYourWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job on your work!'**
+  String get congratulationsOnYourWork;
+
+  /// No description provided for @noCardsToReview.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no more cards to review at the moment.'**
+  String get noCardsToReview;
+
+  /// No description provided for @keepProgressing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep progressing: translate and add new words!'**
+  String get keepProgressing;
+
+  /// No description provided for @coolAIFeatureComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Cool AI feature coming soon...'**
+  String get coolAIFeatureComingSoon;
+
   /// No description provided for @chooseYourLanguagePair.
   ///
   /// In en, this message translates to:
@@ -597,12 +621,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit'**
   String get edit;
-
-  /// No description provided for @noCardToReviewToday.
-  ///
-  /// In en, this message translates to:
-  /// **'No card to review today'**
-  String get noCardToReviewToday;
 
   /// No description provided for @displayAnswer.
   ///

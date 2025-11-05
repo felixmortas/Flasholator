@@ -1,4 +1,8 @@
 {
+  "congratulationsOnYourWork": "Great job on your work!",
+  "noCardsToReview": "You have no more cards to review at the moment.",
+  "keepProgressing": "Keep progressing: translate and add new words!",
+  "coolAIFeatureComingSoon": "Cool AI feature coming soon...",
   "chooseYourLanguagePair": "Choose your language pair",
   "sourceLanguage": "Source language",
   "targetLanguage": "Target language",
@@ -82,7 +86,6 @@
   "editTheRow": "Edit the row",
   "remove": "Remove",
   "edit": "Edit",
-  "noCardToReviewToday": "No card to review today",
   "displayAnswer": "Display answer",
   "again": "Again",
   "hard": "Hard",

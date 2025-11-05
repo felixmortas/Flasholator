@@ -98,7 +98,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
         });
     } else {
       setState(() {
-        _questionText = AppLocalizations.of(context)!.noCardToReviewToday;
+        _questionText = AppLocalizations.of(context)!.noCardsToReview;
         _questionLang = "";
         isResponseHidden = true;
         isDue = false;

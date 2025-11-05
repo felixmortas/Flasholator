@@ -1,8 +1,8 @@
 import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
-
 import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 
 class ReviewPageEmpty extends StatelessWidget {
   const ReviewPageEmpty({Key? key}) : super(key: key);
@@ -24,7 +24,7 @@ class ReviewPageEmpty extends StatelessWidget {
                   children: [
                     // Message encourageant
                     Text(
-                      "Bravo pour ton travail !",
+                      AppLocalizations.of(context)!.congratulationsOnYourWork,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -35,7 +35,7 @@ class ReviewPageEmpty extends StatelessWidget {
                     SizedBox(height: 20),
                     // Annonce pas de carte
                     Text(
-                      "Tu n'as plus de carte à réviser pour le moment.",
+                      AppLocalizations.of(context)!.noCardsToReview,
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.black54,
@@ -45,7 +45,7 @@ class ReviewPageEmpty extends StatelessWidget {
                     SizedBox(height: 30),
                     // Call to action
                     Text(
-                      "Continue à progresser : traduis et ajoute de nouveaux mots !",
+                      AppLocalizations.of(context)!.keepProgressing,
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black87,
@@ -68,7 +68,7 @@ class ReviewPageEmpty extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            "Traduire",
+                            AppLocalizations.of(context)!.translate,
                             style: TextStyle(fontSize: 16),
                           ),
                         ),
@@ -84,7 +84,7 @@ class ReviewPageEmpty extends StatelessWidget {
                             backgroundColor: Colors.orangeAccent,
                           ),
                           child: Text(
-                            "Ajouter des mots",
+                            AppLocalizations.of(context)!.add,
                             style: TextStyle(fontSize: 16),
                           ),
                         ),
@@ -113,8 +113,8 @@ class ReviewPageEmpty extends StatelessWidget {
                         padding:
                             EdgeInsets.symmetric(horizontal: 20 * GOLDEN_NUMBER)
                                 .copyWith(bottom: 20 * GOLDEN_NUMBER),
-                        child: const Text(
-                          "Fonctionnalité cool à venir ...",
+                        child: Text(
+                          AppLocalizations.of(context)!.coolAIFeatureComingSoon,
                           style: TextStyle(
                             fontSize: 16 * GOLDEN_NUMBER,
                             color: Colors.black87,

@@ -1,4 +1,8 @@
 {
+  "congratulationsOnYourWork": "Bravo pour ton travail !",
+  "noCardsToReview": "Tu n'as plus de carte à réviser pour le moment.",
+  "keepProgressing": "Continue à progresser : traduis et ajoute de nouveaux mots !",
+  "coolAIFeatureComingSoon": "Fonctionnalité IA cool à venir ...",
   "chooseYourLanguagePair": "Choisissez votre couple de langues",
   "sourceLanguage": "Langue source",
   "targetLanguage": "Langue cible",
@@ -82,7 +86,6 @@
   "editTheRow": "Modifier la ligne",
   "remove": "Supprimer",
   "edit": "Modifier",
-  "noCardToReviewToday": "Pas de carte à réviser aujourd'hui",
   "displayAnswer": "Afficher la réponse",
   "again": "Encore",
   "hard": "Difficile",
