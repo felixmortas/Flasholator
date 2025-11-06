@@ -1,3 +1,4 @@
+import 'package:flasholator/features/shared/widgets/eraser_button.dart';
 import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -179,72 +180,79 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final localizedLanguageMap = LANGUAGE_KEYS.map(
-      (code, key) => MapEntry(
-          code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
-    );
-    final isSubscribed = ref.watch(isSubscribedProvider);
+@override
+Widget build(BuildContext context) {
+  final localizedLanguageMap = LANGUAGE_KEYS.map(
+    (code, key) => MapEntry(
+        code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
+  );
+  final isSubscribed = ref.watch(isSubscribedProvider);
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-      return GridBackground(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (isSubscribed)
-                ValueListenableBuilder<bool>(
-                  valueListenable: widget.isAllLanguagesToggledNotifier,
-                  builder: (context, value, child) {
-                    return SwitchListTile(
-                      value: value, // ref.watch(notificationsProvider),
-                      onChanged: (bool newValue) {
-                        updateSwitchState(newValue);
-                      },
-                      title: const Text("Sélectionner toutes les langues"),
+  return LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) {
+    return GridBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (isSubscribed)
+              ValueListenableBuilder<bool>(
+                valueListenable: widget.isAllLanguagesToggledNotifier,
+                builder: (context, value, child) {
+                  return SwitchListTile(
+                    value: value, // ref.watch(notificationsProvider),
+                    onChanged: (bool newValue) {
+                      updateSwitchState(newValue);
+                    },
+                    title: const Text("Sélectionner toutes les langues"),
+                  );
+                },
+              ),
+            Expanded(
+              child: ValueListenableBuilder<bool>(
+                valueListenable: widget.isAllLanguagesToggledNotifier,
+                builder: (context, isAllLanguagesToggled, child) {
+                  if (isAllLanguagesToggled) {
+                    return AllLanguagesTable(
+                      data: data,
+                      onCellTap:
+                          _openEditFlashcardPopup, // Modified to pass only rowData
+                      languages: localizedLanguageMap,
                     );
-                  },
-                ),
-              Expanded(
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: widget.isAllLanguagesToggledNotifier,
-                  builder: (context, isAllLanguagesToggled, child) {
-                    if (isAllLanguagesToggled) {
-                      return AllLanguagesTable(
-                        data: data,
-                        onCellTap:
-                            _openEditFlashcardPopup, // Modified to pass only rowData
-                        languages: localizedLanguageMap,
-                      );
-                    } else {
-                      return CoupleLanguagesTable(
-                        data: data,
-                        sourceLanguage: localizedLanguageMap[
-                            languageSelection.sourceLanguage]!,
-                        targetLanguage: localizedLanguageMap[
-                            languageSelection.targetLanguage]!,
-        
-                        onCellTap:
-                            _openEditFlashcardPopup, // Modified to pass only rowData
-                      );
-                    }
-                  },
-                ),
+                  } else {
+                    return CoupleLanguagesTable(
+                      data: data,
+                      sourceLanguage: localizedLanguageMap[
+                          languageSelection.sourceLanguage]!,
+                      targetLanguage: localizedLanguageMap[
+                          languageSelection.targetLanguage]!,
+      
+                      onCellTap:
+                          _openEditFlashcardPopup, // Modified to pass only rowData
+                    );
+                  }
+                },
               ),
-              ElevatedButton(
+            ),
+            SizedBox(
+              height: 50,
+              child: EraserButton(
                 onPressed: _checkIfCanAddCard,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: Text(AppLocalizations.of(context)!.addAWord),
+                label: AppLocalizations.of(context)!.addAWord,
+                gradientColors: [
+                  Colors.blue.shade300,
+                  Colors.blue.shade200,
+                ],
+                iconColor: Colors.white,
+                textColor: Colors.white,
+                isDisabled: false,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    });
-  }
+      ),
+    );
+  });
+}
 }
