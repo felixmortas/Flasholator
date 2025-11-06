@@ -1,3 +1,4 @@
+import 'package:flasholator/features/shared/widgets/eraser_button.dart';
 import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
@@ -57,36 +58,27 @@ class ReviewPageEmpty extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton(
+                        EraserButton(
                           onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)!.translate,
-                            style: TextStyle(fontSize: 16),
-                          ),
+                          label: AppLocalizations.of(context)!.translate,
+                          gradientColors: [
+                            Colors.pink.shade200,
+                            Colors.pink.shade100,
+                          ],
+                          iconColor: Colors.pink.shade700,
+                          textColor: Colors.pink.shade900,
+                          isDisabled: false,
                         ),
-                        ElevatedButton(
+                        EraserButton(
                           onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            backgroundColor: Colors.orangeAccent,
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)!.add,
-                            style: TextStyle(fontSize: 16),
-                          ),
+                          label: AppLocalizations.of(context)!.add,
+                          gradientColors: [
+                            Colors.blue.shade200,
+                            Colors.blue.shade100,
+                          ],
+                          iconColor: Colors.blue.shade700,
+                          textColor: Colors.blue.shade900,
+                          isDisabled: false,
                         ),
                       ],
                     ),

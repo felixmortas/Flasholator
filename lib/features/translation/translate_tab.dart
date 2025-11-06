@@ -1,3 +1,4 @@
+import 'package:flasholator/features/shared/widgets/eraser_button.dart';
 import 'package:flasholator/features/shared/widgets/paste_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -485,7 +486,7 @@ class _ActionButtons extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: _EraserButton(
+          child: EraserButton(
             onPressed: isTranslateDisabled ? null : onTranslate,
             label: AppLocalizations.of(context)!.translate,
             gradientColors: [
@@ -499,15 +500,15 @@ class _ActionButtons extends StatelessWidget {
         ),
         const SizedBox(width: 16.0),
         Expanded(
-          child: _EraserButton(
+          child: EraserButton(
             onPressed: isAddDisabled ? null : onAdd,
             label: AppLocalizations.of(context)!.add,
             gradientColors: [
-              Colors.pink.shade200,
-              Colors.pink.shade100,
+              Colors.blue.shade200,
+              Colors.blue.shade100,
             ],
-            iconColor: Colors.pink.shade700,
-            textColor: Colors.pink.shade900,
+            iconColor: Colors.blue.shade700,
+            textColor: Colors.blue.shade900,
             isDisabled: isAddDisabled,
           ),
         ),
@@ -516,65 +517,3 @@ class _ActionButtons extends StatelessWidget {
   }
 }
 
-class _EraserButton extends StatelessWidget {
-  final VoidCallback? onPressed;
-  final String label;
-  final List<Color> gradientColors;
-  final Color iconColor;
-  final Color textColor;
-  final bool isDisabled;
-
-  const _EraserButton({
-    required this.onPressed,
-    required this.label,
-    required this.gradientColors,
-    required this.iconColor,
-    required this.textColor,
-    this.isDisabled = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        // Dégradé de couleur pastel comme une gomme
-        gradient: isDisabled
-            ? LinearGradient(
-                colors: [
-                  Colors.grey.shade300,
-                  Colors.grey.shade200,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : LinearGradient(
-                colors: gradientColors,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-        // Bordure arrondie douce
-        borderRadius: BorderRadius.circular(16),
-        
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            alignment: Alignment.center,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDisabled ? Colors.grey.shade500 : textColor,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
