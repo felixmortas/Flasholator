@@ -96,6 +96,7 @@ class ReviewPageEmpty extends StatelessWidget {
                             fontSize: 16 * GOLDEN_NUMBER,
                             color: Colors.black87,
                             height: 1.4,
+                            fontFamily: 'MomoSignature',
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -188,13 +189,13 @@ class ReviewPageEmpty extends StatelessWidget {
                     // Titre (première phrase)
                     Text(
                       title,
-                      style: GoogleFonts.poppins(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
-                        letterSpacing: 0.3,
-                        height: 1.3,
-                      ),
+                      style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.3,
+                            fontFamily: 'MomoSignature',
+                            height: 1.3,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),

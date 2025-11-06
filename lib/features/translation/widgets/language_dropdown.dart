@@ -1,7 +1,6 @@
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class LanguageDropdown extends StatelessWidget {
   final String selectedLanguage;
@@ -104,11 +103,12 @@ class LanguageDropdown extends StatelessWidget {
                         child: Text(
                           AppLocalizations.of(context)!
                               .getTranslatedLanguageName(entry.key),
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
+                          style: const TextStyle(
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade800,
+                            color: Color(0xFF424242),
                             letterSpacing: 0.5,
+                            fontFamily: 'MomoSignature',
                           ),
                         ),
                       );
@@ -133,14 +133,13 @@ class LanguageDropdown extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: isDisabled 
                                 ? Colors.grey.shade400 
                                 : Colors.grey.shade800,
                             letterSpacing: 0.5,
-                            // Police sympa
-                            fontFamily: 'Poppins',
+                            fontFamily: 'MomoSignature',
                           ),
                         ),
                       ),
