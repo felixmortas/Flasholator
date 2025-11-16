@@ -253,16 +253,19 @@ Widget build(BuildContext context) {
             ),
             SizedBox(
               height: 50,
-              child: EraserButton(
-                onPressed: _checkIfCanAddCard,
-                label: AppLocalizations.of(context)!.addAWord,
-                gradientColors: [
-                  Colors.blue.shade300,
-                  Colors.blue.shade200,
-                ],
-                iconColor: Colors.white,
-                textColor: Colors.white,
-                isDisabled: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: EraserButton(
+                  onPressed: _checkIfCanAddCard,
+                  label: AppLocalizations.of(context)!.addAWord,
+                  gradientColors: [
+                    Colors.blue.shade300,
+                    Colors.blue.shade200,
+                  ],
+                  iconColor: Colors.white,
+                  textColor: Colors.white,
+                  isDisabled: false,
+                ),
               ),
             ),
           ],
