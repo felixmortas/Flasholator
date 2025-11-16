@@ -274,11 +274,8 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                       ),
                     ),
                                       
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: SwitchLangButton(
-                        onPressed: _swapContent,
-                      ),
+                    SwitchLangButton(
+                      onPressed: _swapContent,
                     ),
                     Expanded(
                       child: LanguageDropdown(

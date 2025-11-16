@@ -104,7 +104,7 @@ class LanguageDropdown extends StatelessWidget {
                           AppLocalizations.of(context)!
                               .getTranslatedLanguageName(entry.key),
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF424242),
                             letterSpacing: 0.5,
@@ -133,7 +133,7 @@ class LanguageDropdown extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: isDisabled 
                                 ? Colors.grey.shade400 
