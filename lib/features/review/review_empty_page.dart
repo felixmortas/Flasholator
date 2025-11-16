@@ -80,7 +80,7 @@ class ReviewPageEmpty extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: 100,
-                  maxHeight: screenHeight * 0.333,
+                  maxHeight: screenHeight * 0.2,
                 ),
                 child: BottomBlock(
                   showDragHandle: true,
