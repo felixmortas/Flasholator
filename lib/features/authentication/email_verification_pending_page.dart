@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/style/grid_background_painter.dart';
 
 class EmailVerificationPendingPage extends ConsumerStatefulWidget {
   const EmailVerificationPendingPage({super.key});
@@ -46,7 +47,7 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
       if (await userManager.isEmailVerified()) {
         if (mounted) {
           await userManager.updateUser({'canTranslate': true});
-          Navigator.pushReplacementNamed(context, "/"); // Retour vers AuthGate
+          Navigator.pushReplacementNamed(context, "/");
         }
       } else {
         setState(() => message = AppLocalizations.of(context)!.yourAddressHasNotYetBeenVerified);
@@ -64,43 +65,55 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.emailVerification)),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(AppLocalizations.of(context)!.aVerificationEmailHasBeenSentTo,
-                style: Theme.of(context).textTheme.bodyMedium),
-            Text(userManager.getUserEmail(),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 20),
-            if (message != null)
-              Text(
-                message!,
-                style: TextStyle(
-                  color: message!.contains(AppLocalizations.of(context)!.error) ? Colors.red : Colors.green,
-                ),
+      body: GridBackground(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(AppLocalizations.of(context)!.aVerificationEmailHasBeenSentTo,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center),
+                  const SizedBox(height: 8),
+                  Text(userManager.getUserEmail(),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.center),
+                  const SizedBox(height: 20),
+                  if (message != null)
+                    Text(
+                      message!,
+                      style: TextStyle(
+                        color: message!.contains(AppLocalizations.of(context)!.error) ? Colors.red : Colors.green,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: isSending ? null : resendVerificationEmail,
+                    child: isSending
+                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        : Text(AppLocalizations.of(context)!.resendEmail),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: isChecking ? null : checkVerificationStatus,
+                    child: isChecking
+                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        : Text(AppLocalizations.of(context)!.iHaveConfirmedMyEmail),
+                  ),
+                  const SizedBox(height: 30),
+                  TextButton(
+                    onPressed: () => userManager.signOut(),
+                    child: Text(AppLocalizations.of(context)!.logOut),
+                  ),
+                ],
               ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: isSending ? null : resendVerificationEmail,
-              child: isSending
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text(AppLocalizations.of(context)!.resendEmail),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: isChecking ? null : checkVerificationStatus,
-              child: isChecking
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text(AppLocalizations.of(context)!.iHaveConfirmedMyEmail),
-            ),
-            const SizedBox(height: 30),
-            TextButton(
-              onPressed: () => userManager.signOut(),
-              child: Text(AppLocalizations.of(context)!.logOut),
-            ),
-          ],
+          ),
         ),
       ),
     );
