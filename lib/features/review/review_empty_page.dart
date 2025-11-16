@@ -1,10 +1,12 @@
-import 'package:flasholator/features/shared/widgets/eraser_button.dart';
-import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
-import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
-import 'package:flasholator/config/constants.dart';
-import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/features/shared/widgets/eraser_button.dart';
+import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
+import 'package:flasholator/features/shared/widgets/big_post_it.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/style/grid_background_painter.dart';
 
 class ReviewPageEmpty extends StatelessWidget {
   const ReviewPageEmpty({Key? key}) : super(key: key);
@@ -27,8 +29,7 @@ class ReviewPageEmpty extends StatelessWidget {
                   children: [
                     const SizedBox(height: 30),
                     // Un seul gros post-it avec les 3 textes
-                    _buildBigPostIt(
-                      context,
+                    BigPostIt(
                       title: AppLocalizations.of(context)!.congratulationsOnYourWork,
                       subtitle: AppLocalizations.of(context)!.noCardsToReview,
                       callToAction: AppLocalizations.of(context)!.keepProgressing,
