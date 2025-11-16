@@ -40,7 +40,6 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   int? overrideQuality; // null = normal behavior
 
   LanguageSelection languageSelection = LanguageSelection.getInstance();
-  bool isDue = false;
   String _questionText = "";
   String _responseText = "";
   String _questionLang = "";
@@ -68,43 +67,41 @@ class ReviewTabState extends ConsumerState<ReviewTab> with TickerProviderStateMi
   }
 
   void updateQuestionText(bool isAllLanguagesToggledNotifier) async {
-    // Get the due flashcards from the database and set the question text and translated text
-    List<Flashcard> dueFlashcards =
-        await widget.flashcardsService.dueFlashcards();
+// Get the due flashcards from the database and set the question text and translated text    
+    List<Flashcard> fetchedCards = await widget.flashcardsService.dueFlashcards();
 
-    if (dueFlashcards.isNotEmpty) {
+    if (isAllLanguagesToggledNotifier) {
       // Filter dueFlashcards based on languageSelection
-      if (isAllLanguagesToggledNotifier) {
-        dueFlashcards = dueFlashcards.toList();
-      } else {
-        dueFlashcards = dueFlashcards
-            .where((flashcard) =>
-                (flashcard.sourceLang == languageSelection.sourceLanguage &&
-                    flashcard.targetLang == languageSelection.targetLanguage) ||
-                (flashcard.sourceLang == languageSelection.targetLanguage &&
-                    flashcard.targetLang == languageSelection.sourceLanguage))
-            .toList();
-      }
-        _currentFlashcard = dueFlashcards[0];
-        setState(() {
-          isResponseHidden = true;
-          isDue = true;
-          _questionText = _currentFlashcard.front;
-          _questionLang = _currentFlashcard.sourceLang;
-          _responseText = _currentFlashcard.back;
-          _responseLang = _currentFlashcard.targetLang;
-          overrideQuality = null;
-          editingController.clear();
-        });
+      fetchedCards = fetchedCards.toList();
     } else {
-      setState(() {
+      fetchedCards = fetchedCards
+          .where((flashcard) =>
+              (flashcard.sourceLang == languageSelection.sourceLanguage &&
+                  flashcard.targetLang == languageSelection.targetLanguage) ||
+              (flashcard.sourceLang == languageSelection.targetLanguage &&
+                  flashcard.targetLang == languageSelection.sourceLanguage))
+          .toList();
+    }
+
+    setState(() {
+      dueFlashcards = fetchedCards; // Stocker la liste
+      
+      if (dueFlashcards.isNotEmpty) {
+        _currentFlashcard = dueFlashcards[0];
+        isResponseHidden = true;
+        _questionText = _currentFlashcard.front;
+        _questionLang = _currentFlashcard.sourceLang;
+        _responseText = _currentFlashcard.back;
+        _responseLang = _currentFlashcard.targetLang;
+        overrideQuality = null;
+        editingController.clear();
+      } else {
         _questionText = AppLocalizations.of(context)!.noCardsToReview;
         _questionLang = "";
         isResponseHidden = true;
-        isDue = false;
         overrideQuality = null;
-      });
-    }
+      }
+    });
   }
 
   void _onQualityButtonPress(int quality) async {
@@ -180,7 +177,7 @@ Widget build(BuildContext context) {
   final isSubscribed = ref.watch(isSubscribedProvider);
   final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-  if (!isDue) {
+  if (dueFlashcards.isEmpty) {
     return const ReviewPageEmpty();
   }
 
