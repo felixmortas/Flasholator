@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/features/authentication/register_page.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/style/grid_background_painter.dart'; // Ajoutez cet import
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -37,28 +38,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.logIn)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            if (errorMessage != null) Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-            TextField(controller: emailController, decoration: InputDecoration(labelText:AppLocalizations.of(context)!.email)),
-            TextField(controller: passwordController, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password), obscureText: true),
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
-            TextButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage(
-                initialEmail: emailController.text.trim(),
-                initialPassword: passwordController.text,
-
-              ))),
-              child: Text(AppLocalizations.of(context)!.signUp),
-            ),
-            TextButton(
-              onPressed: () => userManager.sendPasswordResetEmail(emailController.text.trim()),
-              child: Text(AppLocalizations.of(context)!.forgotYourPassword),
-            ),
-          ],
+      body: GridBackground( // Ajout du background cahier ici
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              if (errorMessage != null) Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+              TextField(controller: emailController, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email)),
+              const SizedBox(height: 16),
+              TextField(controller: passwordController, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password), obscureText: true),
+              const SizedBox(height: 16),
+              ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
+              TextButton(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage(
+                  initialEmail: emailController.text.trim(),
+                  initialPassword: passwordController.text,
+                ))),
+                child: Text(AppLocalizations.of(context)!.signUp),
+              ),
+              TextButton(
+                onPressed: () => userManager.sendPasswordResetEmail(emailController.text.trim()),
+                child: Text(AppLocalizations.of(context)!.forgotYourPassword),
+              ),
+            ],
+          ),
         ),
       ),
     );
