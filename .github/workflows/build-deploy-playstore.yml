@@ -8,8 +8,7 @@ permissions:
   packages: write
 
 env:
-  BUILD_NUMBER: 16
-  BUILD_NAME: 0.5.4
+  BUILD_NAME: 1.0.0
   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
   STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
@@ -42,8 +41,6 @@ jobs:
     - name: Build AAB
       run: |
         flutter build appbundle --release \
-          --build-number=${{ env.BUILD_NUMBER }} \
-          --build-name=${{ env.BUILD_NAME }}
         
     - name: Create Release
       uses: ncipollo/release-action@v1
