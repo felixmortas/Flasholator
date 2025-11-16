@@ -197,17 +197,33 @@ Widget build(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (isSubscribed)
-              ValueListenableBuilder<bool>(
-                valueListenable: widget.isAllLanguagesToggledNotifier,
-                builder: (context, value, child) {
-                  return SwitchListTile(
-                    value: value, // ref.watch(notificationsProvider),
-                    onChanged: (bool newValue) {
-                      updateSwitchState(newValue);
-                    },
-                    title: const Text("Sélectionner toutes les langues"),
-                  );
-                },
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: widget.isAllLanguagesToggledNotifier,
+                  builder: (context, value, child) {
+                    return EraserButton(
+                      onPressed: () {
+                        updateSwitchState(!value);
+                      },
+                      label: value 
+                          ? "Afficher un seul couple de langues" 
+                          : "Afficher tous les couples de langues",
+                      gradientColors: value
+                          ? [
+                Colors.pink.shade300,
+                Colors.pink.shade200,
+                            ]
+                          : [
+                Colors.blue.shade300,
+                Colors.blue.shade200,
+                            ],
+                      iconColor: value ? Colors.pink.shade700 : Colors.blue.shade700,
+                      textColor: value ? Colors.pink.shade800 : Colors.blue.shade800,
+                      isDisabled: false,
+                    );
+                  },
+                ),
               ),
             Expanded(
               child: ValueListenableBuilder<bool>(
