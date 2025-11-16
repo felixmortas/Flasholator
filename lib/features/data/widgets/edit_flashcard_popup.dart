@@ -1,3 +1,4 @@
+import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/config/constants.dart';
@@ -294,7 +295,9 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
               items: LANGUAGE_KEYS.keys.map((String key) {
                 return DropdownMenuItem<String>(
                   value: key,
-                  child: Text(LANGUAGE_KEYS[key]!),
+                  child: Text(        
+                    AppLocalizations.of(context)!.getTranslatedLanguageName(key),
+                  ),
                 );
               }).toList(),
             ),
