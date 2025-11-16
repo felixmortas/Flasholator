@@ -1,6 +1,7 @@
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flasholator/config/constants.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class EditFlashcardPopup extends StatefulWidget {
   final Map<dynamic, dynamic> row;
@@ -39,16 +40,16 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
   }
 
   void _setConfirmButton(String text) {
-    if(text=='edit') {
+    if (text == 'edit') {
       widget.onEdit!({
         'sourceLang': _sourceLanguage,
         'front': _word,
         'back': _translation,
         'targetLang': _targetLanguage,
       }, widget.row);
-    } else if(text=='delete') {
+    } else if (text == 'delete') {
       widget.onDelete!(widget.row);
-    } else if(text=='add') {
+    } else if (text == 'add') {
       widget.onAdd!({
         'sourceLang': _sourceLanguage,
         'front': _word,
@@ -58,45 +59,190 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
     }
   }
 
+  Color _getDarkerShade(Color color, double opacity) {
+    final hsl = HSLColor.fromColor(color);
+    final darkened = hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0));
+    return darkened.toColor().withOpacity(opacity);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.isEditPopup ? AppLocalizations.of(context)!.editTheRow : 'Ajouter une nouvelle carte'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildInputRow(
-            _sourceLanguage,
-            (value) => _sourceLanguage = value!,
-            _word,
-            (value) => _word = value,
-            widget.languageDropdownEnabled,
+    final postItColor = Colors.yellow.shade100;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Transform(
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001)
+          ..rotateX(-0.01)
+          ..rotateZ(-0.02),
+        alignment: Alignment.center,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 450,
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
           ),
-          _buildInputRow(
-            _targetLanguage,
-            (value) => _targetLanguage = value!,
-            _translation,
-            (value) => _translation = value,
-            widget.languageDropdownEnabled,
+          decoration: BoxDecoration(
+            color: postItColor,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+                spreadRadius: 0,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 8,
+                offset: const Offset(3, 4),
+                spreadRadius: -1,
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Bande adhésive en haut
+              Container(
+                height: 16,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      _getDarkerShade(postItColor, 0.4),
+                      _getDarkerShade(postItColor, 0.25),
+                      _getDarkerShade(postItColor, 0.1),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    topRight: Radius.circular(4),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _getDarkerShade(postItColor, 0.15),
+                      blurRadius: 1,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+              ),
+              // Contenu du post-it
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Titre
+                        Text(
+                          widget.isEditPopup
+                              ? AppLocalizations.of(context)!.editTheRow
+                              : 'Ajouter une nouvelle carte',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.3,
+                            fontFamily: 'MomoSignature',
+                            height: 1.3,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        // Champs de saisie
+                        _buildInputRow(
+                          _sourceLanguage,
+                          (value) => _sourceLanguage = value!,
+                          _word,
+                          (value) => _word = value,
+                          widget.languageDropdownEnabled,
+                          postItColor,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildInputRow(
+                          _targetLanguage,
+                          (value) => _targetLanguage = value!,
+                          _translation,
+                          (value) => _translation = value,
+                          widget.languageDropdownEnabled,
+                          postItColor,
+                        ),
+                        const SizedBox(height: 24),
+                        // Boutons d'action
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildPostItButton(
+                              context,
+                              label: widget.isEditPopup
+                                  ? AppLocalizations.of(context)!.remove
+                                  : 'Annuler',
+                              onPressed: () {
+                                _setConfirmButton(
+                                    widget.isEditPopup ? 'delete' : 'cancel');
+                                Navigator.of(context).pop();
+                              },
+                              isPrimary: false,
+                              postItColor: postItColor,
+                            ),
+                            _buildPostItButton(
+                              context,
+                              label: widget.isEditPopup ? 'Modifier' : 'Ajouter',
+                              onPressed: () {
+                                _setConfirmButton(
+                                    widget.isEditPopup ? 'edit' : 'add');
+                                Navigator.of(context).pop();
+                              },
+                              isPrimary: true,
+                              postItColor: postItColor,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            _setConfirmButton(widget.isEditPopup ? 'delete' : 'cancel');
-            Navigator.of(context).pop();
-          },
-          child: Text(widget.isEditPopup ? AppLocalizations.of(context)!.remove : 'Annuler'),
+    );
+  }
+
+  Widget _buildPostItButton(
+    BuildContext context, {
+    required String label,
+    required VoidCallback onPressed,
+    required bool isPrimary,
+    required Color postItColor,
+  }) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        backgroundColor: isPrimary
+            ? _getDarkerShade(postItColor, 0.9)
+            : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: BorderSide(
+            color: _getDarkerShade(postItColor, 0.3),
+            width: 1,
+          ),
         ),
-        TextButton(
-          onPressed: () {
-            _setConfirmButton(widget.isEditPopup ? 'edit' : 'add');
-            Navigator.of(context).pop();
-          },
-          child: Text(widget.isEditPopup ? 'Modifier' : 'Ajouter'),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          fontWeight: isPrimary ? FontWeight.w600 : FontWeight.w500,
+          color: Colors.grey.shade800,
         ),
-      ],
+      ),
     );
   }
 
@@ -106,17 +252,35 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
     String textValue,
     Function(String) onTextChanged,
     bool languageDropdownEnabled,
+    Color postItColor,
   ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: _getDarkerShade(postItColor, 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
         children: [
-          const SizedBox(width: 8.0),
-          Flexible(
-            flex: 2,
+          // Dropdown de langue
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(4),
+            ),
             child: DropdownButton<String>(
               isExpanded: true,
               value: languageValue,
+              underline: const SizedBox(),
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.grey.shade800,
+              ),
               onChanged: languageDropdownEnabled
                   ? (String? newValue) {
                       if (newValue != null) {
@@ -135,12 +299,26 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
               }).toList(),
             ),
           ),
-          const SizedBox(width: 8.0),
-          Flexible(
-            flex: 3,
-            child: TextField(
-              controller: TextEditingController(text: textValue),
-              onChanged: onTextChanged,
+          const SizedBox(height: 8),
+          // Champ de texte
+          TextField(
+            controller: TextEditingController(text: textValue),
+            onChanged: onTextChanged,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              color: Colors.grey.shade800,
+            ),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white.withOpacity(0.7),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
           ),
         ],
