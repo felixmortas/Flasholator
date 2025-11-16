@@ -1,4 +1,3 @@
-import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class AllLanguagesTable extends StatelessWidget {

@@ -100,6 +100,12 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @passwordFormatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password format.'**
+  String get passwordFormatError;
+
   /// No description provided for @congratulationsOnYourWork.
   ///
   /// In en, this message translates to:

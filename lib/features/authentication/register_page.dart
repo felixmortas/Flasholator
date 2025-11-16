@@ -36,7 +36,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
   }
 
-
   Future<void> register() async {
     final username = usernameController.text.trim();
     final email = emailController.text.trim();
@@ -49,15 +48,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
 
     if (password != confirmPassword) {
-      setState(() => errorMessage = "Les mots de passe ne correspondent pas.");
+      setState(() => errorMessage = AppLocalizations.of(context)!.passwordsDoNotMatch);
       return;
     }
 
-    // Password must be at least 8 chars, contain an uppercase, a lowercase, a digit and a special char
-    final passwordPattern = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$');
+    final passwordPattern = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}');
     if (!passwordPattern.hasMatch(password)) {
-      setState(() => errorMessage =
-      'Format du mot de passe incorrect.');
+      setState(() => errorMessage = AppLocalizations.of(context)!.passwordFormatError);
       return;
     }
 
@@ -72,7 +69,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
       setState(() => isLoading = false);
 
-      // Message de succès et retour à la page de connexion
       if (mounted) {
         showDialog(
           context: context,
@@ -82,10 +78,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Fermer la boîte de dialogue
-                  Navigator.pop(context); // Retour à la page login
+                  Navigator.pop(context);
+                  Navigator.pop(context);
                 },
-                child: const Text("OK"),
+                child: Text(AppLocalizations.of(context)!.ok),
               )
             ],
           ),
@@ -143,7 +139,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               ),
               const SizedBox(height: 20),
               Text(
-                'Le mot de passe doit comporter au moins 8 caractères, inclure une majuscule, un chiffre et un caractère spécial.',
+                AppLocalizations.of(context)!.passwordRequirements,
                 style: TextStyle(fontSize: 12, color: Colors.grey[700]),
               ),
               const SizedBox(height: 20),

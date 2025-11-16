@@ -25,10 +25,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       await userManager.login(emailController.text.trim(), passwordController.text.trim());
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      setState(() => errorMessage = e.message ?? 'Erreur de connexion');
+      setState(() => errorMessage = e.message ?? AppLocalizations.of(context)!.connectionError);
     } catch (e) {
       if (!mounted) return;
-      setState(() => errorMessage = 'Une erreur est survenue : $e');
+      setState(() => errorMessage = '${"An error occured"} : $e');
     }
   }
 

@@ -142,7 +142,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                         Text(
                           widget.isEditPopup
                               ? AppLocalizations.of(context)!.editTheRow
-                              : 'Ajouter une nouvelle carte',
+                              : AppLocalizations.of(context)!.addAWord,
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -180,7 +180,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                               context,
                               label: widget.isEditPopup
                                   ? AppLocalizations.of(context)!.remove
-                                  : 'Annuler',
+                                  : AppLocalizations.of(context)!.cancel,
                               onPressed: () {
                                 _setConfirmButton(
                                     widget.isEditPopup ? 'delete' : 'cancel');
@@ -191,7 +191,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                             ),
                             _buildPostItButton(
                               context,
-                              label: widget.isEditPopup ? 'Modifier' : 'Ajouter',
+                              label: widget.isEditPopup ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.add,
                               onPressed: () {
                                 _setConfirmButton(
                                     widget.isEditPopup ? 'edit' : 'add');

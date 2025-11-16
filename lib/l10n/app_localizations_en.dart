@@ -9,6 +9,9 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get passwordFormatError => 'Incorrect password format.';
+
+  @override
   String get congratulationsOnYourWork => 'Great job on your work!';
 
   @override

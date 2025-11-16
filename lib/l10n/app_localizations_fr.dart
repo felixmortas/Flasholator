@@ -9,6 +9,9 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get passwordFormatError => 'Format du mot de passe incorrect.';
+
+  @override
   String get congratulationsOnYourWork => 'Bravo pour ton travail !';
 
   @override

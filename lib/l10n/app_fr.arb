@@ -1,4 +1,5 @@
 {
+  "passwordFormatError": "Format du mot de passe incorrect.",
   "congratulationsOnYourWork": "Bravo pour ton travail !",
   "noCardsToReview": "Tu n'as plus de carte à réviser pour le moment.",
   "keepProgressing": "Continue à progresser : traduis et ajoute de nouveaux mots !",
