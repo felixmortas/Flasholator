@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/features/shared/widgets/eraser_button.dart';
