@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:flasholator/config/constants.dart';
@@ -183,7 +184,34 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     // TODO: implement notifications toggle
   }
   
-  void _rateApp() {}
+  void _rateApp() async {
+    final appName = Uri.encodeComponent('Flasholator');
+    Uri uri;
+
+    if (kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
+      // Open Google Play search for the app name (fallback when package id is not available)
+      uri = Uri.parse('https://play.google.com/store/apps/details?id=com.felinx18.flasholator');
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // Open App Store search for the app name
+      uri = Uri.parse('https://apps.apple.com/search?term=$appName');
+    } else {
+      uri = Uri.parse('https://play.google.com/store/apps/details?id=com.felinx18.flasholator');
+    }
+
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.error)),
+        );
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.error)),
+      );
+    }
+  }
 
   void _openChangelog() {
   }
@@ -217,8 +245,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   onPressed: () async {
                     final Uri emailLaunchUri = Uri(
                       scheme: 'mailto',
-                      path: 'support@tonapp.com',
-                      query: 'subject=Support Profil',
+                      path: 'felix.mortas@hotmail.fr',
+                      query: 'subject=Support Flasholator',
                     );
                     if (await canLaunchUrl(emailLaunchUri)) {
                       await launchUrl(emailLaunchUri);
@@ -229,7 +257,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           
             body: SingleChildScrollView(
-            padding: EdgeInsets.all(16 * GOLDEN_NUMBER),
+            padding: const EdgeInsets.fromLTRB(25 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -243,7 +271,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    SizedBox(width: 12 * GOLDEN_NUMBER),
+                    const SizedBox(width: 12 * GOLDEN_NUMBER),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +279,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           Text(userName,
                               style: Theme.of(context).textTheme.titleMedium),
                           Text(
-                            "Utilisateur depuis ${userManager.getSignupDate()}",
+                            "Utilisateur depuis le ${DateFormat('dd/MM/yyyy').format(userManager.getSignupDate())}",
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -262,17 +290,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 16 * GOLDEN_NUMBER),
+                const SizedBox(height: 16 * GOLDEN_NUMBER),
           
                 // CTA Premium
-                ElevatedButton(
-                  onPressed: () {}, // TODO: implémenter partage
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  child: const Text("Invitez vos proches, obtenez du premium gratuitement"),
-                ),
-                SizedBox(height: 24 * GOLDEN_NUMBER),
+                // ElevatedButton(
+                //   onPressed: () {}, // TODO: implémenter partage
+                //   style: ElevatedButton.styleFrom(
+                //     minimumSize: const Size.fromHeight(50),
+                //   ),
+                //   child: const Text("Invitez vos proches, obtenez du premium gratuitement"),
+                // ),
+                // const SizedBox(height: 24 * GOLDEN_NUMBER),
           
                 // Section Stats
                 _sectionTitle("Stats"),
@@ -284,9 +312,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     );
                   }, // navigate to stats page
-                  child: Text("Statistiques"),
+                  child: const Text("Statistiques"),
                 ),
-                SizedBox(height: 24 * GOLDEN_NUMBER),
+                const SizedBox(height: 24 * GOLDEN_NUMBER),
           
                 // Section Mon Compte
                 _sectionTitle("Mon Compte"),
@@ -294,11 +322,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     action: () => _changeEmail(context)),
                 _infoRow("Mot de passe", "********",
                     action: () => _changePassword(context)),
-                SwitchListTile(
-                  value: true, // ref.watch(notificationsProvider),
-                  onChanged: (val) => _toggleNotifications(val),
-                  title: const Text("Notifications cartes à réviser"),
-                ),
+                // SwitchListTile(
+                //   value: true, // ref.watch(notificationsProvider),
+                //   onChanged: (val) => _toggleNotifications(val),
+                //   title: const Text("Notifications cartes à réviser"),
+                // ),
                 Row(
                   children: [
                     Expanded(
@@ -308,7 +336,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       SubscribeButton(onPressed: _subscribe)
                   ],
                 ),
-                SizedBox(height: 24 * GOLDEN_NUMBER),
+                const SizedBox(height: 24 * GOLDEN_NUMBER),
           
                 // Section Social
                 _sectionTitle("Social"),
@@ -317,7 +345,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   title: const Text("Noter l’app"),
                   onTap: () => _rateApp(),
                 ),
-                SizedBox(height: 24 * GOLDEN_NUMBER),
+                const SizedBox(height: 24 * GOLDEN_NUMBER),
           
                 // Section A propos
                 _sectionTitle("À propos"),
@@ -326,7 +354,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 _linkTile("CGV", _openCGV),
                 if(_showPrivacyButton)
                   _linkTile("Confidentialité", updateConsent),
-                SizedBox(height: 32 * GOLDEN_NUMBER),
+                const SizedBox(height: 32 * GOLDEN_NUMBER),
           
                 // Logout / Delete
                 ElevatedButton.icon(
@@ -371,7 +399,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
 Widget _sectionTitle(String text) {
   return Padding(
-    padding: EdgeInsets.only(bottom: 8 * GOLDEN_NUMBER),
+    padding: const EdgeInsets.only(bottom: 8 * GOLDEN_NUMBER),
     child: Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 }
