@@ -42,22 +42,26 @@ class ReviewPageEmpty extends StatelessWidget {
                       children: [
                         Expanded(
                           child: EraserButton(
-                            onPressed: () {},
-                            label: AppLocalizations.of(context)!.translate,
-                            gradientColors: [
-                              Colors.pink.shade200,
-                              Colors.pink.shade100,
-                            ],
-                            iconColor: Colors.pink.shade700,
-                            textColor: Colors.pink.shade900,
-                            isDisabled: false,
+                          onPressed: () {
+                            DefaultTabController.of(context).animateTo(0);
+                          },
+                          label: AppLocalizations.of(context)!.translate,
+                          gradientColors: [
+                            Colors.pink.shade200,
+                            Colors.pink.shade100,
+                          ],
+                          iconColor: Colors.pink.shade700,
+                          textColor: Colors.pink.shade900,
+                          isDisabled: false,
                           ),
                         ),
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: EraserButton(
-                            onPressed: () {},
-                            label: AppLocalizations.of(context)!.add,
+                          onPressed: () {
+                            DefaultTabController.of(context).animateTo(2);
+                          },
+                          label: AppLocalizations.of(context)!.add,
                             gradientColors: [
                               Colors.blue.shade200,
                               Colors.blue.shade100,
