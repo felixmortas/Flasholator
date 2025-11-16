@@ -10,7 +10,6 @@ import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
-import 'package:flasholator/features/shared/dialogs/cancel_dialog.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
@@ -218,22 +217,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         fontSize: 16.0,
       );
     }
-
-    // open cancel dialog
-    CancelDialog.show(
-      context,
-      onCancel: () {
-        widget.flashcardsService
-            .removeFlashcard(_wordToTranslate, _translatedWord);
-        // close the dialog
-        Navigator.of(context).pop();
-        setState(() {
-          isTranslateButtonDisabled = true;
-          isAddButtonDisabled = false;
-        });
-        _updateButtonState();
-      },
-    );
   }
 
   @override
