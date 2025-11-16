@@ -22,9 +22,6 @@ import 'package:flasholator/features/shared/dialogs/language_selection_popup.dar
 import 'package:flasholator/features/shared/widgets/ad_banner_widget.dart';
 import 'package:flasholator/features/profile/profile_page.dart';
 
-import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
-
-
 class HomePage extends ConsumerStatefulWidget {
 
   const HomePage({
@@ -210,7 +207,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final userManager = ref.read(userManagerProvider);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -224,21 +220,27 @@ class _HomePageState extends ConsumerState<HomePage> {
               )
             },
           ),
-          title: const Text('Flasholator'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.money),
-              onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (_) => MoneyPage()),
-                // );
-              },
+          title: const Text(
+            'Flasholator',
+            style: TextStyle(
+              fontFamily: 'MomoSignature',
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,  // Optionnel
             ),
-            SubscribeButton(
-              onPressed: () => userManager.subscribeUser(),
-            ),
-          ],
+          ),
+          centerTitle: true,
+          // actions: [
+            // IconButton(
+            //   icon: const Icon(Icons.money),
+            //   onPressed: () {
+            //     // Navigator.push(
+            //     //   context,
+            //     //   MaterialPageRoute(builder: (_) => MoneyPage()),
+            //     // );
+            //   },
+            // ),
+          // ],
         ),
         body: Column(
           children: [
