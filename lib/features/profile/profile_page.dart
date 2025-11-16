@@ -19,7 +19,6 @@ import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
-
   final FlashcardsService flashcardsService;
 
   const ProfilePage({
@@ -35,7 +34,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _showPrivacyButton = false;
   late final UserManager userManager;
 
-  @override
+    @override
   void initState() {
     super.initState();
     userManager = ref.read(userManagerProvider);
@@ -238,7 +237,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         return GridBackground(
           child: Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: AppBar(title: Text(AppLocalizations.of(context)!.myProfile),
+            appBar: AppBar(
+              title: Text(AppLocalizations.of(context)!.myProfile),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.help_outline),
@@ -255,44 +255,46 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
               ],
             ),
-          
             body: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(25 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Identité
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 24,
-                      child: Text(
-                        userName[0],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+              padding: const EdgeInsets.fromLTRB(25 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        child: Text(
+                          userName[0],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12 * GOLDEN_NUMBER),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(userName,
-                              style: Theme.of(context).textTheme.titleMedium),
-                          Text(
-                            "Utilisateur depuis le ${DateFormat('dd/MM/yyyy').format(userManager.getSignupDate())}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Colors.grey),
-                          ),
-                        ],
+                      const SizedBox(width: 12 * GOLDEN_NUMBER),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userName,
+                              style: Theme.of(context).textTheme.titleMedium
+                            ),
+                            Text(
+                              AppLocalizations.of(context)!.userSince(
+                                DateFormat('dd/MM/yyyy').format(userManager.getSignupDate())
+                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: Colors.grey),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16 * GOLDEN_NUMBER),
-          
-                // CTA Premium
+                    ],
+                  ),
+                  const SizedBox(height: 16 * GOLDEN_NUMBER),
+
+                                  // CTA Premium
                 // ElevatedButton(
                 //   onPressed: () {}, // TODO: implémenter partage
                 //   style: ElevatedButton.styleFrom(
@@ -303,81 +305,75 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 // const SizedBox(height: 24 * GOLDEN_NUMBER),
           
                 // Section Stats
-                _sectionTitle("Stats"),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => StatsPage(flashcardsService: widget.flashcardsService),
-                      ),
-                    );
-                  }, // navigate to stats page
-                  child: const Text("Statistiques"),
-                ),
-                const SizedBox(height: 24 * GOLDEN_NUMBER),
-          
-                // Section Mon Compte
-                _sectionTitle("Mon Compte"),
-                _infoRow("Email", userManager.getUserEmail(),
-                    action: () => _changeEmail(context)),
-                _infoRow("Mot de passe", "********",
-                    action: () => _changePassword(context)),
+
+                  _sectionTitle(AppLocalizations.of(context)!.stats),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => StatsPage(flashcardsService: widget.flashcardsService),
+                        ),
+                      );
+                    },
+                    child: Text(AppLocalizations.of(context)!.statistics),
+                  ),
+                  const SizedBox(height: 24 * GOLDEN_NUMBER),
+                  _sectionTitle(AppLocalizations.of(context)!.myAccount),
+                  _infoRow(AppLocalizations.of(context)!.email, userManager.getUserEmail(),
+                      action: () => _changeEmail(context)),
+                  _infoRow(AppLocalizations.of(context)!.password, "********",
+                      action: () => _changePassword(context)),
                 // SwitchListTile(
                 //   value: true, // ref.watch(notificationsProvider),
                 //   onChanged: (val) => _toggleNotifications(val),
                 //   title: const Text("Notifications cartes à réviser"),
                 // ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(isSubscribed ? "Abonnement : Abonné" : "Abonnement : Non abonné", style: const TextStyle(fontSize: 16)),
-                    ),
-                    if (!isSubscribed)
-                      SubscribeButton(onPressed: _subscribe)
-                  ],
-                ),
-                const SizedBox(height: 24 * GOLDEN_NUMBER),
-          
-                // Section Social
-                _sectionTitle("Social"),
-                ListTile(
-                  leading: const Icon(Icons.star_rate_outlined),
-                  title: const Text("Noter l’app"),
-                  onTap: () => _rateApp(),
-                ),
-                const SizedBox(height: 24 * GOLDEN_NUMBER),
-          
-                // Section A propos
-                _sectionTitle("À propos"),
-                _linkTile("Changelog", _openChangelog),
-                _linkTile("Mentions légales", _openMentions),
-                _linkTile("CGV", _openCGV),
-                if(_showPrivacyButton)
-                  _linkTile("Confidentialité", updateConsent),
-                const SizedBox(height: 32 * GOLDEN_NUMBER),
-          
-                // Logout / Delete
-                ElevatedButton.icon(
-                  onPressed: () => _signOut(context),
-                  icon: const Icon(Icons.logout),
-                  label: Text(AppLocalizations.of(context)!.logOut),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: () => _deleteAccount(context),
-                  icon: const Icon(Icons.delete_forever),
-                  label: Text(AppLocalizations.of(context)!.deleteMyAccount),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                ),
-              ],
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(isSubscribed ? AppLocalizations.of(context)!.subscribed : AppLocalizations.of(context)!.notSubscribed, style: const TextStyle(fontSize: 16)),
+                      ),
+                      if (!isSubscribed)
+                        SubscribeButton(onPressed: _subscribe)
+                    ],
+                  ),
+                  const SizedBox(height: 24 * GOLDEN_NUMBER),
+                  _sectionTitle(AppLocalizations.of(context)!.social),
+                  ListTile(
+                    leading: const Icon(Icons.star_rate_outlined),
+                    title: Text(AppLocalizations.of(context)!.rateTheApp),
+                    onTap: () => _rateApp(),
+                  ),
+                  const SizedBox(height: 24 * GOLDEN_NUMBER),
+                  _sectionTitle(AppLocalizations.of(context)!.about),
+                  _linkTile(AppLocalizations.of(context)!.changelog, _openChangelog),
+                  _linkTile(AppLocalizations.of(context)!.legalNotices, _openMentions),
+                  _linkTile(AppLocalizations.of(context)!.termsAndConditions, _openCGV),
+                  if(_showPrivacyButton)
+                    _linkTile(AppLocalizations.of(context)!.privacy, updateConsent),
+                  const SizedBox(height: 32 * GOLDEN_NUMBER),
+                  ElevatedButton.icon(
+                    onPressed: () => _signOut(context),
+                    icon: const Icon(Icons.logout),
+                    label: Text(AppLocalizations.of(context)!.logOut),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton.icon(
+                    onPressed: () => _deleteAccount(context),
+                    icon: const Icon(Icons.delete_forever),
+                    label: Text(AppLocalizations.of(context)!.deleteMyAccount),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  ),
+                ],
+              ),
             ),
           ),
-                ),
         );
-    },
-  );
-}
+      },
+    );
+  }
 
   Widget _infoRow(String label, String value, {VoidCallback? action}) {
     return Row(
@@ -394,8 +390,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 }
-
-// Helpers
 
 Widget _sectionTitle(String text) {
   return Padding(

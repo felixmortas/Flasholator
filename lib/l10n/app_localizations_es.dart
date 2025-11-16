@@ -9,6 +9,44 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String userSince(Object date) {
+    return 'Usuario desde el $date';
+  }
+
+  @override
+  String get stats => 'Estadísticas';
+
+  @override
+  String get myAccount => 'Mi cuenta';
+
+  @override
+  String get social => 'Redes sociales';
+
+  @override
+  String get about => 'Acerca de';
+
+  @override
+  String get rateTheApp => 'Calificar la app';
+
+  @override
+  String get changelog => 'Registro de cambios';
+
+  @override
+  String get legalNotices => 'Avisos legales';
+
+  @override
+  String get termsAndConditions => 'Términos y condiciones';
+
+  @override
+  String get privacy => 'Privacidad';
+
+  @override
+  String get subscribed => 'Suscripción: Suscrito';
+
+  @override
+  String get notSubscribed => 'Suscripción: No suscrito';
+
+  @override
   String get passwordFormatError => 'Formato de contraseña incorrecto.';
 
   @override

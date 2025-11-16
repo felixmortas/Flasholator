@@ -9,6 +9,44 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String userSince(Object date) {
+    return 'User since $date';
+  }
+
+  @override
+  String get stats => 'Statistics';
+
+  @override
+  String get myAccount => 'My Account';
+
+  @override
+  String get social => 'Social';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get rateTheApp => 'Rate the app';
+
+  @override
+  String get changelog => 'Changelog';
+
+  @override
+  String get legalNotices => 'Legal Notices';
+
+  @override
+  String get termsAndConditions => 'Terms & Conditions';
+
+  @override
+  String get privacy => 'Privacy';
+
+  @override
+  String get subscribed => 'Subscription: Subscribed';
+
+  @override
+  String get notSubscribed => 'Subscription: Not subscribed';
+
+  @override
   String get passwordFormatError => 'Incorrect password format.';
 
   @override

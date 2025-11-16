@@ -100,6 +100,78 @@ abstract class AppLocalizations {
     Locale('fr')
   ];
 
+  /// No description provided for @userSince.
+  ///
+  /// In en, this message translates to:
+  /// **'User since {date}'**
+  String userSince(Object date);
+
+  /// No description provided for @stats.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get stats;
+
+  /// No description provided for @myAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'My Account'**
+  String get myAccount;
+
+  /// No description provided for @social.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get social;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @rateTheApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate the app'**
+  String get rateTheApp;
+
+  /// No description provided for @changelog.
+  ///
+  /// In en, this message translates to:
+  /// **'Changelog'**
+  String get changelog;
+
+  /// No description provided for @legalNotices.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal Notices'**
+  String get legalNotices;
+
+  /// No description provided for @termsAndConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions'**
+  String get termsAndConditions;
+
+  /// No description provided for @privacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get privacy;
+
+  /// No description provided for @subscribed.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription: Subscribed'**
+  String get subscribed;
+
+  /// No description provided for @notSubscribed.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription: Not subscribed'**
+  String get notSubscribed;
+
   /// No description provided for @passwordFormatError.
   ///
   /// In en, this message translates to:
