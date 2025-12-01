@@ -8,7 +8,7 @@ permissions:
   packages: write
 
 env:
-  BUILD_NAME: 1.0.0
+  BUILD_NAME: 1.1.0
   KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
   STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
