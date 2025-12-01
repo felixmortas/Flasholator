@@ -55,3 +55,7 @@ flasholator-5f32a92b4c53.json
 
 # Miscellaneous
 /miscs/
+
+# Appstore API keys
+*.p8
+*.p12
