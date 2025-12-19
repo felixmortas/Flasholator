@@ -1,3 +1,7 @@
+What's new in version 1.1.1:
+- Fixed a bug that required double-clicking on a word to start typing in the flashcard editing popup
+- Added an eye icon to show/hide the password when creating an account and logging in
+
 What's new in version 1.1.0:
 - Increase free plan limits
 

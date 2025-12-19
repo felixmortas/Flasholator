@@ -1,3 +1,7 @@
+Novedades de la versión 1.1.1:
+- Se ha corregido un error que obligaba a hacer doble clic en una palabra para empezar a escribir en la ventana emergente de modificación de las tarjetas didácticas.
+- Se ha añadido el icono del ojo para mostrar/ocultar la contraseña al crear una cuenta y al iniciar sesión.
+
 Novedades de la versión 1.1.0:
 - Aumenta los límites del plan gratuito
 
