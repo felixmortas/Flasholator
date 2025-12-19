@@ -22,6 +22,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   String? errorMessage;
   bool isLoading = false;
 
@@ -135,15 +138,27 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 TextField(
                   controller: passwordController,
                   autofillHints: const [AutofillHints.newPassword, AutofillHints.password],
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password),
-                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.password,
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                  ),
+                  obscureText: _obscurePassword,
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: confirmPasswordController,
                   autofillHints: const [AutofillHints.newPassword, AutofillHints.password],
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.confirmPassword),
-                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.confirmPassword,
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                    ),
+                  ),
+                  obscureText: _obscureConfirmPassword,
                   onEditingComplete: () => TextInput.finishAutofillContext(),
                 ),
                 const SizedBox(height: 20),

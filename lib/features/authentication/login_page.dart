@@ -20,6 +20,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final passwordController = TextEditingController();
   String? errorMessage;
 
+  bool _obscurePassword = true;
+
   Future<void> login() async {
     try {
       final userManager = ref.read(userManagerProvider);
@@ -56,8 +58,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   controller: passwordController, 
                   autofillHints: const [AutofillHints.password],
                   onEditingComplete: () => TextInput.finishAutofillContext(),
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password), 
-                  obscureText: true),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.password,
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                  ), 
+                  obscureText: _obscurePassword),
                 const SizedBox(height: 16),
                 ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
                 TextButton(
