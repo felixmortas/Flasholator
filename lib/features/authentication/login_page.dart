@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/features/authentication/register_page.dart';
@@ -41,26 +42,37 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       body: GridBackground( // Ajout du background cahier ici
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              if (errorMessage != null) Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-              TextField(controller: emailController, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email)),
-              const SizedBox(height: 16),
-              TextField(controller: passwordController, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password), obscureText: true),
-              const SizedBox(height: 16),
-              ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
-              TextButton(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage(
-                  initialEmail: emailController.text.trim(),
-                  initialPassword: passwordController.text,
-                ))),
-                child: Text(AppLocalizations.of(context)!.signUp),
-              ),
-              TextButton(
-                onPressed: () => userManager.sendPasswordResetEmail(emailController.text.trim()),
-                child: Text(AppLocalizations.of(context)!.forgotYourPassword),
-              ),
-            ],
+          child: AutofillGroup(
+            child: Column(
+              children: [
+                if (errorMessage != null) Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+                TextField(
+                  controller: emailController, 
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const [AutofillHints.email],
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email)),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: passwordController, 
+                  autofillHints: const [AutofillHints.password],
+                  onEditingComplete: () => TextInput.finishAutofillContext(),
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password), 
+                  obscureText: true),
+                const SizedBox(height: 16),
+                ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
+                TextButton(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage(
+                    initialEmail: emailController.text.trim(),
+                    initialPassword: passwordController.text,
+                  ))),
+                  child: Text(AppLocalizations.of(context)!.signUp),
+                ),
+                TextButton(
+                  onPressed: () => userManager.sendPasswordResetEmail(emailController.text.trim()),
+                  child: Text(AppLocalizations.of(context)!.forgotYourPassword),
+                ),
+              ],
+            ),
           ),
         ),
       ),
