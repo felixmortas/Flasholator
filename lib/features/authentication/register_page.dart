@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
@@ -67,6 +68,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       final userManager = ref.read(userManagerProvider);
       await userManager.registerUser(email, password, username);
 
+      TextInput.finishAutofillContext();
+
       setState(() => isLoading = false);
 
       if (mounted) {
@@ -111,45 +114,52 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       body: GridBackground(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              if (errorMessage != null)
-                Text(errorMessage!, style: const TextStyle(color: Colors.red)),
-              TextField(
-                controller: usernameController,
-                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.username),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password),
-                obscureText: true,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: confirmPasswordController,
-                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.confirmPassword),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                AppLocalizations.of(context)!.passwordRequirements,
-                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-              ),
-              const SizedBox(height: 20),
-              isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: register,
-                      child: Text(AppLocalizations.of(context)!.signUp),
-                    ),
-            ],
+          child: AutofillGroup(
+            child: Column(
+              children: [
+                if (errorMessage != null)
+                  Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+                TextField(
+                  controller: usernameController,
+                  autofillHints: const [AutofillHints.username, AutofillHints.newUsername],
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.username),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: emailController,
+                  autofillHints: const [AutofillHints.email],
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: passwordController,
+                  autofillHints: const [AutofillHints.newPassword, AutofillHints.password],
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: confirmPasswordController,
+                  autofillHints: const [AutofillHints.newPassword, AutofillHints.password],
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.confirmPassword),
+                  obscureText: true,
+                  onEditingComplete: () => TextInput.finishAutofillContext(),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.passwordRequirements,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
+                const SizedBox(height: 20),
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: register,
+                        child: Text(AppLocalizations.of(context)!.signUp),
+                      ),
+              ],
+            ),
           ),
         ),
       ),
