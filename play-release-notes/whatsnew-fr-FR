@@ -1,15 +1,3 @@
 Nouveautés de la version 1.1.1 :
 - Correction d'un bug demandant de cliquer 2 fois sur un mot pour commencer à écrire dans le popup de modifiation des flashcards
 - Ajout de l'oeil pour afficher/masquer le mot de passe lors de la création de compte et de la connexion
-
-Nouveautés de la version 1.1.0 :
-- Augmente les limites du plan gratuit
-
-Nouveautés de la version 1.0.0 :
-- Première version stable
-- Ajout d'un tout nouveau visuel
-
-
-Nouveautés de la version 0.5.4 :
-- Dernière mise à jour avant version 1.0
-- Corrections de bugs et migration vers Drift pour le stockage des flashcards
