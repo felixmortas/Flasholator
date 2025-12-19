@@ -27,25 +27,36 @@ class EditFlashcardPopup extends StatefulWidget {
 
 class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
   late String _sourceLanguage;
-  late String _word;
-  late String _translation;
   late String _targetLanguage;
+
+  late TextEditingController _wordController;
+  late TextEditingController _translationController;
 
   @override
   void initState() {
     super.initState();
     _sourceLanguage = widget.row['sourceLang'];
-    _word = widget.row['front'];
-    _translation = widget.row['back'];
     _targetLanguage = widget.row['targetLang'];
+
+    // Initialize controllers with initial values
+    _wordController = TextEditingController(text: widget.row['front']);
+    _translationController = TextEditingController(text: widget.row['back']);
+  }
+
+  @override
+  void dispose() {
+    // Always dispose controllers to prevent memory leaks
+    _wordController.dispose();
+    _translationController.dispose();
+    super.dispose();
   }
 
   void _setConfirmButton(String text) {
     if (text == 'edit') {
       widget.onEdit!({
         'sourceLang': _sourceLanguage,
-        'front': _word,
-        'back': _translation,
+        'front': _wordController.text,
+        'back': _translationController.text,
         'targetLang': _targetLanguage,
       }, widget.row);
     } else if (text == 'delete') {
@@ -53,8 +64,8 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
     } else if (text == 'add') {
       widget.onAdd!({
         'sourceLang': _sourceLanguage,
-        'front': _word,
-        'back': _translation,
+        'front': _wordController.text,
+        'back': _translationController.text,
         'targetLang': _targetLanguage,
       });
     }
@@ -156,18 +167,16 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                         // Champs de saisie
                         _buildInputRow(
                           _sourceLanguage,
-                          (value) => _sourceLanguage = value!,
-                          _word,
-                          (value) => _word = value,
+                          (value) => setState(() => _sourceLanguage = value!),
+                          _wordController, // Pass controller
                           widget.languageDropdownEnabled,
                           postItColor,
                         ),
                         const SizedBox(height: 16),
                         _buildInputRow(
                           _targetLanguage,
-                          (value) => _targetLanguage = value!,
-                          _translation,
-                          (value) => _translation = value,
+                          (value) => setState(() => _targetLanguage = value!),
+                          _translationController, // Pass controller
                           widget.languageDropdownEnabled,
                           postItColor,
                         ),
@@ -250,8 +259,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
   Widget _buildInputRow(
     String languageValue,
     Function(String?) onLanguageChanged,
-    String textValue,
-    Function(String) onTextChanged,
+    TextEditingController controller,
     bool languageDropdownEnabled,
     Color postItColor,
   ) {
@@ -305,8 +313,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
           const SizedBox(height: 8),
           // Champ de texte
           TextField(
-            controller: TextEditingController(text: textValue),
-            onChanged: onTextChanged,
+            controller: controller,
             style: GoogleFonts.poppins(
               fontSize: 16,
               color: Colors.grey.shade800,
