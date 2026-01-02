@@ -215,7 +215,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _openChangelog() {
   }
 
-  void _openMentions() {
+  void _openMentions() async {
+    final Uri url = Uri.parse('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      // Handle error if URL cannot be opened
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open terms and mentions')),
+        );
+      }
+    }
   }
 
   void _openCGV() {
