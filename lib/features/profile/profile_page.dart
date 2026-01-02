@@ -221,6 +221,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   void _openCGV() {
   }
 
+  void _openPrivacyPolicy() async {
+    final Uri url = Uri.parse('https://felixmortas.github.io/flasholator-privacy-policy.html');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      // Handle error if URL cannot be opened
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open privacy policy')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final String userName = userManager.getUserName();
@@ -350,6 +362,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   _linkTile(AppLocalizations.of(context)!.changelog, _openChangelog),
                   _linkTile(AppLocalizations.of(context)!.legalNotices, _openMentions),
                   _linkTile(AppLocalizations.of(context)!.termsAndConditions, _openCGV),
+                  _linkTile(AppLocalizations.of(context)!.privacyPolicy, _openPrivacyPolicy),
                   if(_showPrivacyButton)
                     _linkTile(AppLocalizations.of(context)!.privacy, updateConsent),
                   const SizedBox(height: 32 * GOLDEN_NUMBER),

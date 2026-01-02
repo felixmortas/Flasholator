@@ -9,6 +9,9 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get privacyPolicy => 'Política de privacidad';
+
+  @override
   String userSince(Object date) {
     return 'Usuario desde el $date';
   }
