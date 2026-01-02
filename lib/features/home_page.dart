@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/providers/ad_provider.dart';
@@ -54,12 +55,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     _tabController.addListener(_onTabChange);
 
     if (!kIsWeb ) {
-      ConsentManager.initialize();
-      ref.read(adServiceProvider).loadInterstitial();
-      if(Platform.isAndroid) {
-      requestPermissions();
-      _handleTextIntent();
-      }
+      _initPrivacyFlow();
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -73,6 +69,32 @@ class _HomePageState extends ConsumerState<HomePage> {
     _tabController.dispose();
     isAllLanguagesToggledNotifier.dispose(); // Dispose du notifier
     super.dispose();
+  }
+
+  Future<void> _initPrivacyFlow() async {
+    // 1. Handle Google UMP / GDPR first
+    ConsentManager.initialize();
+
+    // 2. Handle iOS Specific App Tracking Transparency
+    if (Platform.isIOS) {
+      // Check current status
+      var status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      
+      // If not determined, show the system dialog
+      if (status == TrackingStatus.notDetermined) {
+        // Optional: Add a slight delay to allow the UI to settle after GDPR
+        await Future.delayed(const Duration(milliseconds: 1000));
+        await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+    }
+
+    // 3. Now load ads
+    ref.read(adServiceProvider).loadInterstitial();
+    
+    if (Platform.isAndroid) {
+      requestPermissions();
+      _handleTextIntent();
+    }
   }
 
   Future<void> _showLanguageSelectionPopup(String sourceLang, String targetLang) async {
