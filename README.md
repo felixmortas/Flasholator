@@ -1,3 +1,27 @@
+# Executive summary
+
+### 🧠 Flasholator – Spaced Repetition Flashcards & Instant Translation
+
+Flasholator is a mobile application designed to bridge the gap between instant translation and long-term vocabulary retention. It allows users to translate unknown words on the fly and instantly convert them into a personalized study deck.
+
+**The concept:** A seamless workflow where **DeepL** handles the translation, and a custom **Spaced Repetition System (SRS)** ensures you never forget what you've learned, optimizing your study time by focusing on your weakest words.
+
+**Technical highlights:**
+
+- **Optimized UI/UX:** Carefully crafted user interface and experience to ensure intuitive navigation and a delightful learning journey.
+- **Intelligent Learning Algorithm:** Implementation of the **SuperMemo-2 (SM-2)** algorithm in Dart. It dynamically calculates optimal review intervals based on user-reported difficulty and repetition history to maximize memory retention.
+- **Deep API Integrations:** Leveraging the **DeepL API** for high-accuracy linguistic translations.
+- **Robust Offline-First Architecture:** Built using **MVVM** with a local-first approach. It utilizes **SQLite (Drift)** for high-performance offline access.
+- **Authentication & Authorization:** Secure user authentication and authorization using **Firebase Authentication** and **Firestore Security Rules**.
+- **Monetization & Privacy Integration:** Production-ready setup featuring **RevenueCat** for multi-platform subscriptions, **Google AdMob** for ads, and full **GDPR/UMP** compliance for user data privacy.
+- **Automated Localization:** Leveraging my custom-built **"Generate L10n"** VSCode extension to manage multilingual support (French, English, Spanish) via LLM-generated ARB files.
+- **Modern CI/CD Pipeline:** Automated build and distribution flows using **GitHub Actions** for Google Play Store and **Codemagic** for iOS App Store Connect.
+
+**Result:** A scalable, production-grade Flutter application that provides a frictionless learning experience, turning a simple translation tool into a powerful personal tutor.
+
+[Download on Playstore](https://play.google.com/store/apps/details?id=com.felinx18.flasholator)
+[Download on Appstore (soon)]()
+
 # Flasholator
 
 ## Description
