@@ -159,6 +159,29 @@ Elle caractérise les paires et la persistance Drift, les vecteurs SM-2, les
 statistiques, l’authentification et les préférences, ainsi que l’invalidation
 des réponses de traduction tardives. La suite complète reste `flutter test`.
 
+## Convention MVVM et Riverpod
+
+Les nouvelles migrations sont organisées par fonctionnalité. Une vue
+`*_view.dart` ne fait que rendre un état UI immuable et transmettre les
+intentions utilisateur à son `*_view_model.dart`. Chaque état expose une phase
+explicite (`initial`, `loading`, `data` ou `error`) et les erreurs rendues sont
+des erreurs applicatives typées, afin que la vue ne dépende pas des détails
+techniques.
+
+Les dépendances sont composées par des providers Riverpod publics et
+surchargeables en test (`<feature><Role>Provider`). L'exemple exécutable se
+trouve dans `lib/features/mvvm_example/`. Les providers historiques restent en
+place jusqu'à ce que tous leurs consommateurs aient basculé vers leur
+remplaçant et que leur comportement soit couvert par des tests.
+
+Les commandes asynchrones d'un ViewModel portent un jeton monotone : seule la
+commande encore courante peut publier son résultat ou son erreur, et aucun état
+ne doit être écrit après la destruction du ViewModel. Les adaptateurs et
+repositories convertissent les erreurs techniques à la frontière de la
+présentation en `ApplicationError`, avec une catégorie et un identifiant stables
+que la feature associe à ses ressources localisées ; ni la cause technique ni
+un texte utilisateur codé en dur ne doivent être rendus par la vue.
+
 Les contributions sont les bienvenues ! Pour contribuer, veuillez suivre ces étapes :
 
 1. Forker le dépôt.
