@@ -77,7 +77,7 @@ __[Ajouter captures d'écran et tuto]__
 
 L'application est construite avec une approche modulaire et scalable :
 
-* **Framework (Multi-plateforme iOS/Android):** [Flutter](https://flutter.dev/) (v3.22.5)
+* **Framework (Multi-plateforme iOS/Android):** [Flutter](https://flutter.dev/) (v3.32.5)
 * **Architecture :** **MVVM (Model-View-ViewModel)** pour une séparation claire de la logique métier et de l'interface utilisateur.
 * **Traduction des contenus :** Intégration de l'API **DeepL** pour une précision linguistique maximale lors de la création des cartes.
 * **Base de données :** * **Locale :** SQLite (via `drift`) pour une réactivité hors-ligne optimale.
