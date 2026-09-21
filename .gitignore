@@ -59,3 +59,9 @@ flasholator-5f32a92b4c53.json
 # Appstore API keys
 *.p8
 *.p12
+
+# bmad-method folders
+_bmad
+
+# codex skills
+.agents
