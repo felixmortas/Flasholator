@@ -147,6 +147,18 @@ lib/
 
 ## Contribution
 
+## Baseline de migration
+
+Avant chaque tranche de migration, exécuter la baseline déterministe :
+
+```sh
+flutter test test/core/models test/core/services test/features/translation test/user_preferences_service_test.dart
+```
+
+Elle caractérise les paires et la persistance Drift, les vecteurs SM-2, les
+statistiques, l’authentification et les préférences, ainsi que l’invalidation
+des réponses de traduction tardives. La suite complète reste `flutter test`.
+
 Les contributions sont les bienvenues ! Pour contribuer, veuillez suivre ces étapes :
 
 1. Forker le dépôt.

@@ -5,8 +5,13 @@ import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/services/db_wrapper.dart';
 
 class FlashcardsService {
-  final DatabaseWrapper _db = DatabaseWrapper();
+  final DatabaseWrapper _db;
+  final DateTime Function() _clock;
   bool _isInitialized = false;
+
+  FlashcardsService({DatabaseWrapper? database, DateTime Function()? clock})
+      : _db = database ?? DatabaseWrapper(),
+        _clock = clock ?? DateTime.now;
 
   Future<void> _ensureInitialized() async {
     if (!_isInitialized) {
@@ -45,19 +50,20 @@ class FlashcardsService {
       return false;
     }
 
+    final addedAt = _clock();
     final flashcard = Flashcard(
       front: front,
       back: back,
       sourceLang: sourceLang,
       targetLang: targetLang,
-      addedDate: DateTime.now(),
+      addedDate: addedAt,
     );
     final reversedFlashcard = Flashcard(
       front: back,
       back: front,
       sourceLang: targetLang,
       targetLang: sourceLang,
-      addedDate: DateTime.now(),
+      addedDate: addedAt,
     );
 
     await _db.add(flashcard.toDriftCompanion());
@@ -154,7 +160,7 @@ class FlashcardsService {
   Future<List<Flashcard>> dueFlashcards() async {
     await _ensureInitialized();
     List<Flashcard> flashcards = await loadAllFlashcards();
-    List<Flashcard> dueFlashcards = flashcards.where((flashcard) => flashcard.isDue()).toList();
+    List<Flashcard> dueFlashcards = flashcards.where((flashcard) => flashcard.isDue(now: _clock())).toList();
 
     dueFlashcards.shuffle();
 
@@ -175,7 +181,7 @@ class FlashcardsService {
       final flashcard = Flashcard.fromDrift(cardDataToReview);
 
       // 3. Appliquer l'algorithme de révision
-      flashcard.review(quality);
+      flashcard.review(quality, now: _clock());
       
       // 4. Utiliser la méthode `toDriftCompanion()` pour créer un objet
       //    qui peut être utilisé pour la mise à jour dans Drift.

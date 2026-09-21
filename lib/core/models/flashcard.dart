@@ -106,30 +106,34 @@ class Flashcard {
     };
   }
 
-  void review(int quality) {
+  /// Applies the legacy SM-2 result. [now] is injectable for deterministic
+  /// characterisation tests; production continues to use the current clock.
+  void review(int quality, {DateTime? now}) {
+    final reviewTime = now ?? DateTime.now();
     this.quality = quality;
 
     final smTwo = repetitions == 0
-        ? SMTwo.firstReview(quality)
+        ? SMTwo.firstReview(quality, reviewDate: reviewTime)
         : SMTwo(
                 easiness: easiness,
                 interval: interval,
                 repetitions: repetitions)
-            .review(quality);
+            .review(quality, reviewDate: reviewTime);
 
     easiness = smTwo.easiness;
     interval = smTwo.interval;
     repetitions = smTwo.repetitions;
     timesReviewed += 1;
-    lastReviewDate = DateTime.now();
+    lastReviewDate = reviewTime;
     nextReviewDate = quality != 2
         ? smTwo.reviewDate
         : smTwo.reviewDate.subtract(const Duration(days: 1));
   }
 
-  bool isDue() {
+  bool isDue({DateTime? now}) {
+    final currentTime = now ?? DateTime.now();
     return nextReviewDate == null ||
-        DateTime.now().isAfter(nextReviewDate!) ||
-        DateTime.now().isAtSameMomentAs(nextReviewDate!);
+        currentTime.isAfter(nextReviewDate!) ||
+        currentTime.isAtSameMomentAs(nextReviewDate!);
   }
 }

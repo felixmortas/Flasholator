@@ -14,6 +14,7 @@ import 'package:flasholator/features/shared/utils/app_localizations_helper.dart'
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
 import 'package:flasholator/features/translation/widgets/language_dropdown.dart';
+import 'package:flasholator/features/translation/translation_request_guard.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
 import 'package:flasholator/features/translation/widgets/switch_lang_button.dart';
@@ -49,6 +50,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   String _lastTranslatedWord = '';
   String _sourceLanguage = '';
   String _targetLanguage = '';
+  final _translationRequests = TranslationRequestGuard();
   late List<MapEntry<String, String>> sortedLanguageEntries;
 
 
@@ -76,6 +78,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   void _clearTextInput() {
+    _invalidateTranslationRequests();
     setState(() {
       _controller.clear();
       _wordToTranslate = '';
@@ -88,6 +91,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   void _updateButtonState() {
+    _invalidateTranslationRequests();
     setState(() {
       isTranslateButtonDisabled =
           _controller.text.isEmpty || 
@@ -95,8 +99,15 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     });
   }
 
+  /// A translation is only allowed to publish if its input and language pair
+  /// are still current. This prevents a late DeepL response consuming quota.
+  void _invalidateTranslationRequests() {
+    _translationRequests.invalidate();
+  }
+
   void _onLanguageChange(String? newValue, bool isSourceLanguage) {
     if(ref.read(isSubscribedProvider)) {
+      _invalidateTranslationRequests();
       setState(() {
         if (isSourceLanguage) {
           languageSelection.sourceLanguage = newValue!;
@@ -116,6 +127,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   void _swapContent() {
+    _invalidateTranslationRequests();
     setState(() {
       final String tmp = languageSelection.sourceLanguage;
       languageSelection.sourceLanguage = languageSelection.targetLanguage;
@@ -140,7 +152,11 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   Future<void> _translate(bool isSubscribed) async {
-    isTranslateButtonDisabled = true;
+    if (!mounted) return;
+    setState(() {
+      isTranslateButtonDisabled = true;
+    });
+    final requestId = _translationRequests.begin();
     try {
       _wordToTranslate = _controller.text.trim();
       String translation = await widget.deeplTranslator.translate(
@@ -149,23 +165,28 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         languageSelection.sourceLanguage,
       );
 
-      setState(() {
-        _translatedWord = translation;
-        _lastTranslatedWord = _wordToTranslate;
-        _sourceLanguage = languageSelection.sourceLanguage;
-        _targetLanguage = languageSelection.targetLanguage;
-        isAddButtonDisabled = false;
-        isTranslateButtonDisabled = true;
-      });
+      await _translationRequests.publishIfCurrent(requestId, () async {
+        if (!mounted) return;
+        setState(() {
+          _translatedWord = translation;
+          _lastTranslatedWord = _wordToTranslate;
+          _sourceLanguage = languageSelection.sourceLanguage;
+          _targetLanguage = languageSelection.targetLanguage;
+          isAddButtonDisabled = false;
+          isTranslateButtonDisabled = true;
+        });
 
-      if(!isSubscribed) {
-        final userManager = ref.read(userManagerProvider);
-        await userManager.incrementCounter(context);
-      }
+        if (!isSubscribed && mounted) {
+          final userManager = ref.read(userManagerProvider);
+          await userManager.incrementCounter(context);
+        }
+      });
     } catch (e) {
       print('Error translating text: $e');
     } finally {
-      _updateButtonState();
+      if (mounted && _translationRequests.isCurrent(requestId)) {
+        _updateButtonState();
+      }
     }
   }
 
@@ -224,6 +245,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     final coupleLang = ref.watch(coupleLangProvider);
 
     if (coupleLang != _lastCoupleLang) {
+      _invalidateTranslationRequests();
       _lastCoupleLang = coupleLang;
 
       if (coupleLang.contains('-')) {
@@ -496,4 +518,3 @@ class _ActionButtons extends StatelessWidget {
     );
   }
 }
-

@@ -3,13 +3,23 @@ import 'package:flasholator/core/models/stats_model.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
 
 class StatsService {
-  final FlashcardsService flashcardsService;
+  final FlashcardsService? _flashcardsService;
+  final Future<List<Flashcard>> Function()? _loadFlashcards;
 
-  StatsService(this.flashcardsService);
+  /// Production entry point: statistics always read from the card service.
+  StatsService(FlashcardsService flashcardsService)
+      : _flashcardsService = flashcardsService,
+        _loadFlashcards = null;
+
+  /// Controlled collection boundary used by deterministic tests.
+  StatsService.test(Future<List<Flashcard>> Function() loadFlashcards)
+      : _flashcardsService = null,
+        _loadFlashcards = loadFlashcards;
 
   Future<StatsData> calculateStats(
       {DateTime? startDate, DateTime? endDate}) async {
-    final flashcards = await flashcardsService.loadAllFlashcards();
+    final flashcards = await (_loadFlashcards?.call() ??
+        _flashcardsService!.loadAllFlashcards());
 
     // Filtrage selon la période définie
     final filtered = flashcards.where((fc) {

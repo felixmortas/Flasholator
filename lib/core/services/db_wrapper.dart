@@ -50,10 +50,15 @@ class AppDatabase extends _$AppDatabase {
 // Elle masque complètement la complexité de Drift.
 class DatabaseWrapper {
   late AppDatabase _db;
+  final AppDatabase? _database;
+
+  /// An existing database is useful for tests and leaves the production
+  /// constructor behaviour unchanged.
+  DatabaseWrapper({AppDatabase? database}) : _database = database;
 
   /// Initialisation de la base de données. Doit être appelée avant toute autre opération.
   Future<void> init() async {
-    _db = AppDatabase();
+    _db = _database ?? AppDatabase();
   }
 
   /// Récupérer tous les enregistrements
