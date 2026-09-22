@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flasholator/core/services/db_wrapper.dart';
 import 'package:flasholator/features/flashcards/data/flashcard_repository.dart';
+import 'package:flasholator/features/flashcards/domain/flashcard_collection.dart';
 import 'package:flasholator/features/flashcards/domain/flashcard_pair.dart';
 import 'package:flasholator/features/flashcards/domain/flashcard_pair_mutation_result.dart';
 import 'package:flasholator/features/flashcards/flashcard_providers.dart';
@@ -9,6 +10,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final class _FakeFlashcardRepository implements FlashcardRepository {
+  _FakeFlashcardRepository([FlashcardCollectionSnapshot? snapshot])
+      : snapshot = snapshot ?? FlashcardCollectionSnapshot(version: 0, cards: const []);
+
+  final FlashcardCollectionSnapshot snapshot;
+
+  @override
+  Future<FlashcardCollectionSnapshot> loadCollection() async => snapshot;
+
+  @override
+  Stream<FlashcardCollectionSnapshot> watchCollection() => Stream.value(snapshot);
+
   @override
   Future<FlashcardPairMutationResult> addPair(FlashcardPair pair) async =>
       FlashcardPairMutationResult.applied;
@@ -271,13 +283,155 @@ void main() {
     );
   });
 
-  test('le repository peut être surchargé sans créer de base Drift', () {
-    final fake = _FakeFlashcardRepository();
+  test('les providers dérivent collection et projections de la même version surchargée', () async {
+    final snapshot = FlashcardCollectionSnapshot(version: 42, cards: [
+      PersistedFlashcard(
+        id: 1, front: 'bonjour', back: 'hello', sourceLang: 'FR', targetLang: 'EN',
+        addedDate: now, quality: null, easiness: 2.5, interval: 1, repetitions: 0,
+        timesReviewed: 0, lastReviewDate: null, nextReviewDate: null,
+      ),
+      PersistedFlashcard(
+        id: 2, front: 'hello', back: 'bonjour', sourceLang: 'EN', targetLang: 'FR',
+        addedDate: now, quality: null, easiness: 2.5, interval: 1, repetitions: 0,
+        timesReviewed: 0, lastReviewDate: null, nextReviewDate: null,
+      ),
+    ]);
+    final fake = _FakeFlashcardRepository(snapshot);
     final container = ProviderContainer(
       overrides: [flashcardRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
 
     expect(container.read(flashcardRepositoryProvider), same(fake));
+    expect(await container.read(flashcardCollectionProvider.future), same(snapshot));
+    expect(container.read(flashcardReviewProjectionProvider).requireValue.version, 42);
+    expect(container.read(flashcardTableProjectionProvider).requireValue.version, 42);
+    expect(container.read(flashcardStatisticsProjectionProvider).requireValue.version, 42);
+  });
+
+  test('charge une base historique sans altérer les treize champs', () async {
+    final db = await database();
+    addTearDown(db.close);
+    await db.into(db.flashcards).insert(FlashcardsCompanion.insert(
+          front: 'bonjour',
+          back: 'hello',
+          sourceLang: 'FR',
+          targetLang: 'EN',
+          addedDate: now,
+          quality: const Value(3),
+          easiness: 2.3,
+          interval: 4,
+          repetitions: 2,
+          timesReviewed: 7,
+          lastReviewDate: Value(now.subtract(const Duration(days: 1))),
+          nextReviewDate: Value(now.add(const Duration(days: 4))),
+        ));
+    final repository = DriftFlashcardRepository(db);
+
+    final collection = await repository.loadCollection();
+    final card = collection.cards.single;
+    expect(collection.version, 0);
+    expect(card.id, 1);
+    expect(card.front, 'bonjour');
+    expect(card.back, 'hello');
+    expect(card.sourceLang, 'FR');
+    expect(card.targetLang, 'EN');
+    expect(card.addedDate.toUtc(), now);
+    expect(card.quality, 3);
+    expect(card.easiness, 2.3);
+    expect(card.interval, 4);
+    expect(card.repetitions, 2);
+    expect(card.timesReviewed, 7);
+    expect(card.lastReviewDate!.toUtc(), now.subtract(const Duration(days: 1)));
+    expect(card.nextReviewDate!.toUtc(), now.add(const Duration(days: 4)));
+  });
+
+  test('publie uniquement après un commit appliqué', () async {
+    final db = await database();
+    addTearDown(db.close);
+    final repository = DriftFlashcardRepository(db, clock: () => now);
+    final snapshots = <FlashcardCollectionSnapshot>[];
+    final subscription = repository.watchCollection().listen(snapshots.add);
+    addTearDown(subscription.cancel);
+
+    await Future<void>.delayed(Duration.zero);
+    expect(await repository.addPair(pair()), FlashcardPairMutationResult.applied);
+    await Future<void>.delayed(Duration.zero);
+    expect(snapshots.map((snapshot) => snapshot.version), [0, 1]);
+    expect(snapshots.last.cards, hasLength(2));
+
+    expect(await repository.addPair(pair()), FlashcardPairMutationResult.conflict);
+    expect(await repository.deletePair(pair(front: 'absente', back: 'missing')), FlashcardPairMutationResult.notFound);
+    await Future<void>.delayed(Duration.zero);
+    expect(snapshots.map((snapshot) => snapshot.version), [0, 1]);
+  });
+
+  test('les lignes legacy isolées restent lisibles dans le snapshot', () async {
+    final db = await database();
+    addTearDown(db.close);
+    await db.into(db.flashcards).insert(FlashcardsCompanion.insert(
+          front: 'isolée', back: 'orphan', sourceLang: '', targetLang: 'EN',
+          addedDate: now, easiness: 2.5, interval: 1, repetitions: 0, timesReviewed: 0,
+        ));
+
+    final collection = await DriftFlashcardRepository(db).loadCollection();
+    expect(collection.cards, hasLength(1));
+    expect(collection.cards.single.sourceLang, '');
+    expect(collection.cards.single.front, 'isolée');
+  });
+
+  test('termine une mutation déjà en file avant de fermer sa publication', () async {
+    final db = await database();
+    addTearDown(db.close);
+    final repository = DriftFlashcardRepository(db, clock: () => now);
+
+    final mutation = repository.addPair(pair());
+    final disposal = repository.dispose();
+
+    expect(await mutation, FlashcardPairMutationResult.applied);
+    await disposal;
+    expect(await db.select(db.flashcards).get(), hasLength(2));
+  });
+
+  test('conserve la dernière publication quand la transaction échoue', () async {
+    final db = await database();
+    addTearDown(db.close);
+    final repository = DriftFlashcardRepository(db, clock: () => now);
+    final snapshots = <FlashcardCollectionSnapshot>[];
+    final subscription = repository.watchCollection().listen(snapshots.add);
+    addTearDown(subscription.cancel);
+    await Future<void>.delayed(Duration.zero);
+    await db.customStatement('''
+      CREATE TRIGGER reject_second_face BEFORE INSERT ON flashcards
+      WHEN NEW.front = 'hello'
+      BEGIN SELECT RAISE(ABORT, 'échec voulu'); END;
+    ''');
+
+    await expectLater(repository.addPair(pair()), throwsA(isA<Object>()));
+    await Future<void>.delayed(Duration.zero);
+    expect(snapshots.map((snapshot) => snapshot.version), [0]);
+    expect((await repository.loadCollection()).cards, isEmpty);
+  });
+
+  test('publie un snapshot suivant pour une édition puis une suppression appliquées', () async {
+    final db = await database();
+    addTearDown(db.close);
+    final repository = DriftFlashcardRepository(db, clock: () => now);
+    final source = pair();
+    expect(await repository.addPair(source), FlashcardPairMutationResult.applied);
+
+    final received = repository.watchCollection().take(3).toList();
+    await Future<void>.delayed(Duration.zero);
+    final replacement = pair(front: 'merci', back: 'thanks');
+    expect(
+      await repository.editPair(source: source, replacement: replacement),
+      FlashcardPairMutationResult.applied,
+    );
+    expect(await repository.deletePair(replacement), FlashcardPairMutationResult.applied);
+
+    final snapshots = await received;
+    expect(snapshots.map((snapshot) => snapshot.version), [1, 2, 3]);
+    expect(snapshots[1].cards.map((card) => card.front), ['merci', 'thanks']);
+    expect(snapshots[2].cards, isEmpty);
   });
 }

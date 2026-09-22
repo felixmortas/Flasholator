@@ -1,9 +1,15 @@
-import 'package:drift/drift.dart';
+import 'dart:async';
+
 import 'package:flasholator/core/services/db_wrapper.dart';
+import 'package:flasholator/features/flashcards/domain/flashcard_collection.dart';
 import 'package:flasholator/features/flashcards/domain/flashcard_pair.dart';
 import 'package:flasholator/features/flashcards/domain/flashcard_pair_mutation_result.dart';
 
 abstract interface class FlashcardRepository {
+  Future<FlashcardCollectionSnapshot> loadCollection();
+
+  Stream<FlashcardCollectionSnapshot> watchCollection();
+
   Future<FlashcardPairMutationResult> addPair(FlashcardPair pair);
 
   Future<FlashcardPairMutationResult> editPair({
@@ -22,9 +28,62 @@ final class DriftFlashcardRepository implements FlashcardRepository {
 
   final AppDatabase _database;
   final DateTime Function() _clock;
+  final StreamController<FlashcardCollectionSnapshot> _snapshots =
+      StreamController<FlashcardCollectionSnapshot>.broadcast();
+  Future<void> _serial = Future.value();
+  FlashcardCollectionSnapshot? _latest;
+  var _disposed = false;
 
   @override
-  Future<FlashcardPairMutationResult> addPair(FlashcardPair pair) {
+  Future<FlashcardCollectionSnapshot> loadCollection() => _enqueue(() async {
+        final latest = _latest;
+        if (latest != null) return latest;
+        final snapshot = await _readSnapshot(version: 0);
+        _latest = snapshot;
+        return snapshot;
+      });
+
+  @override
+  Stream<FlashcardCollectionSnapshot> watchCollection() {
+    return Stream.multi((controller) {
+      StreamSubscription<FlashcardCollectionSnapshot>? subscription;
+      var active = true;
+      controller.onCancel = () {
+        active = false;
+        return subscription?.cancel();
+      };
+
+      unawaited(_enqueue(() async {
+        try {
+          if (!active || _disposed) return;
+          final snapshot = _latest ?? await _readSnapshot(version: 0);
+          _latest ??= snapshot;
+          subscription = _snapshots.stream.listen(
+            controller.add,
+            onError: controller.addError,
+            onDone: controller.close,
+          );
+          if (active) {
+            controller.add(snapshot);
+          } else {
+            await subscription?.cancel();
+          }
+        } on Object catch (error, stackTrace) {
+          if (active) controller.addError(error, stackTrace);
+        }
+      }));
+    });
+  }
+
+  /// Le provider possède cet adaptateur concret et ferme donc sa publication.
+  /// Les fakes injectées via le contrat ne sont jamais concernées.
+  Future<void> dispose() => _enqueue(() async {
+        _disposed = true;
+        await _snapshots.close();
+      });
+
+  @override
+  Future<FlashcardPairMutationResult> addPair(FlashcardPair pair) => _mutate(() {
     return _database.transaction(() async {
       final matches = await _matchingCards(pair);
       if (matches.isNotEmpty) return FlashcardPairMutationResult.conflict;
@@ -36,13 +95,13 @@ final class DriftFlashcardRepository implements FlashcardRepository {
           .insert(_newCard(pair.reversedFace, addedDate));
       return FlashcardPairMutationResult.applied;
     });
-  }
+  });
 
   @override
   Future<FlashcardPairMutationResult> editPair({
     required FlashcardPair source,
     required FlashcardPair replacement,
-  }) {
+  }) => _mutate(() {
     return _database.transaction(() async {
       final sourceCards = await _matchingCards(source);
       final sourceValidation = _validateCompletePair(source, sourceCards);
@@ -81,10 +140,10 @@ final class DriftFlashcardRepository implements FlashcardRepository {
       }
       return FlashcardPairMutationResult.applied;
     });
-  }
+  });
 
   @override
-  Future<FlashcardPairMutationResult> deletePair(FlashcardPair pair) {
+  Future<FlashcardPairMutationResult> deletePair(FlashcardPair pair) => _mutate(() {
     return _database.transaction(() async {
       final cards = await _matchingCards(pair);
       final validation = _validateCompletePair(pair, cards);
@@ -98,6 +157,42 @@ final class DriftFlashcardRepository implements FlashcardRepository {
       }
       return FlashcardPairMutationResult.applied;
     });
+  });
+
+  Future<T> _enqueue<T>(Future<T> Function() operation) {
+    final result = _serial.then((_) => operation());
+    _serial = result.then<void>((_) {}, onError: (_, __) {});
+    return result;
+  }
+
+  Future<FlashcardPairMutationResult> _mutate(Future<FlashcardPairMutationResult> Function() operation) =>
+      _enqueue(() async {
+        if (_disposed) {
+          throw StateError('Le repository de flashcards est fermé.');
+        }
+        final result = await operation();
+        if (result == FlashcardPairMutationResult.applied) {
+          final snapshot = await _readSnapshot(version: (_latest?.version ?? 0) + 1);
+          _latest = snapshot;
+          if (!_disposed) _snapshots.add(snapshot);
+        }
+        return result;
+      });
+
+  Future<FlashcardCollectionSnapshot> _readSnapshot({required int version}) async {
+    final cards = await _database.select(_database.flashcards).get();
+    cards.sort((left, right) => left.id.compareTo(right.id));
+    return FlashcardCollectionSnapshot(
+      version: version,
+      cards: cards.map((card) => PersistedFlashcard(
+        id: card.id, front: card.front, back: card.back,
+        sourceLang: card.sourceLang, targetLang: card.targetLang,
+        addedDate: card.addedDate, quality: card.quality, easiness: card.easiness,
+        interval: card.interval, repetitions: card.repetitions,
+        timesReviewed: card.timesReviewed, lastReviewDate: card.lastReviewDate,
+        nextReviewDate: card.nextReviewDate,
+      )),
+    );
   }
 
   Future<List<FlashcardData>> _matchingCards(FlashcardPair pair) async {
