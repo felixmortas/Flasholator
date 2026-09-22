@@ -7,11 +7,14 @@ import 'package:flasholator/core/services/firestore_users_dao.dart';
 // Mocks
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
-class MockCollectionReference extends Mock implements CollectionReference<Map<String, dynamic>> {}
+class MockCollectionReference extends Mock
+    implements CollectionReference<Map<String, dynamic>> {}
 
-class MockDocumentReference extends Mock implements DocumentReference<Map<String, dynamic>> {}
+class MockDocumentReference extends Mock
+    implements DocumentReference<Map<String, dynamic>> {}
 
-class MockDocumentSnapshot extends Mock implements DocumentSnapshot<Map<String, dynamic>> {}
+class MockDocumentSnapshot extends Mock
+    implements DocumentSnapshot<Map<String, dynamic>> {}
 
 void main() {
   late FirestoreUsersDAO dao;
@@ -30,11 +33,11 @@ void main() {
     when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
     when(() => mockCollection.doc(any())).thenReturn(mockDocument);
 
-    dao = FirestoreUsersDAO.test(mockFirestore); // Besoin d’un constructeur de test
+    dao = FirestoreUsersDAO.test(
+        mockFirestore); // Besoin d’un constructeur de test
   });
 
   group('FirestoreUsersDAO', () {
-
     final userData = <String, dynamic>{
       'isSubscribed': false,
       'canTranslate': true,
@@ -82,11 +85,11 @@ void main() {
       });
 
       verify(() => mockDocument.update({
-        'isSubscribed': true,
-        'subscriptionDate': '2025-04-01',
-        'subscriptionEndDate': '',
-        'canTranslate': true,
-      })).called(1);
+            'isSubscribed': true,
+            'subscriptionDate': '2025-04-01',
+            'subscriptionEndDate': '',
+            'canTranslate': true,
+          })).called(1);
     });
 
     test('scheduleSubscriptionRevocation sets subscriptionEndDate', () async {
@@ -95,11 +98,12 @@ void main() {
       await dao.updateUser(fakeUid, {'subscriptionEndDate': '2026-04-01'});
 
       verify(() => mockDocument.update({
-        'subscriptionEndDate': '2026-04-01',
-      })).called(1);
+            'subscriptionEndDate': '2026-04-01',
+          })).called(1);
     });
 
-    test('revokeSubscription sets isSubscribed to false and clears endDate', () async {
+    test('revokeSubscription sets isSubscribed to false and clears endDate',
+        () async {
       when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
       await dao.updateUser(fakeUid, {
@@ -108,9 +112,9 @@ void main() {
       });
 
       verify(() => mockDocument.update({
-        'isSubscribed': false,
-        'subscriptionEndDate': '',
-      })).called(1);
+            'isSubscribed': false,
+            'subscriptionEndDate': '',
+          })).called(1);
     });
 
     test('deleteUser deletes document', () async {

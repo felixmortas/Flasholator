@@ -46,19 +46,26 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      setState(() => errorMessage = AppLocalizations.of(context)!.allFieldsRequired);
+    if (username.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      setState(
+          () => errorMessage = AppLocalizations.of(context)!.allFieldsRequired);
       return;
     }
 
     if (password != confirmPassword) {
-      setState(() => errorMessage = AppLocalizations.of(context)!.passwordsDoNotMatch);
+      setState(() =>
+          errorMessage = AppLocalizations.of(context)!.passwordsDoNotMatch);
       return;
     }
 
-    final passwordPattern = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}');
+    final passwordPattern =
+        RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}');
     if (!passwordPattern.hasMatch(password)) {
-      setState(() => errorMessage = AppLocalizations.of(context)!.passwordFormatError);
+      setState(() =>
+          errorMessage = AppLocalizations.of(context)!.passwordFormatError);
       return;
     }
 
@@ -121,28 +128,40 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             child: Column(
               children: [
                 if (errorMessage != null)
-                  Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+                  Text(errorMessage!,
+                      style: const TextStyle(color: Colors.red)),
                 TextField(
                   controller: usernameController,
-                  autofillHints: const [AutofillHints.username, AutofillHints.newUsername],
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.username),
+                  autofillHints: const [
+                    AutofillHints.username,
+                    AutofillHints.newUsername
+                  ],
+                  decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.username),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: emailController,
                   autofillHints: const [AutofillHints.email],
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email),
+                  decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.email),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: passwordController,
-                  autofillHints: const [AutofillHints.newPassword, AutofillHints.password],
+                  autofillHints: const [
+                    AutofillHints.newPassword,
+                    AutofillHints.password
+                  ],
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.password,
                     suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      icon: Icon(_obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                     ),
                   ),
                   obscureText: _obscurePassword,
@@ -150,12 +169,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: confirmPasswordController,
-                  autofillHints: const [AutofillHints.newPassword, AutofillHints.password],
+                  autofillHints: const [
+                    AutofillHints.newPassword,
+                    AutofillHints.password
+                  ],
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.confirmPassword,
                     suffixIcon: IconButton(
-                      icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off),
-                      onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                      icon: Icon(_obscureConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: () => setState(() =>
+                          _obscureConfirmPassword = !_obscureConfirmPassword),
                     ),
                   ),
                   obscureText: _obscureConfirmPassword,

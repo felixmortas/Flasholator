@@ -33,7 +33,8 @@ final class _ExpectedError implements ApplicationError {
 }
 
 void main() {
-  test('publie initial, loading puis data avec une nouvelle instance immuable', () async {
+  test('publie initial, loading puis data avec une nouvelle instance immuable',
+      () async {
     final completion = Completer<String>();
     final fake = _FakeRepository(() => completion.future);
     final container = ProviderContainer(
@@ -46,7 +47,8 @@ void main() {
       states.add(next);
     }, fireImmediately: true);
 
-    final command = container.read(mvvmExampleViewModelProvider.notifier).load();
+    final command =
+        container.read(mvvmExampleViewModelProvider.notifier).load();
     expect(container.read(mvvmExampleViewModelProvider).phase, UiPhase.loading);
 
     completion.complete('Depuis le fake');
@@ -64,7 +66,8 @@ void main() {
     expect(fake.calls, 1);
   });
 
-  test('publie une erreur applicative typée quand la dépendance échoue', () async {
+  test('publie une erreur applicative typée quand la dépendance échoue',
+      () async {
     const expectedError = _ExpectedError();
     final fake = _FakeRepository(() async => throw expectedError);
     final container = ProviderContainer(

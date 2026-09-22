@@ -20,7 +20,8 @@ class AllLanguagesTable extends StatelessWidget {
           // Post-it cards
           ...data.map((rowData) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: GestureDetector(
                 onTap: () => onCellTap(rowData),
                 child: Container(

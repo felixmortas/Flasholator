@@ -53,21 +53,19 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   final _translationRequests = TranslationRequestGuard();
   late List<MapEntry<String, String>> sortedLanguageEntries;
 
-
   final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(_updateButtonState);
-
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-      sortedLanguageEntries = getSortedLanguageEntries(context, LANGUAGE_KEYS);
+    sortedLanguageEntries = getSortedLanguageEntries(context, LANGUAGE_KEYS);
   }
 
   @override
@@ -94,8 +92,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     _invalidateTranslationRequests();
     setState(() {
       isTranslateButtonDisabled =
-          _controller.text.isEmpty || 
-          _controller.text == _lastTranslatedWord;
+          _controller.text.isEmpty || _controller.text == _lastTranslatedWord;
     });
   }
 
@@ -106,7 +103,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   void _onLanguageChange(String? newValue, bool isSourceLanguage) {
-    if(ref.read(isSubscribedProvider)) {
+    if (ref.read(isSubscribedProvider)) {
       _invalidateTranslationRequests();
       setState(() {
         if (isSourceLanguage) {
@@ -119,11 +116,9 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         isAddButtonDisabled = true;
         _updateButtonState();
       });
-
     } else {
       _openSubscribePopup();
     }
-    
   }
 
   void _swapContent() {
@@ -144,7 +139,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     final isSubscribed = ref.read(isSubscribedProvider);
     final canTranslate = ref.read(canTranslateProvider);
 
-    if(isSubscribed || canTranslate) {
+    if (isSubscribed || canTranslate) {
       _translate(isSubscribed);
     } else {
       _openSubscribePopup();
@@ -193,7 +188,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   Future<void> _checkIfCanAddFlashcard() async {
     final isSubscribed = ref.read(isSubscribedProvider);
     final canAddCard = await widget.flashcardsService.canAddCard();
-    if(isSubscribed || canAddCard) {
+    if (isSubscribed || canAddCard) {
       _addFlashcard();
     } else {
       _openSubscribePopup();
@@ -257,7 +252,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     return GridBackground(
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: Colors.transparent, 
+        backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Column(
             children: [
@@ -266,19 +261,20 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: 
-                      LanguageDropdown(
+                      child: LanguageDropdown(
                         selectedLanguage: languageSelection.sourceLanguage,
                         otherLanguage: languageSelection.targetLanguage,
-                        sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                      AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                        )).toList(),
+                        sortedLanguages: sortedLanguageEntries
+                            .map((e) => MapEntry(
+                                e.key,
+                                AppLocalizations.of(context)!
+                                    .getTranslatedLanguageName(e.key)))
+                            .toList(),
                         onChanged: (String? newValue) {
                           _onLanguageChange(newValue, true);
                         },
                       ),
                     ),
-                                      
                     SwitchLangButton(
                       onPressed: _swapContent,
                     ),
@@ -286,9 +282,12 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                       child: LanguageDropdown(
                         selectedLanguage: languageSelection.targetLanguage,
                         otherLanguage: languageSelection.sourceLanguage,
-                        sortedLanguages: sortedLanguageEntries.map((e) => MapEntry(e.key,
-                          AppLocalizations.of(context)!.getTranslatedLanguageName(e.key)
-                        )).toList(),
+                        sortedLanguages: sortedLanguageEntries
+                            .map((e) => MapEntry(
+                                e.key,
+                                AppLocalizations.of(context)!
+                                    .getTranslatedLanguageName(e.key)))
+                            .toList(),
                         onChanged: (String? newValue) {
                           _onLanguageChange(newValue, false);
                         },
@@ -297,7 +296,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                   ],
                 ),
               ),
-      
               const Spacer(),
               AnimatedPadding(
                 duration: const Duration(milliseconds: 300),
@@ -309,9 +307,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                   showDragHandle: true,
                   children: [
                     _InputFieldWithClear(
-                      controller: _controller,
-                      onClear: _clearTextInput
-                    ),
+                        controller: _controller, onClear: _clearTextInput),
                     _PasteAndCameraRow(controller: _controller),
                     const Divider(),
                     const SizedBox(height: 12),
@@ -327,7 +323,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                             subject: 'Apprendre avec Flasholator',
                           );
                         }
-
                       },
                     ),
                     const SizedBox(height: 16),
@@ -344,7 +339,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
           ),
         ),
       ),
-    );  
+    );
   }
 }
 

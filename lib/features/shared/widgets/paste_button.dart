@@ -26,6 +26,5 @@ class PasteButton extends StatelessWidget {
       icon: const Icon(Icons.paste),
       label: const Text("Coller"),
     );
-
   }
 }

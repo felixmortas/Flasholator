@@ -7,3 +7,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-2-conserver-les-cartes-hors-ligne-et-leurs-projections.md`
   summary: Déclencher une actualisation de la projection de révision lorsque l'échéance d'une carte est atteinte sans mutation de collection.
   evidence: La projection pure respecte le snapshot reçu ; l'orchestration temporelle relève de la migration du parcours de révision de la story 2.3.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3-reviser-avec-le-comportement-sm-2-caracterise.md`
+  summary: Réparer les doublures Firestore incomplètes qui font échouer sept scénarios de `test/firestore_users_dao_test.dart`.
+  evidence: La suite complète échoue sur les mocks `DocumentReference.get` et `update`, sans lien avec les fichiers de révision modifiés par cette story.

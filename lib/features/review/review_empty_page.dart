@@ -22,16 +22,19 @@ class ReviewPageEmpty extends StatelessWidget {
           children: [
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24 * GOLDEN_NUMBER),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24 * GOLDEN_NUMBER),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 30),
                     // Un seul gros post-it avec les 3 textes
                     BigPostIt(
-                      title: AppLocalizations.of(context)!.congratulationsOnYourWork,
+                      title: AppLocalizations.of(context)!
+                          .congratulationsOnYourWork,
                       subtitle: AppLocalizations.of(context)!.noCardsToReview,
-                      callToAction: AppLocalizations.of(context)!.keepProgressing,
+                      callToAction:
+                          AppLocalizations.of(context)!.keepProgressing,
                       postItColor: Colors.yellow.shade100,
                       width: screenWidth * 0.85,
                       height: 280,
@@ -42,26 +45,26 @@ class ReviewPageEmpty extends StatelessWidget {
                       children: [
                         Expanded(
                           child: EraserButton(
-                          onPressed: () {
-                            DefaultTabController.of(context).animateTo(0);
-                          },
-                          label: AppLocalizations.of(context)!.translate,
-                          gradientColors: [
-                            Colors.pink.shade200,
-                            Colors.pink.shade100,
-                          ],
-                          iconColor: Colors.pink.shade700,
-                          textColor: Colors.pink.shade900,
-                          isDisabled: false,
+                            onPressed: () {
+                              DefaultTabController.of(context).animateTo(0);
+                            },
+                            label: AppLocalizations.of(context)!.translate,
+                            gradientColors: [
+                              Colors.pink.shade200,
+                              Colors.pink.shade100,
+                            ],
+                            iconColor: Colors.pink.shade700,
+                            textColor: Colors.pink.shade900,
+                            isDisabled: false,
                           ),
                         ),
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: EraserButton(
-                          onPressed: () {
-                            DefaultTabController.of(context).animateTo(2);
-                          },
-                          label: AppLocalizations.of(context)!.add,
+                            onPressed: () {
+                              DefaultTabController.of(context).animateTo(2);
+                            },
+                            label: AppLocalizations.of(context)!.add,
                             gradientColors: [
                               Colors.blue.shade200,
                               Colors.blue.shade100,
@@ -91,9 +94,9 @@ class ReviewPageEmpty extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SingleChildScrollView(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 20 * GOLDEN_NUMBER)
-                                .copyWith(bottom: 20 * GOLDEN_NUMBER),
+                        padding: const EdgeInsets.symmetric(
+                                horizontal: 20 * GOLDEN_NUMBER)
+                            .copyWith(bottom: 20 * GOLDEN_NUMBER),
                         child: Text(
                           AppLocalizations.of(context)!.coolAIFeatureComingSoon,
                           style: const TextStyle(

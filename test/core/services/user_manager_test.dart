@@ -11,17 +11,21 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _MockAuthService extends Mock implements AuthService {}
+
 class _MockFirestoreUsersDao extends Mock implements FirestoreUsersDAO {}
+
 class _MockRevenueCatService extends Mock implements RevenueCatService {}
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('la déconnexion RevenueCat ne bloque pas la fermeture Firebase', () async {
+  test('la déconnexion RevenueCat ne bloque pas la fermeture Firebase',
+      () async {
     final auth = _MockAuthService();
     final firestore = _MockFirestoreUsersDao();
     final revenueCat = _MockRevenueCatService();
-    when(() => revenueCat.logOut()).thenAnswer((_) async => throw StateError('RC indisponible'));
+    when(() => revenueCat.logOut())
+        .thenAnswer((_) async => throw StateError('RC indisponible'));
     when(() => auth.signOut()).thenAnswer((_) async {});
 
     final container = ProviderContainer(overrides: [

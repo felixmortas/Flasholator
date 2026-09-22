@@ -72,5 +72,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'flasholator-cf84b.firebasestorage.app',
     iosBundleId: 'com.felinx18.flasholator',
   );
-
 }

@@ -131,8 +131,7 @@ class WordsDisplay extends StatelessWidget {
                     ),
                   ),
                   // Icône overlay si fournie
-                  if (overlayIcon != null)
-                    Center(child: overlayIcon),
+                  if (overlayIcon != null) Center(child: overlayIcon),
                 ],
               ),
             ),
@@ -207,7 +206,8 @@ class WordsDisplay extends StatelessWidget {
                         showText: !isResponseHidden,
                         postItColor: AppColors.postit, // Rose/pêche
                         rotation: 0.012,
-                        overlayIcon: isResponseHidden ? const _PulsingTouchIcon() : null,
+                        overlayIcon:
+                            isResponseHidden ? const _PulsingTouchIcon() : null,
                       ),
                     ),
             ),
@@ -237,7 +237,7 @@ class _PulsingTouchIconState extends State<_PulsingTouchIcon>
       duration: const Duration(milliseconds: 809),
       vsync: this,
     )..repeat(reverse: true);
-    
+
     _animation = Tween<double>(begin: 0.9, end: 1.1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );

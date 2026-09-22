@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 class BottomBlockStyles {
   // Couleur de la bordure (cyan/turquoise de l'image)
   static const Color borderColor = Color(0xFF00BCD4); // Cyan
-  
+
   // Épaisseur de la bordure
   static const double borderWidth = 12.0;
-  
+
   // Rayon des coins arrondis
   static const double cornerRadius = 30.0;
-  
+
   // Rayon des "protections" de coins
   static const double cornerProtectionRadius = 20.0;
 
@@ -68,7 +68,7 @@ class BottomBlockStyles {
 
   /// Dimensions des coins protecteurs
   static const double cornerProtectionSize = 35.0;
-  
+
   /// Offset des coins protecteurs
   static const double cornerProtectionOffset = -8.0;
 }

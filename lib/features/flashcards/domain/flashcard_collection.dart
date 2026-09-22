@@ -2,11 +2,19 @@
 /// Les treize champs de la table sont conservés à cette frontière.
 final class PersistedFlashcard {
   const PersistedFlashcard({
-    required this.id, required this.front, required this.back,
-    required this.sourceLang, required this.targetLang, required this.addedDate,
-    required this.quality, required this.easiness, required this.interval,
-    required this.repetitions, required this.timesReviewed,
-    required this.lastReviewDate, required this.nextReviewDate,
+    required this.id,
+    required this.front,
+    required this.back,
+    required this.sourceLang,
+    required this.targetLang,
+    required this.addedDate,
+    required this.quality,
+    required this.easiness,
+    required this.interval,
+    required this.repetitions,
+    required this.timesReviewed,
+    required this.lastReviewDate,
+    required this.nextReviewDate,
   });
 
   final int id;
@@ -26,7 +34,8 @@ final class PersistedFlashcard {
 
 /// Version cohérente de la collection locale, sans liste mutable partagée.
 final class FlashcardCollectionSnapshot {
-  FlashcardCollectionSnapshot({required this.version, required Iterable<PersistedFlashcard> cards})
+  FlashcardCollectionSnapshot(
+      {required this.version, required Iterable<PersistedFlashcard> cards})
       : cards = List.unmodifiable(cards);
 
   final int version;

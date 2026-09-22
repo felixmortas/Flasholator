@@ -83,7 +83,8 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
 
     if (!data.contains(row)) {
       print("Adding row to db: $row");
-      widget.flashcardsService.addFlashcard(front, back, sourceLanguage, targetLanguage);
+      widget.flashcardsService
+          .addFlashcard(front, back, sourceLanguage, targetLanguage);
       setState(() {
         print("add row to table");
         data.add(row);
@@ -164,7 +165,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
       'sourceLang': languageSelection.sourceLanguage,
       'targetLang': languageSelection.targetLanguage
     };
-    
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -180,98 +181,100 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     );
   }
 
-@override
-Widget build(BuildContext context) {
-  final localizedLanguageMap = LANGUAGE_KEYS.map(
-    (code, key) => MapEntry(
-        code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
-  );
-  final isSubscribed = ref.watch(isSubscribedProvider);
+  @override
+  Widget build(BuildContext context) {
+    final localizedLanguageMap = LANGUAGE_KEYS.map(
+      (code, key) => MapEntry(
+          code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
+    );
+    final isSubscribed = ref.watch(isSubscribedProvider);
 
-  return LayoutBuilder(
-    builder: (BuildContext context, BoxConstraints constraints) {
-    return GridBackground(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (isSubscribed)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      return GridBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isSubscribed)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: widget.isAllLanguagesToggledNotifier,
+                    builder: (context, value, child) {
+                      return EraserButton(
+                        onPressed: () {
+                          updateSwitchState(!value);
+                        },
+                        label: value
+                            ? "Afficher un seul couple de langues"
+                            : "Afficher tous les couples de langues",
+                        gradientColors: value
+                            ? [
+                                Colors.pink.shade300,
+                                Colors.pink.shade200,
+                              ]
+                            : [
+                                Colors.blue.shade300,
+                                Colors.blue.shade200,
+                              ],
+                        iconColor:
+                            value ? Colors.pink.shade700 : Colors.blue.shade700,
+                        textColor:
+                            value ? Colors.pink.shade800 : Colors.blue.shade800,
+                        isDisabled: false,
+                      );
+                    },
+                  ),
+                ),
+              Expanded(
                 child: ValueListenableBuilder<bool>(
                   valueListenable: widget.isAllLanguagesToggledNotifier,
-                  builder: (context, value, child) {
-                    return EraserButton(
-                      onPressed: () {
-                        updateSwitchState(!value);
-                      },
-                      label: value 
-                          ? "Afficher un seul couple de langues" 
-                          : "Afficher tous les couples de langues",
-                      gradientColors: value
-                          ? [
-                Colors.pink.shade300,
-                Colors.pink.shade200,
-                            ]
-                          : [
-                Colors.blue.shade300,
-                Colors.blue.shade200,
-                            ],
-                      iconColor: value ? Colors.pink.shade700 : Colors.blue.shade700,
-                      textColor: value ? Colors.pink.shade800 : Colors.blue.shade800,
-                      isDisabled: false,
-                    );
+                  builder: (context, isAllLanguagesToggled, child) {
+                    if (isAllLanguagesToggled) {
+                      return AllLanguagesTable(
+                        data: data,
+                        onCellTap:
+                            _openEditFlashcardPopup, // Modified to pass only rowData
+                        languages: localizedLanguageMap,
+                      );
+                    } else {
+                      return CoupleLanguagesTable(
+                        data: data,
+                        sourceLanguage: localizedLanguageMap[
+                            languageSelection.sourceLanguage]!,
+                        targetLanguage: localizedLanguageMap[
+                            languageSelection.targetLanguage]!,
+
+                        onCellTap:
+                            _openEditFlashcardPopup, // Modified to pass only rowData
+                      );
+                    }
                   },
                 ),
               ),
-            Expanded(
-              child: ValueListenableBuilder<bool>(
-                valueListenable: widget.isAllLanguagesToggledNotifier,
-                builder: (context, isAllLanguagesToggled, child) {
-                  if (isAllLanguagesToggled) {
-                    return AllLanguagesTable(
-                      data: data,
-                      onCellTap:
-                          _openEditFlashcardPopup, // Modified to pass only rowData
-                      languages: localizedLanguageMap,
-                    );
-                  } else {
-                    return CoupleLanguagesTable(
-                      data: data,
-                      sourceLanguage: localizedLanguageMap[
-                          languageSelection.sourceLanguage]!,
-                      targetLanguage: localizedLanguageMap[
-                          languageSelection.targetLanguage]!,
-      
-                      onCellTap:
-                          _openEditFlashcardPopup, // Modified to pass only rowData
-                    );
-                  }
-                },
-              ),
-            ),
-            SizedBox(
-              height: 50,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: EraserButton(
-                  onPressed: _checkIfCanAddCard,
-                  label: AppLocalizations.of(context)!.addAWord,
-                  gradientColors: [
-                    Colors.blue.shade300,
-                    Colors.blue.shade200,
-                  ],
-                  iconColor: Colors.white,
-                  textColor: Colors.white,
-                  isDisabled: false,
+              SizedBox(
+                height: 50,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: EraserButton(
+                    onPressed: _checkIfCanAddCard,
+                    label: AppLocalizations.of(context)!.addAWord,
+                    gradientColors: [
+                      Colors.blue.shade300,
+                      Colors.blue.shade200,
+                    ],
+                    iconColor: Colors.white,
+                    textColor: Colors.white,
+                    isDisabled: false,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  });
-}
+      );
+    });
+  }
 }

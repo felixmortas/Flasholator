@@ -8,19 +8,31 @@ class MemoryDatabase extends DatabaseWrapper {
   final inserted = <FlashcardsCompanion>[];
   final updated = <FlashcardsCompanion>[];
   MemoryDatabase();
-  @override Future<void> init() async {}
-  @override Future<int> count() async => cards.length;
-  @override Future<List<FlashcardData>> getAll() async => List.of(cards);
-  @override Future<bool> cardExists(String front, String back) async => cards.any((c) => c.front == front && c.back == back);
-  @override Future<int> add(FlashcardsCompanion card) async { inserted.add(card); return inserted.length; }
-  @override Future<void> put(FlashcardsCompanion card) async {
+  @override
+  Future<void> init() async {}
+  @override
+  Future<int> count() async => cards.length;
+  @override
+  Future<List<FlashcardData>> getAll() async => List.of(cards);
+  @override
+  Future<bool> cardExists(String front, String back) async =>
+      cards.any((c) => c.front == front && c.back == back);
+  @override
+  Future<int> add(FlashcardsCompanion card) async {
+    inserted.add(card);
+    return inserted.length;
+  }
+
+  @override
+  Future<void> put(FlashcardsCompanion card) async {
     updated.add(card);
   }
 }
 
 void main() {
   final now = DateTime.utc(2026, 1, 1);
-  test('adds both directions once and refuses empty or duplicate pairs', () async {
+  test('adds both directions once and refuses empty or duplicate pairs',
+      () async {
     final db = MemoryDatabase();
     final service = FlashcardsService(database: db, clock: () => now);
     expect(await service.addFlashcard('bonjour', 'hello', 'FR', 'EN'), isTrue);
@@ -28,7 +40,17 @@ void main() {
     expect(db.inserted.first.addedDate.value, now);
     expect(db.inserted[1].front.value, 'hello');
     expect(await service.addFlashcard('', 'hello', 'FR', 'EN'), isFalse);
-    db.cards.add(FlashcardData(id: 1, front: 'bonjour', back: 'hello', sourceLang: 'FR', targetLang: 'EN', addedDate: now, easiness: 2.5, interval: 1, repetitions: 0, timesReviewed: 0));
+    db.cards.add(FlashcardData(
+        id: 1,
+        front: 'bonjour',
+        back: 'hello',
+        sourceLang: 'FR',
+        targetLang: 'EN',
+        addedDate: now,
+        easiness: 2.5,
+        interval: 1,
+        repetitions: 0,
+        timesReviewed: 0));
     expect(await service.addFlashcard('bonjour', 'hello', 'FR', 'EN'), isFalse);
   });
 
@@ -50,7 +72,8 @@ void main() {
 
   test('reviewing an absent card does not persist a mutation', () async {
     final db = MemoryDatabase();
-    await FlashcardsService(database: db, clock: () => now).review('none', 'missing', 5);
+    await FlashcardsService(database: db, clock: () => now)
+        .review('none', 'missing', 5);
     expect(db.inserted, isEmpty);
   });
 
@@ -113,8 +136,8 @@ void main() {
         nextReviewDate: now.add(const Duration(seconds: 1)),
       ));
 
-    final due = await FlashcardsService(database: db, clock: () => now)
-        .dueFlashcards();
+    final due =
+        await FlashcardsService(database: db, clock: () => now).dueFlashcards();
     expect(due.map((card) => card.front), ['due']);
   });
 }

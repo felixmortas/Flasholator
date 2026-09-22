@@ -6,7 +6,8 @@ import 'package:flasholator/core/services/feedback_service.dart';
 class UnsubscribeDialog extends StatefulWidget {
   final VoidCallback onUnsubscribe;
 
-  const UnsubscribeDialog({Key? key, required this.onUnsubscribe}) : super(key: key);
+  const UnsubscribeDialog({Key? key, required this.onUnsubscribe})
+      : super(key: key);
 
   @override
   _UnsubscribeDialogState createState() => _UnsubscribeDialogState();
@@ -16,7 +17,6 @@ class _UnsubscribeDialogState extends State<UnsubscribeDialog> {
   String? _selectedReason;
   final TextEditingController _feedbackController = TextEditingController();
   final FeedbackService _feedbackService = FeedbackService();
-
 
   @override
   Widget build(BuildContext context) {

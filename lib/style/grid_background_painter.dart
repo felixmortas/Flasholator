@@ -17,9 +17,9 @@ class GridBackground extends StatelessWidget {
 class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint backgroundPaint = Paint()
-      ..color = AppColors.sheetBackground;
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
+    final Paint backgroundPaint = Paint()..color = AppColors.sheetBackground;
+    canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
 
     final Paint gridPaint = Paint()
       ..color = Colors.blue.shade200

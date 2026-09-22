@@ -25,7 +25,7 @@ class AppTextStyles {
     fontWeight: FontWeight.normal,
     color: AppColors.textDark,
   );
-  
+
   static const TextStyle bodyLight = TextStyle(
     fontFamily: 'Poppins',
     fontSize: 14,

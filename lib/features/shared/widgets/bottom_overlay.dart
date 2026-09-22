@@ -51,7 +51,7 @@ class BottomBlock extends StatelessWidget {
         ),
         // Poignée centrale en haut
         if (showDragHandle) TopHandle(backgroundColor: borderColor),
-        
+
         // Coins protecteurs
         CornerProtection(isLeft: true, color: borderColor),
         CornerProtection(isLeft: false, color: borderColor),

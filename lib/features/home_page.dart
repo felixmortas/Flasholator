@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flasholator/style/app_colors.dart';
 import 'package:flutter/foundation.dart';
@@ -21,11 +20,10 @@ import 'package:flasholator/features/shared/widgets/ad_banner_widget.dart';
 import 'package:flasholator/features/profile/profile_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
-
   const HomePage({
     Key? key,
   }) : super(key: key);
-  
+
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
@@ -73,7 +71,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     await _handleTextIntent();
   }
 
-  Future<void> _showLanguageSelectionPopup(String sourceLang, String targetLang) async {
+  Future<void> _showLanguageSelectionPopup(
+      String sourceLang, String targetLang) async {
     final userManager = ref.read(userManagerProvider);
 
     await showDialog(
@@ -126,11 +125,12 @@ class _HomePageState extends ConsumerState<HomePage> {
     final isSubscribed = ref.read(isSubscribedProvider);
     final canTranslate = ref.read(canTranslateProvider);
     final canAddCard = await flashcardsService.canAddCard();
-    
+
     if (isSubscribed || (canTranslate && canAddCard)) {
       try {
         // Récupérer le texte sélectionné
-        String? wordToTranslate = await _platform.invokeMethod<String>('getText');
+        String? wordToTranslate =
+            await _platform.invokeMethod<String>('getText');
         if (wordToTranslate != null) {
           // Appeler la fonction de traduction
           String translatedWord =
@@ -139,16 +139,16 @@ class _HomePageState extends ConsumerState<HomePage> {
           if (wordToTranslate != '' &&
               translatedWord != '' &&
               translatedWord != AppLocalizations.of(context)!.connectionError &&
-              !await flashcardsService
-                  .checkIfFlashcardExists(wordToTranslate, translatedWord)) {
+              !await flashcardsService.checkIfFlashcardExists(
+                  wordToTranslate, translatedWord)) {
             wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
                 wordToTranslate.toLowerCase().substring(1);
             translatedWord = translatedWord.toLowerCase()[0].toUpperCase() +
                 translatedWord.toLowerCase().substring(1);
           }
 
-          Future<bool> isCardAdded = flashcardsService
-              .addFlashcard(wordToTranslate, translatedWord, "EN", "FR");
+          Future<bool> isCardAdded = flashcardsService.addFlashcard(
+              wordToTranslate, translatedWord, "EN", "FR");
 
           // Confirm that the card was added
           Fluttertoast.showToast(
@@ -213,7 +213,10 @@ class _HomePageState extends ConsumerState<HomePage> {
             onPressed: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => ProfilePage(flashcardsService: flashcardsService,)),
+                MaterialPageRoute(
+                    builder: (_) => ProfilePage(
+                          flashcardsService: flashcardsService,
+                        )),
               )
             },
           ),
@@ -223,50 +226,47 @@ class _HomePageState extends ConsumerState<HomePage> {
               fontFamily: 'MomoSignature',
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,  // Optionnel
+              letterSpacing: 1.2, // Optionnel
             ),
           ),
           centerTitle: true,
           // actions: [
-            // IconButton(
-            //   icon: const Icon(Icons.money),
-            //   onPressed: () {
-            //     // Navigator.push(
-            //     //   context,
-            //     //   MaterialPageRoute(builder: (_) => MoneyPage()),
-            //     // );
-            //   },
-            // ),
+          // IconButton(
+          //   icon: const Icon(Icons.money),
+          //   onPressed: () {
+          //     // Navigator.push(
+          //     //   context,
+          //     //   MaterialPageRoute(builder: (_) => MoneyPage()),
+          //     // );
+          //   },
+          // ),
           // ],
         ),
-        body: Column(
-          children: [
-            const AdBannerWidget(),
-            Expanded(child: 
-              TabBarView(
-                children: [
-                  TranslateTab(
-                    flashcardsService: flashcardsService,
-                    deeplTranslator: deeplTranslator,
-                    addRow: dataTableTabFunction,
-                    updateQuestionText: reviewTabFunction,
-                  ),
-                  ReviewTab(
-                    flashcardsService: flashcardsService,
-                    key: reviewTabKey,
-                    isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
-                  ),
-                  DataTableTab(
-                    flashcardsService: flashcardsService,
-                    key: dataTableTabKey,
-                    updateQuestionText: reviewTabFunction,
-                    isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
-                  )
-                ],
-              ),
-            )
-          ]
-        ),
+        body: Column(children: [
+          const AdBannerWidget(),
+          Expanded(
+            child: TabBarView(
+              children: [
+                TranslateTab(
+                  flashcardsService: flashcardsService,
+                  deeplTranslator: deeplTranslator,
+                  addRow: dataTableTabFunction,
+                  updateQuestionText: reviewTabFunction,
+                ),
+                ReviewTab(
+                  key: reviewTabKey,
+                  isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
+                ),
+                DataTableTab(
+                  flashcardsService: flashcardsService,
+                  key: dataTableTabKey,
+                  updateQuestionText: reviewTabFunction,
+                  isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
+                )
+              ],
+            ),
+          )
+        ]),
         bottomNavigationBar: const Material(
           color: AppColors.white,
           child: TabBar(

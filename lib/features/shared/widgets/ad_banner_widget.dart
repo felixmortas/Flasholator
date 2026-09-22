@@ -22,11 +22,12 @@ class AdBannerWidget extends ConsumerWidget {
     return bannerAdAsyncValue.when(
       // Chargement en cours
       loading: () => Container(
-        height: 50.0, // Hauteur typique d'une bannière pour éviter les sauts de layout
+        height:
+            50.0, // Hauteur typique d'une bannière pour éviter les sauts de layout
         alignment: Alignment.center,
         child: const CircularProgressIndicator(),
       ),
-      
+
       // Erreur
       error: (err, stack) {
         // En production, il est souvent préférable de ne rien afficher
@@ -43,7 +44,8 @@ class AdBannerWidget extends ConsumerWidget {
 
         // On retourne le widget de la bannière prêt à l'emploi
         return SafeArea(
-          bottom: false, // Souvent on ne veut pas de SafeArea en bas pour une bannière
+          bottom:
+              false, // Souvent on ne veut pas de SafeArea en bas pour une bannière
           child: SizedBox(
             width: bannerAd.size.width.toDouble(),
             height: bannerAd.size.height.toDouble(),

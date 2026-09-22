@@ -135,8 +135,8 @@ class LanguageDropdown extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: isDisabled 
-                                ? Colors.grey.shade400 
+                            color: isDisabled
+                                ? Colors.grey.shade400
                                 : Colors.grey.shade800,
                             letterSpacing: 0.5,
                             fontFamily: 'MomoSignature',

@@ -26,7 +26,8 @@ class _ReviewControlsState extends State<ReviewControls> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Column(
         children: [
-          if (widget.overrideDisplayWithResult && widget.overrideQuality != null)
+          if (widget.overrideDisplayWithResult &&
+              widget.overrideQuality != null)
             // Case: Written answer is incorrect
             if (widget.overrideQuality == 2)
               Row(
@@ -73,7 +74,6 @@ class _ReviewControlsState extends State<ReviewControls> {
                   ),
                 ],
               ),
-
           if (!widget.isResponseHidden && !widget.overrideDisplayWithResult)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -127,7 +127,8 @@ class _ReviewControlsState extends State<ReviewControls> {
   ) {
     return Expanded(
       child: DragTarget<int>(
-        onWillAccept: (data) => data == 1, // accepte seulement les cartes réponses
+        onWillAccept: (data) =>
+            data == 1, // accepte seulement les cartes réponses
         onAccept: (_) => onPressed(),
         builder: (context, candidateData, rejectedData) {
           final isHovered = candidateData.isNotEmpty;

@@ -72,7 +72,8 @@ class EditableAnswerSection extends StatelessWidget {
                     backgroundColor: Colors.white,
                     radius: borderRadius,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
                   child: EditAnswerOverlay(
                     isExpanded: isEditing,
                     controller: editingController,
@@ -84,8 +85,10 @@ class EditableAnswerSection extends StatelessWidget {
               TopHandle(backgroundColor: BottomBlockStyles.borderColor),
 
               // Coins protecteurs
-              CornerProtection(isLeft: true, color: BottomBlockStyles.borderColor),
-              CornerProtection(isLeft: false, color: BottomBlockStyles.borderColor),
+              CornerProtection(
+                  isLeft: true, color: BottomBlockStyles.borderColor),
+              CornerProtection(
+                  isLeft: false, color: BottomBlockStyles.borderColor),
             ],
           ),
         ],

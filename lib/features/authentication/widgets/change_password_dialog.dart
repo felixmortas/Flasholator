@@ -24,12 +24,14 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     final confirm = _confirmPasswordController.text;
 
     if (newPass != confirm) {
-      setState(() => _error = AppLocalizations.of(context)!.passwordsDoNotMatch);
+      setState(
+          () => _error = AppLocalizations.of(context)!.passwordsDoNotMatch);
       return;
     }
 
     if (newPass.length < 6) {
-      setState(() => _error = AppLocalizations.of(context)!.passwordRequirements);
+      setState(
+          () => _error = AppLocalizations.of(context)!.passwordRequirements);
       return;
     }
 
@@ -49,17 +51,20 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
           TextField(
             controller: _currentPasswordController,
             obscureText: true,
-            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.currentPassword),
+            decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.currentPassword),
           ),
           TextField(
             controller: _newPasswordController,
             obscureText: true,
-            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.newPassword),
+            decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.newPassword),
           ),
           TextField(
             controller: _confirmPasswordController,
             obscureText: true,
-            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.confirmPassword),
+            decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.confirmPassword),
           ),
         ],
       ),

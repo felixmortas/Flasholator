@@ -10,11 +10,14 @@ void main() {
     expect(await UserPreferencesService.getCounter(), 0);
     expect(await UserPreferencesService.getCoupleLang(), '');
     expect(await UserPreferencesService.isUserDataCached(), isFalse);
-    await UserPreferencesService.updateUser({'canTranslate': false, 'counter': 3, 'coupleLang': 'FR-EN'});
-    expect(await UserPreferencesService.loadUserData(), {'canTranslate': false, 'counter': 3, 'coupleLang': 'FR-EN'});
+    await UserPreferencesService.updateUser(
+        {'canTranslate': false, 'counter': 3, 'coupleLang': 'FR-EN'});
+    expect(await UserPreferencesService.loadUserData(),
+        {'canTranslate': false, 'counter': 3, 'coupleLang': 'FR-EN'});
     expect(await UserPreferencesService.isUserDataCached(), isTrue);
     await UserPreferencesService.deleteUser();
-    expect(await UserPreferencesService.loadUserData(), {'canTranslate': true, 'counter': 0, 'coupleLang': ''});
+    expect(await UserPreferencesService.loadUserData(),
+        {'canTranslate': true, 'counter': 0, 'coupleLang': ''});
     expect(await UserPreferencesService.isUserDataCached(), isFalse);
   });
 

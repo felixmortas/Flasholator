@@ -7,7 +7,8 @@ import 'package:flasholator/features/authentication/widgets/review_section.dart'
 class UnsubscribePage extends StatelessWidget {
   final VoidCallback onUnsubscribe;
 
-  const UnsubscribePage({Key? key, required this.onUnsubscribe}) : super(key: key);
+  const UnsubscribePage({Key? key, required this.onUnsubscribe})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +31,13 @@ class UnsubscribePage extends StatelessWidget {
                 AppLocalizations.of(context)!.premiumBenefits,
               ),
               const SizedBox(height: 10),
-              Text(
-                '- ${AppLocalizations.of(context)!.benefit1}\n'
-                '- ${AppLocalizations.of(context)!.benefit2}\n'
-                '- ${AppLocalizations.of(context)!.benefit3}\n'
-                '- ${AppLocalizations.of(context)!.benefit4}\n'
-                '- ${AppLocalizations.of(context)!.benefit5}\n'
-                '- ${AppLocalizations.of(context)!.benefit6}\n'
-                '- ${AppLocalizations.of(context)!.benefit7}'
-              ),
+              Text('- ${AppLocalizations.of(context)!.benefit1}\n'
+                  '- ${AppLocalizations.of(context)!.benefit2}\n'
+                  '- ${AppLocalizations.of(context)!.benefit3}\n'
+                  '- ${AppLocalizations.of(context)!.benefit4}\n'
+                  '- ${AppLocalizations.of(context)!.benefit5}\n'
+                  '- ${AppLocalizations.of(context)!.benefit6}\n'
+                  '- ${AppLocalizations.of(context)!.benefit7}'),
               const SizedBox(height: 10),
               const ReviewsSection(),
               const SizedBox(height: 20),
@@ -47,12 +46,12 @@ class UnsubscribePage extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                    return UnsubscribeDialog(
-                      onUnsubscribe: () {
-                        onUnsubscribe();
-                        Navigator.pop(context); 
-                      },
-                    );
+                      return UnsubscribeDialog(
+                        onUnsubscribe: () {
+                          onUnsubscribe();
+                          Navigator.pop(context);
+                        },
+                      );
                     },
                   );
                 },

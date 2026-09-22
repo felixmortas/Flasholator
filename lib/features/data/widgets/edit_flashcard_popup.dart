@@ -200,7 +200,9 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                             ),
                             _buildPostItButton(
                               context,
-                              label: widget.isEditPopup ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.add,
+                              label: widget.isEditPopup
+                                  ? AppLocalizations.of(context)!.edit
+                                  : AppLocalizations.of(context)!.add,
                               onPressed: () {
                                 _setConfirmButton(
                                     widget.isEditPopup ? 'edit' : 'add');
@@ -233,9 +235,8 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        backgroundColor: isPrimary
-            ? _getDarkerShade(postItColor, 0.9)
-            : Colors.transparent,
+        backgroundColor:
+            isPrimary ? _getDarkerShade(postItColor, 0.9) : Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
@@ -303,8 +304,9 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
               items: LANGUAGE_KEYS.keys.map((String key) {
                 return DropdownMenuItem<String>(
                   value: key,
-                  child: Text(        
-                    AppLocalizations.of(context)!.getTranslatedLanguageName(key),
+                  child: Text(
+                    AppLocalizations.of(context)!
+                        .getTranslatedLanguageName(key),
                   ),
                 );
               }).toList(),

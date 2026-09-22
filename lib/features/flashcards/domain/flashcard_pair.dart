@@ -15,7 +15,8 @@ final class FlashcardPairFace {
         back.trim().isEmpty ||
         sourceLang.trim().isEmpty ||
         targetLang.trim().isEmpty) {
-      throw ArgumentError('Une face de flashcard doit être entièrement renseignée.');
+      throw ArgumentError(
+          'Une face de flashcard doit être entièrement renseignée.');
     }
   }
 
@@ -85,11 +86,12 @@ final class FlashcardPairKey {
 
   @override
   bool operator ==(Object other) =>
-      other is FlashcardPairKey && _first == other._first && _second == other._second;
+      other is FlashcardPairKey &&
+      _first == other._first &&
+      _second == other._second;
 
   @override
   int get hashCode => Object.hash(_first, _second);
-
 }
 
 /// La donnée métier minimale nécessaire pour créer, chercher ou modifier une paire.
@@ -112,7 +114,8 @@ final class FlashcardPair {
   FlashcardPairKey get key => FlashcardPairKey.fromFace(face);
 
   @override
-  bool operator ==(Object other) => other is FlashcardPair && face == other.face;
+  bool operator ==(Object other) =>
+      other is FlashcardPair && face == other.face;
 
   @override
   int get hashCode => face.hashCode;

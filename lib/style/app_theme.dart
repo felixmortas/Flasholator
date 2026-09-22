@@ -10,7 +10,8 @@ class AppTheme {
     return ThemeData(
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: Colors.transparent,
-      fontFamily: 'Poppins', // Assurez-vous d'ajouter cette police à votre pubspec.yaml
+      fontFamily:
+          'Poppins', // Assurez-vous d'ajouter cette police à votre pubspec.yaml
 
       // Thème pour l'AppBar
       appBarTheme: const AppBarTheme(
@@ -26,7 +27,7 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: AppTextStyles.button,
         ),
@@ -36,7 +37,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,

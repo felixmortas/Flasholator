@@ -34,7 +34,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _showPrivacyButton = false;
   late final UserManager userManager;
 
-    @override
+  @override
   void initState() {
     super.initState();
     userManager = ref.read(userManagerProvider);
@@ -61,9 +61,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     if (isSubscribed && !wasSubscribed) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
       );
-    } 
+    }
   }
 
   Future<void> _signOut(BuildContext context) async {
@@ -87,25 +88,28 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       Navigator.pop(context);
     } on Exception catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${AppLocalizations.of(context)!.error} ${e.toString()}')),
+        SnackBar(
+            content:
+                Text('${AppLocalizations.of(context)!.error} ${e.toString()}')),
       );
     }
   }
 
   Future<void> _changePassword(BuildContext context) async {
-  showDialog(
-    context: context,
-    builder: (_) => ChangePasswordDialog(
-      onConfirm: (currentPassword, newPassword) async {
+    showDialog(
+      context: context,
+      builder: (_) => ChangePasswordDialog(
+        onConfirm: (currentPassword, newPassword) async {
           await userManager.changePassword(currentPassword, newPassword);
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.passwordUpdated)),
+            SnackBar(
+                content: Text(AppLocalizations.of(context)!.passwordUpdated)),
           );
-      },
-    ),
-  );
-}
+        },
+      ),
+    );
+  }
 
   Future<bool> _showConfirmationDialog(
     BuildContext context, {
@@ -118,8 +122,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             title: Text(title),
             content: Text(content),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLocalizations.of(context)!.cancel)),
-              TextButton(onPressed: () => Navigator.pop(context, true), child: Text(AppLocalizations.of(context)!.confirm)),
+              TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(AppLocalizations.of(context)!.cancel)),
+              TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text(AppLocalizations.of(context)!.confirm)),
             ],
           ),
         ) ??
@@ -140,22 +148,26 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 TextField(
                   controller: controller,
                   obscureText: true,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password),
+                  decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.password),
                 ),
               ],
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLocalizations.of(context)!.cancel)),
+              TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(AppLocalizations.of(context)!.cancel)),
               TextButton(
                 onPressed: () async {
                   try {
-                    await userManager.reauthenticateWithCredential(
-                      controller.text
-                    );
+                    await userManager
+                        .reauthenticateWithCredential(controller.text);
                     Navigator.pop(context, true);
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppLocalizations.of(context)!.incorrectPassword)),
+                      SnackBar(
+                          content: Text(
+                              AppLocalizations.of(context)!.incorrectPassword)),
                     );
                   }
                 },
@@ -175,26 +187,28 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     });
   }
 
-    void _changeEmail(BuildContext context) {
+  void _changeEmail(BuildContext context) {
     // TODO: implement email change
   }
 
   void _toggleNotifications(bool val) {
     // TODO: implement notifications toggle
   }
-  
+
   void _rateApp() async {
     final appName = Uri.encodeComponent('Flasholator');
     Uri uri;
 
     if (kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
       // Open Google Play search for the app name (fallback when package id is not available)
-      uri = Uri.parse('https://play.google.com/store/apps/details?id=com.felinx18.flasholator');
+      uri = Uri.parse(
+          'https://play.google.com/store/apps/details?id=com.felinx18.flasholator');
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       // Open App Store search for the app name
       uri = Uri.parse('https://apps.apple.com/search?term=$appName');
     } else {
-      uri = Uri.parse('https://play.google.com/store/apps/details?id=com.felinx18.flasholator');
+      uri = Uri.parse(
+          'https://play.google.com/store/apps/details?id=com.felinx18.flasholator');
     }
 
     try {
@@ -212,11 +226,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  void _openChangelog() {
-  }
+  void _openChangelog() {}
 
   void _openMentions() async {
-    final Uri url = Uri.parse('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/');
+    final Uri url = Uri.parse(
+        'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       // Handle error if URL cannot be opened
       if (mounted) {
@@ -227,11 +241,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  void _openCGV() {
-  }
+  void _openCGV() {}
 
   void _openPrivacyPolicy() async {
-    final Uri url = Uri.parse('https://felixmortas.github.io/flasholator-privacy-policy.html');
+    final Uri url = Uri.parse(
+        'https://felixmortas.github.io/flasholator-privacy-policy.html');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       // Handle error if URL cannot be opened
       if (mounted) {
@@ -250,7 +264,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       future: userManager.isUserDataCached(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || !snapshot.data!) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         }
 
         final isSubscribed = ref.watch(isSubscribedProvider);
@@ -277,7 +292,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ],
             ),
             body: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(25 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER),
+              padding: const EdgeInsets.fromLTRB(25 * GOLDEN_NUMBER,
+                  16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -295,14 +311,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              userName,
-                              style: Theme.of(context).textTheme.titleMedium
-                            ),
+                            Text(userName,
+                                style: Theme.of(context).textTheme.titleMedium),
                             Text(
                               AppLocalizations.of(context)!.userSince(
-                                DateFormat('dd/MM/yyyy').format(userManager.getSignupDate())
-                              ),
+                                  DateFormat('dd/MM/yyyy')
+                                      .format(userManager.getSignupDate())),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
@@ -315,24 +329,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                   const SizedBox(height: 16 * GOLDEN_NUMBER),
 
-                                  // CTA Premium
-                // ElevatedButton(
-                //   onPressed: () {}, // TODO: implémenter partage
-                //   style: ElevatedButton.styleFrom(
-                //     minimumSize: const Size.fromHeight(50),
-                //   ),
-                //   child: const Text("Invitez vos proches, obtenez du premium gratuitement"),
-                // ),
-                // const SizedBox(height: 24 * GOLDEN_NUMBER),
-          
-                // Section Stats
+                  // CTA Premium
+                  // ElevatedButton(
+                  //   onPressed: () {}, // TODO: implémenter partage
+                  //   style: ElevatedButton.styleFrom(
+                  //     minimumSize: const Size.fromHeight(50),
+                  //   ),
+                  //   child: const Text("Invitez vos proches, obtenez du premium gratuitement"),
+                  // ),
+                  // const SizedBox(height: 24 * GOLDEN_NUMBER),
+
+                  // Section Stats
 
                   _sectionTitle(AppLocalizations.of(context)!.stats),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => StatsPage(flashcardsService: widget.flashcardsService),
+                          builder: (context) => StatsPage(
+                              flashcardsService: widget.flashcardsService),
                         ),
                       );
                     },
@@ -340,23 +355,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                   const SizedBox(height: 24 * GOLDEN_NUMBER),
                   _sectionTitle(AppLocalizations.of(context)!.myAccount),
-                  _infoRow(AppLocalizations.of(context)!.email, userManager.getUserEmail(),
+                  _infoRow(AppLocalizations.of(context)!.email,
+                      userManager.getUserEmail(),
                       action: () => _changeEmail(context)),
                   _infoRow(AppLocalizations.of(context)!.password, "********",
                       action: () => _changePassword(context)),
-                // SwitchListTile(
-                //   value: true, // ref.watch(notificationsProvider),
-                //   onChanged: (val) => _toggleNotifications(val),
-                //   title: const Text("Notifications cartes à réviser"),
-                // ),
+                  // SwitchListTile(
+                  //   value: true, // ref.watch(notificationsProvider),
+                  //   onChanged: (val) => _toggleNotifications(val),
+                  //   title: const Text("Notifications cartes à réviser"),
+                  // ),
 
                   Row(
                     children: [
                       Expanded(
-                        child: Text(isSubscribed ? AppLocalizations.of(context)!.subscribed : AppLocalizations.of(context)!.notSubscribed, style: const TextStyle(fontSize: 16)),
+                        child: Text(
+                            isSubscribed
+                                ? AppLocalizations.of(context)!.subscribed
+                                : AppLocalizations.of(context)!.notSubscribed,
+                            style: const TextStyle(fontSize: 16)),
                       ),
-                      if (!isSubscribed)
-                        SubscribeButton(onPressed: _subscribe)
+                      if (!isSubscribed) SubscribeButton(onPressed: _subscribe)
                     ],
                   ),
                   const SizedBox(height: 24 * GOLDEN_NUMBER),
@@ -368,25 +387,32 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                   const SizedBox(height: 24 * GOLDEN_NUMBER),
                   _sectionTitle(AppLocalizations.of(context)!.about),
-                  _linkTile(AppLocalizations.of(context)!.changelog, _openChangelog),
-                  _linkTile(AppLocalizations.of(context)!.legalNotices, _openMentions),
-                  _linkTile(AppLocalizations.of(context)!.termsAndConditions, _openCGV),
-                  _linkTile(AppLocalizations.of(context)!.privacyPolicy, _openPrivacyPolicy),
-                  if(_showPrivacyButton)
-                    _linkTile(AppLocalizations.of(context)!.privacy, updateConsent),
+                  _linkTile(
+                      AppLocalizations.of(context)!.changelog, _openChangelog),
+                  _linkTile(AppLocalizations.of(context)!.legalNotices,
+                      _openMentions),
+                  _linkTile(AppLocalizations.of(context)!.termsAndConditions,
+                      _openCGV),
+                  _linkTile(AppLocalizations.of(context)!.privacyPolicy,
+                      _openPrivacyPolicy),
+                  if (_showPrivacyButton)
+                    _linkTile(
+                        AppLocalizations.of(context)!.privacy, updateConsent),
                   const SizedBox(height: 32 * GOLDEN_NUMBER),
                   ElevatedButton.icon(
                     onPressed: () => _signOut(context),
                     icon: const Icon(Icons.logout),
                     label: Text(AppLocalizations.of(context)!.logOut),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange),
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () => _deleteAccount(context),
                     icon: const Icon(Icons.delete_forever),
                     label: Text(AppLocalizations.of(context)!.deleteMyAccount),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   ),
                 ],
               ),
@@ -416,7 +442,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 Widget _sectionTitle(String text) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 8 * GOLDEN_NUMBER),
-    child: Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    child: Text(text,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );
 }
 

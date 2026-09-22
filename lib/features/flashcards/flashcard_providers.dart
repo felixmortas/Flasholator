@@ -17,24 +17,33 @@ final flashcardRepositoryProvider = Provider<FlashcardRepository>((ref) {
 });
 
 /// Collection locale partagée : tous les lecteurs observent une même version.
-final flashcardCollectionProvider = StreamProvider<FlashcardCollectionSnapshot>((ref) {
+final flashcardCollectionProvider =
+    StreamProvider<FlashcardCollectionSnapshot>((ref) {
   return ref.watch(flashcardRepositoryProvider).watchCollection();
 });
 
 /// Horloge surchargeable pour conserver les projections de révision déterministes.
-final flashcardClockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+final flashcardClockProvider =
+    Provider<DateTime Function()>((ref) => DateTime.now);
 
-final flashcardReviewProjectionProvider = Provider<AsyncValue<FlashcardReviewProjection>>((ref) {
+final flashcardReviewProjectionProvider =
+    Provider<AsyncValue<FlashcardReviewProjection>>((ref) {
   final now = ref.watch(flashcardClockProvider)();
   return ref.watch(flashcardCollectionProvider).whenData(
         (snapshot) => FlashcardCollectionProjections.review(snapshot, now: now),
       );
 });
 
-final flashcardTableProjectionProvider = Provider<AsyncValue<FlashcardTableProjection>>((ref) {
-  return ref.watch(flashcardCollectionProvider).whenData(FlashcardCollectionProjections.table);
+final flashcardTableProjectionProvider =
+    Provider<AsyncValue<FlashcardTableProjection>>((ref) {
+  return ref
+      .watch(flashcardCollectionProvider)
+      .whenData(FlashcardCollectionProjections.table);
 });
 
-final flashcardStatisticsProjectionProvider = Provider<AsyncValue<FlashcardStatisticsProjection>>((ref) {
-  return ref.watch(flashcardCollectionProvider).whenData(FlashcardCollectionProjections.statistics);
+final flashcardStatisticsProjectionProvider =
+    Provider<AsyncValue<FlashcardStatisticsProjection>>((ref) {
+  return ref
+      .watch(flashcardCollectionProvider)
+      .whenData(FlashcardCollectionProjections.statistics);
 });

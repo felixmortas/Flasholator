@@ -25,10 +25,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> login() async {
     try {
       final userManager = ref.read(userManagerProvider);
-      await userManager.login(emailController.text.trim(), passwordController.text.trim());
+      await userManager.login(
+          emailController.text.trim(), passwordController.text.trim());
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      setState(() => errorMessage = e.message ?? AppLocalizations.of(context)!.connectionError);
+      setState(() => errorMessage =
+          e.message ?? AppLocalizations.of(context)!.connectionError);
     } catch (e) {
       if (!mounted) return;
       setState(() => errorMessage = '${"An error occured"} : $e');
@@ -41,42 +43,55 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.logIn)),
-      body: GridBackground( // Ajout du background cahier ici
+      body: GridBackground(
+        // Ajout du background cahier ici
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: AutofillGroup(
             child: Column(
               children: [
-                if (errorMessage != null) Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+                if (errorMessage != null)
+                  Text(errorMessage!,
+                      style: const TextStyle(color: Colors.red)),
                 TextField(
-                  controller: emailController, 
-                  keyboardType: TextInputType.emailAddress,
-                  autofillHints: const [AutofillHints.email],
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email)),
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email],
+                    decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.email)),
                 const SizedBox(height: 16),
                 TextField(
-                  controller: passwordController, 
-                  autofillHints: const [AutofillHints.password],
-                  onEditingComplete: () => TextInput.finishAutofillContext(),
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.password,
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    controller: passwordController,
+                    autofillHints: const [AutofillHints.password],
+                    onEditingComplete: () => TextInput.finishAutofillContext(),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.password,
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
+                      ),
                     ),
-                  ), 
-                  obscureText: _obscurePassword),
+                    obscureText: _obscurePassword),
                 const SizedBox(height: 16),
-                ElevatedButton(onPressed: login, child: Text(AppLocalizations.of(context)!.logIn)),
+                ElevatedButton(
+                    onPressed: login,
+                    child: Text(AppLocalizations.of(context)!.logIn)),
                 TextButton(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterPage(
-                    initialEmail: emailController.text.trim(),
-                    initialPassword: passwordController.text,
-                  ))),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => RegisterPage(
+                                initialEmail: emailController.text.trim(),
+                                initialPassword: passwordController.text,
+                              ))),
                   child: Text(AppLocalizations.of(context)!.signUp),
                 ),
                 TextButton(
-                  onPressed: () => userManager.sendPasswordResetEmail(emailController.text.trim()),
+                  onPressed: () => userManager
+                      .sendPasswordResetEmail(emailController.text.trim()),
                   child: Text(AppLocalizations.of(context)!.forgotYourPassword),
                 ),
               ],

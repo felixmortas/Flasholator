@@ -6,11 +6,10 @@ List<MapEntry<String, String>> getSortedLanguageEntries(
     BuildContext context, Map<String, String> languageMap) {
   late List<MapEntry<String, String>> entries = languageMap.entries.toList();
 
-  entries.sort((a, b) => AppLocalizations.of(context)!
-      .getTranslatedLanguageName(a.key)
-      .compareTo(
-        AppLocalizations.of(context)!.getTranslatedLanguageName(b.key),
-      ));
+  entries.sort((a, b) =>
+      AppLocalizations.of(context)!.getTranslatedLanguageName(a.key).compareTo(
+            AppLocalizations.of(context)!.getTranslatedLanguageName(b.key),
+          ));
 
   return entries;
 }

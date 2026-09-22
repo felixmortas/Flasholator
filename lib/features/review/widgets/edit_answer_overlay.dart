@@ -23,14 +23,14 @@ class EditAnswerOverlay extends StatelessWidget {
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),                
+                borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
                 controller: controller,
                 autofocus: true,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  focusedBorder: InputBorder.none,  
+                  focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   hintText: AppLocalizations.of(context)!.writeYourResponseHere,
                   hintStyle: TextStyle(

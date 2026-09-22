@@ -38,7 +38,6 @@ class EraserButton extends StatelessWidget {
               ),
         // Bordure arrondie douce
         borderRadius: BorderRadius.circular(16),
-        
       ),
       child: Material(
         color: Colors.transparent,

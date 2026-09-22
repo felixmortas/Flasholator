@@ -32,7 +32,8 @@ void main() {
   });
 
   test('une erreur technique est représentée par une erreur applicative', () {
-    const error = UnexpectedApplicationError(FormatException('Format invalide'));
+    const error =
+        UnexpectedApplicationError(FormatException('Format invalide'));
 
     expect(error, isA<ApplicationError>());
     expect(error.category, ApplicationErrorCategory.unexpected);

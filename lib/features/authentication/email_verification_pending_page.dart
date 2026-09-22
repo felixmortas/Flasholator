@@ -9,10 +9,12 @@ class EmailVerificationPendingPage extends ConsumerStatefulWidget {
   const EmailVerificationPendingPage({super.key});
 
   @override
-  ConsumerState<EmailVerificationPendingPage> createState() => _EmailVerificationPendingPageState();
+  ConsumerState<EmailVerificationPendingPage> createState() =>
+      _EmailVerificationPendingPageState();
 }
 
-class _EmailVerificationPendingPageState extends ConsumerState<EmailVerificationPendingPage> {
+class _EmailVerificationPendingPageState
+    extends ConsumerState<EmailVerificationPendingPage> {
   bool isSending = false;
   bool isChecking = false;
   String? message;
@@ -27,7 +29,8 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
       final userManager = ref.read(userManagerProvider);
       await userManager.sendEmailVerification();
 
-      setState(() => message = AppLocalizations.of(context)!.verificationEmailSent);
+      setState(
+          () => message = AppLocalizations.of(context)!.verificationEmailSent);
     } catch (e) {
       setState(() => message = AppLocalizations.of(context)!.error);
     } finally {
@@ -50,7 +53,8 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
           Navigator.pushReplacementNamed(context, "/");
         }
       } else {
-        setState(() => message = AppLocalizations.of(context)!.yourAddressHasNotYetBeenVerified);
+        setState(() => message =
+            AppLocalizations.of(context)!.yourAddressHasNotYetBeenVerified);
       }
     } catch (e) {
       setState(() => message = AppLocalizations.of(context)!.error);
@@ -64,7 +68,8 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
     final userManager = ref.read(userManagerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.emailVerification)),
+      appBar:
+          AppBar(title: Text(AppLocalizations.of(context)!.emailVerification)),
       body: GridBackground(
         child: Center(
           child: SingleChildScrollView(
@@ -75,19 +80,25 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(AppLocalizations.of(context)!.aVerificationEmailHasBeenSentTo,
+                  Text(
+                      AppLocalizations.of(context)!
+                          .aVerificationEmailHasBeenSentTo,
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center),
                   const SizedBox(height: 8),
                   Text(userManager.getUserEmail(),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 20),
                   if (message != null)
                     Text(
                       message!,
                       style: TextStyle(
-                        color: message!.contains(AppLocalizations.of(context)!.error) ? Colors.red : Colors.green,
+                        color: message!
+                                .contains(AppLocalizations.of(context)!.error)
+                            ? Colors.red
+                            : Colors.green,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -95,15 +106,22 @@ class _EmailVerificationPendingPageState extends ConsumerState<EmailVerification
                   ElevatedButton(
                     onPressed: isSending ? null : resendVerificationEmail,
                     child: isSending
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2))
                         : Text(AppLocalizations.of(context)!.resendEmail),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: isChecking ? null : checkVerificationStatus,
                     child: isChecking
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                        : Text(AppLocalizations.of(context)!.iHaveConfirmedMyEmail),
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : Text(AppLocalizations.of(context)!
+                            .iHaveConfirmedMyEmail),
                   ),
                   const SizedBox(height: 30),
                   TextButton(
