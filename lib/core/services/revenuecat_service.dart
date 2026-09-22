@@ -1,9 +1,20 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:url_launcher/url_launcher.dart';
 
 class RevenueCatService {
+  RevenueCatService({
+    Future<void> Function(String userId)? configure,
+    Future<void> Function(String userId)? logIn,
+    Future<void> Function()? logOut,
+  })  : _configureClient = configure,
+        _logInClient = logIn,
+        _logOutClient = logOut;
+
+  final Future<void> Function(String userId)? _configureClient;
+  final Future<void> Function(String userId)? _logInClient;
+  final Future<void> Function()? _logOutClient;
   static const String _androidApiKey = 'goog_yrvYeFcZAwKnCSkdHaMeUAIUPFb';
   static const String _webApiKey = 'rcb_sb_NQccqqpXcoNQongucDBbMULZZ';
 
@@ -26,12 +37,22 @@ class RevenueCatService {
 
     await _configuration;
     if (_activeUserId != userId) {
-      await Purchases.logIn(userId);
+      final logInClient = _logInClient;
+      if (logInClient != null) {
+        await logInClient(userId);
+      } else {
+        await Purchases.logIn(userId);
+      }
       _activeUserId = userId;
     }
   }
 
   Future<void> _configure(String userId) async {
+    final configureClient = _configureClient;
+    if (configureClient != null) {
+      await configureClient(userId);
+      return;
+    }
     await Purchases.setLogLevel(LogLevel.debug);
     await Purchases.configure(
         PurchasesConfiguration(kIsWeb ? _webApiKey : _androidApiKey)
@@ -90,7 +111,23 @@ class RevenueCatService {
   }
 
   Future<void> logOut() async {
-    await Purchases.logOut();
+    // Un compte Firebase non vérifié peut être déconnecté avant toute
+    // configuration RevenueCat.
+    if (_configuration == null) return;
+    await _configuration;
+    if (_activeUserId == null) return;
+    final logOutClient = _logOutClient;
+    if (logOutClient != null) {
+      await logOutClient();
+    } else {
+      await Purchases.logOut();
+    }
+    _activeUserId = null;
+  }
+
+  @visibleForTesting
+  static void resetForTesting() {
+    _configuration = null;
     _activeUserId = null;
   }
 }

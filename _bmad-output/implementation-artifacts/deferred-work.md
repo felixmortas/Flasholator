@@ -10,3 +10,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-3-reviser-avec-le-comportement-sm-2-caracterise.md`
   summary: Réparer les doublures Firestore incomplètes qui font échouer sept scénarios de `test/firestore_users_dao_test.dart`.
   evidence: La suite complète échoue sur les mocks `DocumentReference.get` et `update`, sans lien avec les fichiers de révision modifiés par cette story.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-1-authentifier-et-restaurer-une-session-utilisateur.md`
+  summary: Sérialiser les transitions entre comptes et invalider chaque écriture tardive dans le cache, le profil et les droits.
+  evidence: Le cache et le notifier historiques sont globaux ; une réponse de l'ancien compte peut encore écrire après une déconnexion ou un changement d'uid. L'isolation complète est le critère explicite de la story 4.2.

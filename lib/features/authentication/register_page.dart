@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/features/authentication/auth_view_model.dart';
 import 'package:flasholator/style/grid_background_painter.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -26,7 +26,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   bool _obscureConfirmPassword = true;
 
   String? errorMessage;
-  bool isLoading = false;
 
   @override
   void initState() {
@@ -69,21 +68,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       return;
     }
 
-    setState(() {
-      errorMessage = null;
-      isLoading = true;
-    });
-
-    try {
-      final userManager = ref.read(userManagerProvider);
-      await userManager.registerUser(email, password, username);
-
+    setState(() => errorMessage = null);
+    await ref.read(authViewModelProvider.notifier)
+        .register(email, password, username);
+    if (!mounted) return;
+    if (ref.read(authViewModelProvider).completed) {
       TextInput.finishAutofillContext();
-
-      setState(() => isLoading = false);
-
-      if (mounted) {
-        showDialog(
+      showDialog(
           context: context,
           builder: (_) => AlertDialog(
             title: Text(AppLocalizations.of(context)!.accountCreated),
@@ -99,12 +90,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             ],
           ),
         );
-      }
-    } on Exception catch (e) {
-      setState(() {
-        errorMessage = e.toString();
-        isLoading = false;
-      });
     }
   }
 
@@ -119,6 +104,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final action = ref.watch(authViewModelProvider);
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.signUp)),
       body: GridBackground(
@@ -127,8 +113,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           child: AutofillGroup(
             child: Column(
               children: [
-                if (errorMessage != null)
-                  Text(errorMessage!,
+                if (errorMessage != null || action.error != null)
+                  Text(errorMessage ?? action.error.toString(),
                       style: const TextStyle(color: Colors.red)),
                 TextField(
                   controller: usernameController,
@@ -192,7 +178,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 20),
-                isLoading
+                action.loading
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: register,

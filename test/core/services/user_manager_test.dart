@@ -115,4 +115,28 @@ void main() {
     verify(() => revenueCat.logOut()).called(1);
     verify(() => auth.signOut()).called(1);
   });
+
+  test('inscription conserve création, nom et courriel de vérification',
+      () async {
+    final auth = _MockAuthService();
+    when(() => auth.registerUser('a@example.com', 'secret'))
+        .thenAnswer((_) async {});
+    when(() => auth.updateDisplayName('Alice')).thenAnswer((_) async {});
+    when(() => auth.sendEmailVerification()).thenAnswer((_) async {});
+    final container = ProviderContainer(overrides: [
+      authServiceProvider.overrideWithValue(auth),
+      firestoreUsersDAOProvider.overrideWithValue(_MockFirestoreUsersDao()),
+      revenueCatServiceProvider.overrideWithValue(_MockRevenueCatService()),
+    ]);
+    addTearDown(container.dispose);
+
+    await container.read(userManagerProvider)
+        .registerUser('a@example.com', 'secret', 'Alice');
+
+    verifyInOrder([
+      () => auth.registerUser('a@example.com', 'secret'),
+      () => auth.updateDisplayName('Alice'),
+      () => auth.sendEmailVerification(),
+    ]);
+  });
 }

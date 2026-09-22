@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/features/authentication/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,28 +18,17 @@ class LoginPage extends ConsumerStatefulWidget {
 class _LoginPageState extends ConsumerState<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  String? errorMessage;
-
   bool _obscurePassword = true;
 
   Future<void> login() async {
-    try {
-      final userManager = ref.read(userManagerProvider);
-      await userManager.login(
-          emailController.text.trim(), passwordController.text.trim());
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      setState(() => errorMessage =
-          e.message ?? AppLocalizations.of(context)!.connectionError);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => errorMessage = '${"An error occured"} : $e');
-    }
+    await ref.read(authViewModelProvider.notifier).login(
+        emailController.text.trim(), passwordController.text.trim());
   }
 
   @override
   Widget build(BuildContext context) {
-    final userManager = ref.read(userManagerProvider);
+    final action = ref.watch(authViewModelProvider);
+    final error = action.error;
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.logIn)),
@@ -50,8 +39,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: AutofillGroup(
             child: Column(
               children: [
-                if (errorMessage != null)
-                  Text(errorMessage!,
+                if (error != null)
+                  Text(error is FirebaseAuthException
+                      ? (error.message ?? AppLocalizations.of(context)!.connectionError)
+                      : AppLocalizations.of(context)!.connectionError,
                       style: const TextStyle(color: Colors.red)),
                 TextField(
                     controller: emailController,
@@ -77,8 +68,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     obscureText: _obscurePassword),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                    onPressed: login,
-                    child: Text(AppLocalizations.of(context)!.logIn)),
+                    onPressed: action.loading ? null : login,
+                    child: action.loading
+                        ? const CircularProgressIndicator()
+                        : Text(AppLocalizations.of(context)!.logIn)),
                 TextButton(
                   onPressed: () => Navigator.push(
                       context,
@@ -90,8 +83,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: Text(AppLocalizations.of(context)!.signUp),
                 ),
                 TextButton(
-                  onPressed: () => userManager
-                      .sendPasswordResetEmail(emailController.text.trim()),
+                  onPressed: action.loading
+                      ? null
+                      : () => ref.read(authViewModelProvider.notifier)
+                          .resetPassword(emailController.text.trim()),
                   child: Text(AppLocalizations.of(context)!.forgotYourPassword),
                 ),
               ],

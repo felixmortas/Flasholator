@@ -47,7 +47,7 @@ void main() {
     verify(() => auth.signOut()).called(1);
   });
 
-  test('auth-state stream is forwarded and login errors remain absorbed',
+  test('auth-state stream is forwarded and login errors reach the caller',
       () async {
     when(() => auth.authStateChanges()).thenAnswer((_) => Stream.value(null));
     when(() => auth.signInWithEmailAndPassword(
@@ -59,7 +59,9 @@ void main() {
 
     await expectLater(
         service.authStateChanges(), emitsInOrder([isNull, emitsDone]));
-    await expectLater(service.login('a@example.com', 'wrong'), completes);
+    await expectLater(service.login('a@example.com', 'wrong'),
+        throwsA(isA<FirebaseAuthException>()
+            .having((error) => error.code, 'code', 'invalid-credential')));
     verify(() => auth.signInWithEmailAndPassword(
           email: 'a@example.com',
           password: 'wrong',

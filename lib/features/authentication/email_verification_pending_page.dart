@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/features/authentication/auth_session_repository.dart';
+import 'package:flasholator/features/authentication/auth_view_model.dart';
 import 'package:flasholator/style/grid_background_painter.dart';
 
 class EmailVerificationPendingPage extends ConsumerStatefulWidget {
@@ -15,57 +16,29 @@ class EmailVerificationPendingPage extends ConsumerStatefulWidget {
 
 class _EmailVerificationPendingPageState
     extends ConsumerState<EmailVerificationPendingPage> {
-  bool isSending = false;
-  bool isChecking = false;
-  String? message;
+  bool _sent = false;
 
   Future<void> resendVerificationEmail() async {
-    setState(() {
-      isSending = true;
-      message = null;
-    });
-
-    try {
-      final userManager = ref.read(userManagerProvider);
-      await userManager.sendEmailVerification();
-
-      setState(
-          () => message = AppLocalizations.of(context)!.verificationEmailSent);
-    } catch (e) {
-      setState(() => message = AppLocalizations.of(context)!.error);
-    } finally {
-      setState(() => isSending = false);
-    }
+    await ref.read(authViewModelProvider.notifier).resendVerification();
+    if (mounted) setState(() => _sent = ref.read(authViewModelProvider).completed);
   }
 
   Future<void> checkVerificationStatus() async {
-    setState(() {
-      isChecking = true;
-      message = null;
-    });
-
-    try {
-      final userManager = ref.read(userManagerProvider);
-
-      if (await userManager.isEmailVerified()) {
-        if (mounted) {
-          await userManager.updateUser({'canTranslate': true});
-          Navigator.pushReplacementNamed(context, "/");
-        }
-      } else {
-        setState(() => message =
-            AppLocalizations.of(context)!.yourAddressHasNotYetBeenVerified);
-      }
-    } catch (e) {
-      setState(() => message = AppLocalizations.of(context)!.error);
-    } finally {
-      setState(() => isChecking = false);
-    }
+    setState(() => _sent = false);
+    await ref.read(authViewModelProvider.notifier).checkVerification();
   }
 
   @override
   Widget build(BuildContext context) {
-    final userManager = ref.read(userManagerProvider);
+    final action = ref.watch(authViewModelProvider);
+    final session = ref.read(authSessionRepositoryProvider.notifier);
+    final message = action.error != null
+        ? AppLocalizations.of(context)!.error
+        : action.verified == false
+            ? AppLocalizations.of(context)!.yourAddressHasNotYetBeenVerified
+            : _sent
+                ? AppLocalizations.of(context)!.verificationEmailSent
+                : null;
 
     return Scaffold(
       appBar:
@@ -86,16 +59,16 @@ class _EmailVerificationPendingPageState
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center),
                   const SizedBox(height: 8),
-                  Text(userManager.getUserEmail(),
+                  Text(session.userEmail,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 20),
                   if (message != null)
                     Text(
-                      message!,
+                      message,
                       style: TextStyle(
-                        color: message!
+                        color: message
                                 .contains(AppLocalizations.of(context)!.error)
                             ? Colors.red
                             : Colors.green,
@@ -104,8 +77,8 @@ class _EmailVerificationPendingPageState
                     ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: isSending ? null : resendVerificationEmail,
-                    child: isSending
+                    onPressed: action.loading ? null : resendVerificationEmail,
+                    child: action.loading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
@@ -114,8 +87,8 @@ class _EmailVerificationPendingPageState
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
-                    onPressed: isChecking ? null : checkVerificationStatus,
-                    child: isChecking
+                    onPressed: action.loading ? null : checkVerificationStatus,
+                    child: action.loading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
@@ -125,7 +98,7 @@ class _EmailVerificationPendingPageState
                   ),
                   const SizedBox(height: 30),
                   TextButton(
-                    onPressed: () => userManager.signOut(),
+                    onPressed: () => session.signOut(),
                     child: Text(AppLocalizations.of(context)!.logOut),
                   ),
                 ],

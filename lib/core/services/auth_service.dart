@@ -39,6 +39,8 @@ class AuthService {
     return _firebaseAuth.authStateChanges();
   }
 
+  User? get currentUser => _firebaseAuth.currentUser;
+
   String getUserName() {
     final user = _firebaseAuth.currentUser;
     return user?.displayName ?? user?.email ?? '';
@@ -98,12 +100,8 @@ class AuthService {
   }
 
   Future<void> login(String email, String password) async {
-    try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-    } on Exception catch (e) {
-      print("Error logging in: $e");
-    }
+    await _firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
   }
 
   DateTime getSignupDate() {

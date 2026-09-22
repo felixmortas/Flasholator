@@ -56,7 +56,6 @@ class ApplicationBootstrap {
     ads: const AdsBootstrapStep(),
     afterAds: const [
       PrivacyAndAdsBootstrapStep(),
-      RevenueCatSessionBootstrapStep(),
     ],
   );
 
@@ -77,7 +76,6 @@ class ApplicationBootstrap {
         afterAds: afterAds ??
             const [
               PrivacyAndAdsBootstrapStep(),
-              RevenueCatSessionBootstrapStep(),
             ],
       );
     }
