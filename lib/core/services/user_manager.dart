@@ -17,11 +17,14 @@ class UserManager {
   final RevenueCatService _revenueCatService;
   final Ref ref;
 
-  UserManager({required this.ref, required FirestoreUsersDAO firestoreDAO, required AuthService authService, required RevenueCatService revenueCatService})
+  UserManager(
+      {required this.ref,
+      required FirestoreUsersDAO firestoreDAO,
+      required AuthService authService,
+      required RevenueCatService revenueCatService})
       : _firestoreDAO = firestoreDAO,
         _authService = authService,
         _revenueCatService = revenueCatService;
-
 
   UserDataNotifier get userNotifier => ref.read(userDataProvider.notifier);
 
@@ -58,7 +61,8 @@ class UserManager {
     await _authService.reauthenticateWithCredential(password);
   }
 
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
     await _authService.changePassword(currentPassword, newPassword);
   }
 
@@ -79,7 +83,8 @@ class UserManager {
     return _authService.authStateChanges();
   }
 
-  Future<void> registerUser(String email, String password, String username) async {
+  Future<void> registerUser(
+      String email, String password, String username) async {
     await _authService.registerUser(email, password);
     await _authService.updateDisplayName(username);
     await _authService.sendEmailVerification();
@@ -92,7 +97,6 @@ class UserManager {
       await initRevenueCat();
       await syncLocalFromFirestore();
       ref.read(userSyncStateProvider.notifier).state = true;
-
     } catch (e) {
       throw Exception('Failed to login and sync user: $e');
     }
@@ -102,7 +106,7 @@ class UserManager {
     final bool wasSubscribed = userNotifier.isSubscribed;
     final userId = getUserId();
     await _revenueCatService.presentPaywall(userId);
-    if(!wasSubscribed) {
+    if (!wasSubscribed) {
       final bool isSubscribed = await isUserSubscribed();
       if (isSubscribed) {
         updateLocal({"isSubscribed": isSubscribed});
@@ -111,8 +115,12 @@ class UserManager {
   }
 
   Future<void> signOut() async {
-    await _authService.signOut();
-    await clearLocalData();
+    try {
+      await _revenueCatService.logOut();
+    } finally {
+      await _authService.signOut();
+      await clearLocalData();
+    }
   }
 
   Future<void> clearLocalData() async {
@@ -125,8 +133,12 @@ class UserManager {
     if (uid != null) {
       await _authService.deleteUser();
       await _firestoreDAO.deleteUser(uid);
-      await UserPreferencesService.deleteUser();
-      userNotifier.clear();
+      try {
+        await _revenueCatService.logOut();
+      } finally {
+        await UserPreferencesService.deleteUser();
+        userNotifier.clear();
+      }
     }
   }
 
@@ -151,7 +163,6 @@ class UserManager {
     await updateLocal(data);
   }
 
-
   Future<void> updateLocal(Map<String, dynamic> data) async {
     await UserPreferencesService.updateUser(data);
     userNotifier.update(data);
@@ -159,7 +170,7 @@ class UserManager {
 
   Future<void> updateUser(Map<String, dynamic> data) async {
     final uid = _authService.getUserId();
-    
+
     await _firestoreDAO.updateUser(uid, data);
     await UserPreferencesService.updateUser(data);
     userNotifier.update(data);
@@ -184,7 +195,7 @@ class UserManager {
     return userDoc;
   }
 
-    String getUserEmail() {
+  String getUserEmail() {
     return _authService.getUserEmail();
   }
 
@@ -199,5 +210,4 @@ class UserManager {
   DateTime getSignupDate() {
     return _authService.getSignupDate();
   }
-
 }

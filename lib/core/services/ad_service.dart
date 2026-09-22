@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
+  static final AdService shared = AdService();
+  static Future<void>? _sdkInitialization;
   // ---------- Interstitial ----------
   InterstitialAd? _interstitialAd;
   bool _isInterstitialLoaded = false;
@@ -15,11 +17,22 @@ class AdService {
   bool _isBannerLoadedOnce = false;
 
   // ---------- IDs ----------
-  final String interstitialAdUnitId = 'ca-app-pub-9706580094748746/2652484340'; // Test ID : ca-app-pub-3940256099942544/1033173712
-  final String bannerAdUnitId = 'ca-app-pub-9706580094748746/7892523530'; // Test ID : ca-app-pub-3940256099942544/9214589741
+  final String interstitialAdUnitId =
+      'ca-app-pub-9706580094748746/2652484340'; // Test ID : ca-app-pub-3940256099942544/1033173712
+  final String bannerAdUnitId =
+      'ca-app-pub-9706580094748746/7892523530'; // Test ID : ca-app-pub-3940256099942544/9214589741
 
   // ---------- INITIALISATION ----------
-  static Future<void> initialize() async {
+  static Future<void> initialize() =>
+      _sdkInitialization ??= _initializeSdk().onError((error, stackTrace) {
+        _sdkInitialization = null;
+        Error.throwWithStackTrace(
+          error ?? StateError('Échec de l’initialisation Ads'),
+          stackTrace,
+        );
+      });
+
+  static Future<void> _initializeSdk() async {
     if (!kIsWeb) {
       await MobileAds.instance.initialize();
 
@@ -82,12 +95,13 @@ class AdService {
       debugPrint('Unable to get banner ad size.');
       return null;
     }
-    
+
     // On utilise un Completer pour transformer le callback en Future
     final completer = Completer<BannerAd?>();
 
     final ad = BannerAd(
-      adUnitId: bannerAdUnitId, // Assurez-vous que cette variable est accessible
+      adUnitId:
+          bannerAdUnitId, // Assurez-vous que cette variable est accessible
       request: const AdRequest(),
       size: size,
       listener: BannerAdListener(
@@ -106,12 +120,11 @@ class AdService {
     ad.load();
     return completer.future;
   }
-  
+
   bool _shouldShowBanner() {
     // Votre logique existante
     return !kIsWeb && (Platform.isAndroid || Platform.isIOS);
   }
-
 
   // ---------- DISPOSE ----------
   void dispose() {
@@ -120,7 +133,6 @@ class AdService {
   }
 }
 
-  void disposeBanner(BannerAd? banner) {
-    banner?.dispose();
-  }
-
+void disposeBanner(BannerAd? banner) {
+  banner?.dispose();
+}

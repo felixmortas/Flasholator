@@ -1,4 +1,5 @@
-import 'package:drift/drift.dart' show Value; // IMPORTANT: Importer Value de Drift
+import 'package:drift/drift.dart'
+    show Value; // IMPORTANT: Importer Value de Drift
 
 import 'package:flasholator/core/services/sm_two.dart';
 import 'package:flasholator/core/services/db_wrapper.dart'; // IMPORTANT: Importer db_wrapper.dart
@@ -65,8 +66,12 @@ class Flashcard {
       interval: Value(interval),
       repetitions: Value(repetitions),
       timesReviewed: Value(timesReviewed),
-      lastReviewDate: lastReviewDate != null ? Value(lastReviewDate!) : const Value.absent(),
-      nextReviewDate: nextReviewDate != null ? Value(nextReviewDate!) : const Value.absent(),
+      lastReviewDate: lastReviewDate != null
+          ? Value(lastReviewDate!)
+          : const Value.absent(),
+      nextReviewDate: nextReviewDate != null
+          ? Value(nextReviewDate!)
+          : const Value.absent(),
     );
   }
 

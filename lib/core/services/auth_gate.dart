@@ -9,7 +9,6 @@ import 'package:flasholator/features/home_page.dart';
 import 'package:flasholator/features/authentication/email_verification_pending_page.dart';
 
 class AuthGate extends ConsumerStatefulWidget {
-
   const AuthGate({
     super.key,
   });
@@ -19,7 +18,6 @@ class AuthGate extends ConsumerStatefulWidget {
 }
 
 class _AuthGateState extends ConsumerState<AuthGate> {
-
   @override
   Widget build(BuildContext context) {
     final userManager = ref.watch(userManagerProvider);
@@ -27,12 +25,14 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     return StreamBuilder<User?>(
       stream: userManager.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting || !userSyncState) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        if (snapshot.connectionState == ConnectionState.waiting ||
+            !userSyncState) {
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         }
 
         final user = snapshot.data;
-        
+
         if (user != null && user.emailVerified && userSyncState) {
           return const HomePage();
         } else if (user != null && !user.emailVerified) {

@@ -3,14 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _firebaseAuth;
 
-  AuthService({required FirebaseAuth firebaseAuth}) : _firebaseAuth = firebaseAuth;
+  AuthService({required FirebaseAuth firebaseAuth})
+      : _firebaseAuth = firebaseAuth;
 
   Future<void> updateDisplayName(String displayName) async {
     await _firebaseAuth.currentUser?.updateDisplayName(displayName);
   }
 
   Future<void> registerUser(String email, String password) async {
-    await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+    await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
@@ -69,7 +71,8 @@ class AuthService {
     }
   }
 
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
     final user = _firebaseAuth.currentUser;
 
     if (user == null || user.email == null) return;
@@ -96,7 +99,8 @@ class AuthService {
 
   Future<void> login(String email, String password) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      await _firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
     } on Exception catch (e) {
       print("Error logging in: $e");
     }
@@ -107,6 +111,7 @@ class AuthService {
     if (user != null && user.metadata.creationTime != null) {
       return user.metadata.creationTime!;
     }
-    return DateTime.now(); // Fallback to current time if creation time is not available
+    return DateTime
+        .now(); // Fallback to current time if creation time is not available
   }
 }

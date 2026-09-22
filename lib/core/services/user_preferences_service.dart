@@ -92,7 +92,8 @@ class UserPreferencesService {
   // =========================
 
   /// Marque les données utilisateur comme étant mises en cache si certains champs sont mis à jour
-  static Future<void> _updateCachedFlag(SharedPreferences prefs, Map<String, dynamic> fields) async {
+  static Future<void> _updateCachedFlag(
+      SharedPreferences prefs, Map<String, dynamic> fields) async {
     const watchedKeys = {
       _canTranslateKey,
       _coupleLangKey,

@@ -4,12 +4,13 @@ import 'package:flasholator/core/services/ad_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 final adServiceProvider = Provider<AdService>((ref) {
-  return AdService();
+  return AdService.shared;
 });
 
-final bannerAdProvider = FutureProvider.family<BannerAd?, double>((ref, width) async {
+final bannerAdProvider =
+    FutureProvider.family<BannerAd?, double>((ref, width) async {
   // Récupère l'état d'abonnement pour décider si on charge la pub
-  final isSubscribed = ref.watch(isSubscribedProvider); 
+  final isSubscribed = ref.watch(isSubscribedProvider);
   if (isSubscribed) {
     return null; // Ne pas charger la pub si l'utilisateur est abonné
   }

@@ -1,47 +1,76 @@
-# Inventaire de retrait du legacy
+# Registre de preuve de retrait du legacy
 
-_État initial — 2026-09-21. Cet inventaire est une matrice de pilotage : un élément n’est supprimable que lorsque son remplacement, ses consommateurs migrés et ses preuves de caractérisation sont tous renseignés._
+_État observé le 2026-09-22. Ce document est un registre de preuve : il ne
+prouve pas une bascule qui n'a pas eu lieu et n'autorise aucune suppression à
+lui seul._
 
-## Règle de décision
+## Statuts et champs obligatoires
 
-Un candidat ne passe à **supprimable** que si :
+Chaque candidat conserve les champs suivants jusqu'à son retrait : remplaçant,
+consommateurs observés et migrés, tests associés, audit de références, état,
+preuves de vérification et commit de retrait. Une valeur `aucun` signifie qu'une
+preuve est absente, pas qu'elle est acquise.
 
-1. son remplaçant est intégré et utilisé par tous ses consommateurs de production ;
-2. les invariants listés dans `migration-contract.md` sont couverts pour son domaine ;
-3. `rg` ne trouve plus d’import ou référence exécutable vers le candidat ;
-4. `flutter analyze` et `flutter test` sont verts après sa suppression dans un changement dédié.
+- **legacy actif** : le composant ou au moins un de ses consommateurs de
+  production est encore en place ; sa suppression est interdite.
+- **migré, en attente de retrait** : tous les consommateurs connus ont basculé,
+  mais l'audit après bascule, les vérifications ou le commit isolé manquent.
+- **supprimable** : statut réservé à un candidat dont les critères du protocole
+  ci-dessous sont consignés. Aucun candidat n'a ce statut dans cet état du
+  registre.
 
-Le code généré Drift et l10n ne sont jamais des candidats de retrait manuel.
+Les fichiers générés `lib/l10n/app_localizations*.dart` et
+`lib/core/services/db_wrapper.g.dart` sont exclus de tout retrait manuel.
 
-## Matrice initiale
+## Registre courant
 
-| Candidat actuel | Consommateurs de production observés | Remplaçant cible | Tranche | État | Preuve manquante avant retrait |
-|---|---|---|---|---|---|
-| `core/services/sm_two.dart` | `Flashcard` | Règle de planification du domaine review, avec horloge injectable | 3 | À migrer, pas à supprimer sans relogement | Cas SM-2 figés : première revue, succès, échec, borne 1,3 |
-| `core/services/db_wrapper.dart` | `Flashcard`, `FlashcardsService` | Adaptateur Drift derrière un contrat de dépôt de cartes | 3 | À encapsuler | Aller-retour complet Drift et opérations de paire |
-| `core/services/flashcards_service.dart` | `HomePage`, `ReviewTab`, `DataTableTab`, `ProfilePage`, `TranslateTab`, `StatsService` | Cas d’usage/repository flashcards injecté par provider de fonctionnalité | 3 | Legacy actif | Tous les consommateurs basculés ; tests ajout/modification/suppression/due/review |
-| `core/services/stats_service.dart` | `StatsPage` | Cas d’usage statistiques + `StatsViewModel` | 5 | Legacy actif | Totaux dédoublonnés, séries, moyennes, couples et classements |
-| `core/services/deepl_translator.dart` | `HomePage`, `TranslateTab` | Adaptateur DeepL injecté + cas d’usage traduction | 4 | Legacy actif | Réponses succès/échec caractérisées avec client HTTP fake ; clé sortie du code source |
-| `core/services/auth_gate.dart` | `main.dart` | Vue de routage/session de la feature authentication | 5 | Legacy actif | États anonyme, vérification en attente, utilisateur vérifié, synchronisation |
-| `core/services/auth_service.dart` + `auth_service_provider.dart` + `firebase_auth_provider.dart` | `UserManager`, `UserManagerProvider`, pages d’authentification via manager | Port/auth adapter Firebase + `AuthViewModel` et providers de feature | 5 | Legacy actif | Flux auth et traitement exact des erreurs existantes |
-| `core/services/firestore_users_dao.dart` + providers Firestore/DAO | `UserManager`, `UserManagerProvider` | Repository de profil, adaptateur Firestore injecté | 5 | Legacy actif | Création/mise à jour/suppression/lire utilisateur avec fake Firestore |
-| `core/services/user_preferences_service.dart` | `UserManager`, tests | Port de préférences + adaptateur SharedPreferences injecté | 5 | Legacy actif | Valeurs par défaut, cache, mises à jour et nettoyage |
-| `core/services/user_manager.dart` + `user_manager_provider.dart` | AuthGate, login, register, email verification, profile, data table, translation, home | ViewModels séparés : session/auth, profil/préférences, abonnement ; cas d’usage dédiés | 5 | Legacy actif, composant pivot | Tous les consommateurs migrés et tests de coordination auth/cache/abonnement |
-| `core/providers/user_data_provider.dart` + `user_sync_provider.dart` | Home, profile, review, translation, data, auth gate, ad provider | États UI typés et immuables par feature ; état session dédié | 2 puis 5 | Legacy actif | Overrides Riverpod et états chargement/données/erreur vérifiés |
-| `core/services/revenuecat_service.dart` + `revenuecat_provider.dart` | `UserManager` | Port abonnement + adaptateur RevenueCat injecté | 5 | Legacy actif | Initialisation, statut, paywall, achat/restauration avec fake |
-| `core/services/ad_service.dart` + `ad_provider.dart` | `main.dart`, home, review, bannière partagée | Adaptateur publicité/consentement injecté ; providers de présentation | 5 | Legacy actif | Décision abonné/non abonné, web/mobile, échecs de chargement |
-| `core/services/consent_manager.dart` | Home, profile | Adaptateur consentement injecté | 5 | Legacy actif | Consentement, options de confidentialité, erreurs de SDK |
-| `core/services/feedback_service.dart` | `UnsubscribeDialog` | Repository feedback injecté dans la feature profile/authentication | 5 | Legacy actif | Envoi, échec propagé et absence de SDK dans le widget |
+| Candidat | Remplaçant concret ou cible explicite | Consommateurs observés de production (2026-09-22) | Consommateurs migrés | Tests de caractérisation associés | Audit de références requis et résultat actuel | État | Commit isolé et vérifications de retrait |
+|---|---|---|---|---|---|---|---|
+| `core/services/sm_two.dart` | Règle de planification review du domaine avec horloge injectable | `lib/core/models/flashcard.dart` | Aucun | `test/core/services/sm_two_test.dart` ; `test/core/services/flashcards_service_test.dart` | `rg -n "sm_two" lib test` : références exécutables dans `flashcard.dart` ; tests également présents | legacy actif | Aucun ; retrait bloqué |
+| `core/services/db_wrapper.dart` | Adaptateur Drift derrière un contrat de dépôt de cartes | `lib/core/models/flashcard.dart`, `lib/core/services/flashcards_service.dart` | Aucun | `test/core/models/flashcard_test.dart` ; `test/core/services/flashcards_service_test.dart` | `rg -n "db_wrapper" lib test` : imports exécutables dans le modèle et le service | legacy actif | Aucun ; retrait bloqué. Le généré `db_wrapper.g.dart` n'est jamais supprimé manuellement. |
+| `core/services/flashcards_service.dart` | Cas d'usage/repository flashcards injecté par provider de fonctionnalité | `lib/features/home_page.dart`, `review/review_tab.dart`, `data/data_table_tab.dart`, `profile/profile_page.dart`, `translation/translate_tab.dart`, `core/services/stats_service.dart` | Aucun | `test/core/services/flashcards_service_test.dart` ; `test/core/models/flashcard_test.dart` | `rg -n "flashcards_service" lib test` : imports exécutables dans tous les consommateurs listés | legacy actif | Aucun ; retrait bloqué |
+| `core/services/stats_service.dart` | Cas d'usage statistiques + `StatsViewModel` | `lib/features/stats/stats_page.dart` | Aucun | `test/core/services/stats_service_test.dart` | `rg -n "stats_service" lib test` : import exécutable dans `stats_page.dart` | legacy actif | Aucun ; retrait bloqué |
+| `core/services/deepl_translator.dart` | Adaptateur DeepL injecté + cas d'usage traduction | `lib/features/home_page.dart`, `features/translation/translate_tab.dart` | Aucun | `test/features/translation/translate_tab_test.dart` (invalidations de requêtes) ; aucun test d'adaptateur DeepL dédié observé | `rg -n "deepl_translator" lib test` : imports exécutables dans home et traduction | legacy actif | Aucun ; retrait bloqué |
+| `core/services/auth_gate.dart` | Vue de routage/session de la feature authentication | `lib/main.dart` | Aucun | Aucun test dédié observé | `rg -n "auth_gate" lib test` : import exécutable dans `main.dart` | legacy actif | Aucun ; retrait bloqué |
+| `core/services/auth_service.dart`, `auth_service_provider.dart`, `firebase_auth_provider.dart` | Port/auth adapter Firebase + `AuthViewModel` et providers de feature | `core/services/user_manager.dart`, `core/providers/user_manager_provider.dart` ; pages `login_page.dart`, `register_page.dart`, `email_verification_pending_page.dart` via le manager | Aucun | `test/core/services/auth_service_test.dart` ; `test/core/services/user_manager_test.dart` | `rg -n "auth_service_provider\|firebase_auth_provider\|auth_service" lib test` : imports exécutables dans providers et `user_manager.dart` | legacy actif | Aucun ; retrait bloqué |
+| `core/services/firestore_users_dao.dart` et providers Firestore/DAO | Repository de profil + adaptateur Firestore injecté | `core/services/user_manager.dart`, `core/providers/user_manager_provider.dart` | Aucun | `test/firestore_users_dao_test.dart` ; `test/core/services/user_manager_test.dart` | `rg -n "firestore_users_dao\|firebase_firestore_provider" lib test` : imports exécutables dans le manager et ses providers | legacy actif | Aucun ; retrait bloqué |
+| `core/services/user_preferences_service.dart` | Port de préférences + adaptateur SharedPreferences injecté | `lib/core/services/user_manager.dart` | Aucun | `test/user_preferences_service_test.dart` ; `test/core/services/user_manager_test.dart` | `rg -n "user_preferences_service" lib test` : import exécutable dans `user_manager.dart` | legacy actif | Aucun ; retrait bloqué |
+| `core/services/user_manager.dart` et `user_manager_provider.dart` | ViewModels séparés session/auth, profil/préférences et abonnement ; cas d'usage dédiés | `auth_gate.dart`, `home_page.dart`, `profile_page.dart`, `review/review_tab.dart`, `data/data_table_tab.dart`, `translation/translate_tab.dart`, pages d'authentification ; `user_sync_provider.dart` | Aucun | `test/core/services/user_manager_test.dart` | `rg -n "user_manager_provider\|user_manager" lib test` : imports exécutables dans les écrans et providers listés | legacy actif (composant pivot) | Aucun ; retrait bloqué |
+| `core/providers/user_data_provider.dart` et `user_sync_provider.dart` | États UI typés et immuables par feature ; état de session dédié | `home_page.dart`, `profile_page.dart`, `review/review_tab.dart`, `data/data_table_tab.dart`, `translation/translate_tab.dart`, `auth_gate.dart`, `ad_provider.dart`, `user_manager.dart` | Aucun | `test/core/services/user_manager_test.dart` ; aucun test dédié aux états UI observé | `rg -n "user_data_provider\|user_sync_provider" lib test` : imports exécutables dans les consommateurs listés | legacy actif | Aucun ; retrait bloqué |
+| `core/services/revenuecat_service.dart` et `revenuecat_provider.dart` | Port abonnement + adaptateur RevenueCat injecté | `core/bootstrap/application_bootstrap.dart`, `core/services/user_manager.dart`, `core/providers/user_manager_provider.dart` | Aucun | `test/core/bootstrap/application_bootstrap_test.dart` ; `test/core/services/user_manager_test.dart` | `rg -n "revenuecat_service\|revenuecat_provider" lib test` : imports exécutables dans bootstrap, manager et provider | legacy actif | Aucun ; retrait bloqué |
+| `core/services/ad_service.dart` et `ad_provider.dart` | Adaptateur publicité/consentement injecté ; providers de présentation | `core/bootstrap/application_bootstrap.dart`, `features/review/review_tab.dart`, `features/shared/widgets/ad_banner_widget.dart` | Aucun | `test/core/bootstrap/application_bootstrap_test.dart` ; aucun test de décision publicitaire dédié observé | `rg -n "ad_service\|ad_provider" lib test` : imports exécutables dans bootstrap, review et bannière | legacy actif | Aucun ; retrait bloqué |
+| `core/services/consent_manager.dart` | Adaptateur consentement injecté | `lib/core/bootstrap/application_bootstrap.dart`, `lib/features/profile/profile_page.dart` | Aucun | `test/core/bootstrap/application_bootstrap_test.dart` (séquence injectable, pas le SDK de consentement) | `rg -n "consent_manager\|ConsentManager" lib test` : usages exécutables dans bootstrap et profil | legacy actif | Aucun ; retrait bloqué. Les adaptations du bootstrap ne constituent pas une bascule complète. |
+| `core/services/feedback_service.dart` | Repository feedback injecté dans la feature profile/authentication | `lib/features/authentication/widgets/unsubscribe_dialog.dart` | Aucun | Aucun test dédié observé | `rg -n "feedback_service\|FeedbackService" lib test` : import et usage exécutables dans `unsubscribe_dialog.dart` | legacy actif | Aucun ; retrait bloqué |
 
-## Constats qui conditionnent la première tranche
+## Protocole de retrait, à appliquer candidat par candidat
 
-- `FlashcardsService` instancie `DatabaseWrapper`, et `DeeplTranslator`, `FeedbackService`, `ConsentManager` ainsi que `AdService` exposent encore des accès directs aux SDK ou méthodes statiques : ce sont les premières frontières à rendre injectables.
-- `UserManager` dépend de `Ref`, de `BuildContext` dans certaines actions, de Firebase, Firestore, RevenueCat et préférences : il doit être découpé, pas déplacé tel quel.
-- Le constructeur de production de `FirestoreUsersDAO` ignore le `FirebaseFirestore` fourni et utilise `FirebaseFirestore.instance` ; ce comportement doit être caractérisé puis corrigé dans l’adaptateur de remplacement, via une décision explicite.
-- `test/user_preferences_service_test.dart` importe `local_user_data_notifier.dart`, fichier absent de l’arborescence observée. La première tranche doit rétablir une base de tests exécutable avant d’en déduire une couverture.
+1. **Avant la migration**, exécuter et consigner `rg -n
+   "<symbole-ou-import-du-candidat>" lib test`. Le résultat doit lister les
+   consommateurs de production observés, les tests et les références internes ;
+   il ne justifie jamais une suppression.
+2. **Migrer tous les consommateurs** vers le remplaçant indiqué, sans modifier
+   de parcours ni de règle métier. Renseigner leurs chemins dans la colonne
+   « Consommateurs migrés » et associer les tests de caractérisation qui
+   couvrent le comportement remplacé.
+3. **Auditer après bascule** avec la même commande `rg`. Seules les références
+   de documentation, commentaires ou artefacts générés explicitement exclus
+   peuvent subsister ; toute référence exécutable maintient le statut `legacy
+   actif`.
+4. **Préparer une suppression dédiée et réversible** : un seul candidat (et ses
+   fichiers indissociables) par commit, sans migration fonctionnelle mêlée.
+   Consigner le SHA complet du commit et la manière de le revenir dans la
+   colonne de preuve.
+5. **Vérifier dans ce commit** : exécuter `flutter analyze` puis `flutter test`
+   après la suppression. Consigner la date et les résultats verts, ainsi que le
+   résultat `rg` sans référence exécutable.
+6. **Seulement alors**, remplacer l'état par `supprimable`, puis par `retiré`
+   après intégration. L'absence d'un seul consommateur migré, test, audit,
+   résultat Flutter ou commit réversible interdit les deux statuts.
 
-## Prochaine passe opérationnelle
+## Lecture des preuves actuelles
 
-1. Rétablir et exécuter les tests existants sans toucher au comportement produit.
-2. Écrire les tests de caractérisation flashcards/review, statistiques, auth et persistance.
-3. Après chaque tranche, remplacer l’état de chaque ligne par `migré`, `bloqué` ou `supprimable`, et consigner les imports restants.
+Les suites existantes caractérisent déjà une partie des cartes/review,
+statistiques, authentification, préférences, traduction asynchrone et bootstrap.
+Elles ne constituent pas, à elles seules, la preuve de retrait d'un candidat :
+les migrations des Epics 2 à 5 et l'audit sans référence exécutable restent à
+faire. Par conséquent, toutes les lignes du registre demeurent `legacy actif`.

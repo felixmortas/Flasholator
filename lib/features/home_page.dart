@@ -7,15 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
-import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
 import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
@@ -54,8 +51,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
 
-    if (!kIsWeb ) {
-      _initPrivacyFlow();
+    if (!kIsWeb && Platform.isAndroid) {
+      _initAndroidIntegration();
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -71,30 +68,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.dispose();
   }
 
-  Future<void> _initPrivacyFlow() async {
-    // 1. Handle Google UMP / GDPR first
-    ConsentManager.initialize();
-
-    // 2. Handle iOS Specific App Tracking Transparency
-    if (Platform.isIOS) {
-      // Check current status
-      var status = await AppTrackingTransparency.trackingAuthorizationStatus;
-      
-      // If not determined, show the system dialog
-      if (status == TrackingStatus.notDetermined) {
-        // Optional: Add a slight delay to allow the UI to settle after GDPR
-        await Future.delayed(const Duration(milliseconds: 1000));
-        await AppTrackingTransparency.requestTrackingAuthorization();
-      }
-    }
-
-    // 3. Now load ads
-    ref.read(adServiceProvider).loadInterstitial();
-    
-    if (Platform.isAndroid) {
-      requestPermissions();
-      _handleTextIntent();
-    }
+  Future<void> _initAndroidIntegration() async {
+    await requestPermissions();
+    await _handleTextIntent();
   }
 
   Future<void> _showLanguageSelectionPopup(String sourceLang, String targetLang) async {
@@ -115,7 +91,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _initUserState() async {
     final userManager = ref.read(userManagerProvider);
-    await userManager.initRevenueCat();
     await userManager.syncNotifierFromCache();
 
     final coupleLang = ref.read(coupleLangProvider);

@@ -6,25 +6,31 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flasholator/main.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  for (final languageCode in ['fr', 'en', 'es']) {
+    testWidgets('MyApp charge la localisation générée $languageCode',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MyApp(
+            locale: Locale(languageCode),
+            home: const Placeholder(),
+          ),
+        ),
+      );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      final localizations = AppLocalizations.of(
+        tester.element(find.byType(Placeholder)),
+      );
+      expect(app.supportedLocales, contains(Locale(languageCode)));
+      expect(localizations?.localeName, languageCode);
+    });
+  }
 }

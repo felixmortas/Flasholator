@@ -9,14 +9,17 @@ class SMTwo {
   int repetitions;
   DateTime reviewDate;
 
-  SMTwo({
-    // Assign default values here
-    required this.easiness, 
-    required this.interval, 
-    required this.repetitions})
-      : reviewDate = DateTime.now(); // Assign default value here because the value assigned is the result of a complex commands
+  SMTwo(
+      {
+      // Assign default values here
+      required this.easiness,
+      required this.interval,
+      required this.repetitions})
+      : reviewDate = DateTime
+            .now(); // Assign default value here because the value assigned is the result of a complex commands
 
-  factory SMTwo.firstReview(int quality, {DateTime? reviewDate, String? dateFormat}) {
+  factory SMTwo.firstReview(int quality,
+      {DateTime? reviewDate, String? dateFormat}) {
     // Review the flashcard for the first time
     if (reviewDate == null) {
       reviewDate = DateTime.now();
@@ -26,7 +29,8 @@ class SMTwo {
       dateFormat = 'yyyy-MM-dd';
     }
 
-    return SMTwo(easiness: 2.5, interval: 0, repetitions: 0).review(quality, reviewDate: reviewDate, dateFormat: dateFormat);
+    return SMTwo(easiness: 2.5, interval: 0, repetitions: 0)
+        .review(quality, reviewDate: reviewDate, dateFormat: dateFormat);
   }
 
   SMTwo review(int quality, {DateTime? reviewDate, String? dateFormat}) {

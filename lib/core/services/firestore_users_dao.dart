@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirestoreUsersDAO {
   final FirebaseFirestore _firestore;
 
-  FirestoreUsersDAO({required FirebaseFirestore firestore}) : _firestore = FirebaseFirestore.instance;
+  FirestoreUsersDAO({required FirebaseFirestore firestore})
+      : _firestore = FirebaseFirestore.instance;
 
   // Constructeur pour les tests
   FirestoreUsersDAO.test(this._firestore);

@@ -25,7 +25,6 @@ class Flashcards extends Table {
   DateTimeColumn get nextReviewDate => dateTime().nullable()();
 }
 
-
 // --- 2. Classe de la base de données Drift ---
 // C'est le cœur de Drift. Elle connecte les définitions de tables à un fichier de base de données.
 @DriftDatabase(tables: [Flashcards])
@@ -68,7 +67,8 @@ class DatabaseWrapper {
 
   /// Récupérer un élément par son ID (clé primaire)
   Future<FlashcardData?> get(int id) async {
-    return (_db.select(_db.flashcards)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+    return (_db.select(_db.flashcards)..where((tbl) => tbl.id.equals(id)))
+        .getSingleOrNull();
   }
 
   /// Ajouter un élément et retourner son nouvel ID.
@@ -91,12 +91,14 @@ class DatabaseWrapper {
 
   /// Supprimer un élément par son ID
   Future<int> delete(int id) async {
-    return await (_db.delete(_db.flashcards)..where((tbl) => tbl.id.equals(id))).go();
+    return await (_db.delete(_db.flashcards)..where((tbl) => tbl.id.equals(id)))
+        .go();
   }
 
   /// Supprimer plusieurs éléments par leurs IDs
   Future<int> deleteAll(List<int> ids) async {
-    return await (_db.delete(_db.flashcards)..where((tbl) => tbl.id.isIn(ids))).go();
+    return await (_db.delete(_db.flashcards)..where((tbl) => tbl.id.isIn(ids)))
+        .go();
   }
 
   /// Compter le nombre total d'éléments
@@ -111,7 +113,7 @@ class DatabaseWrapper {
   /// Retourne une Map des éléments avec leur ID comme clé.
   Future<Map<int, FlashcardData>> toMap() async {
     final allItems = await getAll();
-    return { for (var item in allItems) item.id : item };
+    return {for (var item in allItems) item.id: item};
   }
 
   /// Fermer la connexion à la base de données

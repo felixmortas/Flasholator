@@ -182,6 +182,28 @@ présentation en `ApplicationError`, avec une catégorie et un identifiant stabl
 que la feature associe à ses ressources localisées ; ni la cause technique ni
 un texte utilisateur codé en dur ne doivent être rendus par la vue.
 
+## Bootstrap et ressources générées
+
+Le point d’entrée appelle `ApplicationBootstrap.production()` avant l’unique
+`ProviderScope`. Cette frontière initialise Flutter, Firebase avec
+`DefaultFirebaseOptions`, puis AdMob exactement une fois; elle compose ensuite
+le consentement UMP/ATT, le préchargement publicitaire et la restauration de la
+session RevenueCat. Les vues et ViewModels ne construisent ni n’initialisent de
+SDK. Les contrats de bootstrap sont injectables afin que leurs tests utilisent
+des doublures, sans réseau ni plugin réel.
+
+Les fichiers ARB de `lib/l10n/` et `lib/core/services/db_wrapper.dart` sont les
+seules sources modifiables pour la localisation et Drift. Ne modifiez jamais
+`lib/l10n/app_localizations*.dart` ni `lib/core/services/db_wrapper.g.dart`
+directement. Après une modification de source, régénérez puis vérifiez :
+
+```sh
+flutter gen-l10n
+dart run build_runner build --delete-conflicting-outputs
+flutter analyze
+flutter test
+```
+
 Les contributions sont les bienvenues ! Pour contribuer, veuillez suivre ces étapes :
 
 1. Forker le dépôt.

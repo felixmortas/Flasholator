@@ -3,9 +3,9 @@ import 'dart:convert';
 
 class DeeplTranslator {
   final String authKey = "92549361-8983-0e46-4f5f-185b786cedb0:fx";
-  
+
   Future<String> translate(
-    String textToTranslate, String targetLang, String sourceLang) async {
+      String textToTranslate, String targetLang, String sourceLang) async {
     String? translationResult;
 
     try {

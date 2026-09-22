@@ -4,19 +4,38 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:url_launcher/url_launcher.dart';
 
 class RevenueCatService {
-
   static const String _androidApiKey = 'goog_yrvYeFcZAwKnCSkdHaMeUAIUPFb';
   static const String _webApiKey = 'rcb_sb_NQccqqpXcoNQongucDBbMULZZ';
 
-  bool _isInitialized = false;
+  static Future<void>? _configuration;
+  static String? _activeUserId;
 
   Future<void> initRevenueCat(String userId) async {
-    if (_isInitialized) return;
+    if (_configuration == null) {
+      _activeUserId = userId;
+      _configuration = _configure(userId).onError((error, stackTrace) {
+        _configuration = null;
+        _activeUserId = null;
+        Error.throwWithStackTrace(
+          error ?? StateError('Échec de l’initialisation RevenueCat'),
+          stackTrace,
+        );
+      });
+      return _configuration!;
+    }
 
+    await _configuration;
+    if (_activeUserId != userId) {
+      await Purchases.logIn(userId);
+      _activeUserId = userId;
+    }
+  }
+
+  Future<void> _configure(String userId) async {
     await Purchases.setLogLevel(LogLevel.debug);
-    await Purchases.configure(PurchasesConfiguration(kIsWeb ? _webApiKey : _androidApiKey)..appUserID = userId);
-
-    _isInitialized = true;
+    await Purchases.configure(
+        PurchasesConfiguration(kIsWeb ? _webApiKey : _androidApiKey)
+          ..appUserID = userId);
   }
 
   Future<CustomerInfo> getCustomerInfo() async {
@@ -72,5 +91,6 @@ class RevenueCatService {
 
   Future<void> logOut() async {
     await Purchases.logOut();
+    _activeUserId = null;
   }
 }

@@ -24,7 +24,8 @@ class StatsService {
     // Filtrage selon la période définie
     final filtered = flashcards.where((fc) {
       final created = fc.addedDate;
-      if (startDate != null && created.isBefore(startDate) == true) return false;
+      if (startDate != null && created.isBefore(startDate) == true)
+        return false;
       if (endDate != null && created.isAfter(endDate) == true) return false;
       return true;
     }).toList();
