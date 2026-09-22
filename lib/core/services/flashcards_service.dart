@@ -1,17 +1,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:collection/collection.dart';
 import 'package:flasholator/core/models/flashcard.dart';
-import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/config/free_plan_limits.dart';
 import 'package:flasholator/core/services/db_wrapper.dart';
 
 class FlashcardsService {
   final DatabaseWrapper _db;
   final DateTime Function() _clock;
+  final FreePlanLimits _limits;
+  final bool Function() _isPremium;
   bool _isInitialized = false;
 
-  FlashcardsService({DatabaseWrapper? database, DateTime Function()? clock})
+  FlashcardsService({
+    DatabaseWrapper? database,
+    DateTime Function()? clock,
+    FreePlanLimits limits = const FreePlanLimits(),
+    bool Function()? isPremium,
+  })
       : _db = database ?? DatabaseWrapper(),
-        _clock = clock ?? DateTime.now;
+        _clock = clock ?? DateTime.now,
+        _limits = limits,
+        _isPremium = isPremium ?? _freeUser;
+
+  static bool _freeUser() => false;
 
   Future<void> _ensureInitialized() async {
     if (!_isInitialized) {
@@ -23,7 +34,8 @@ class FlashcardsService {
   Future<bool> canAddCard() async {
     await _ensureInitialized();
     final count = await _db.count();
-    return count < MAX_CARDS * 2;
+    return _limits.canAddCardPair(
+      cardCount: count, isPremium: _isPremium());
   }
 
   Future<List<Flashcard>> loadAllFlashcards() async {
@@ -43,6 +55,7 @@ class FlashcardsService {
     String targetLang,
   ) async {
     await _ensureInitialized();
+    if (!await canAddCard()) return false;
     if (await checkIfFlashcardExists(front, back) ||
         front.isEmpty ||
         back.isEmpty) {

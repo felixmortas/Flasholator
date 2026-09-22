@@ -61,8 +61,13 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
       FlashcardPairMutationResult.applied => AppLocalizations.of(context)!.cardAdded,
       FlashcardPairMutationResult.notFound => 'Cette paire n’existe plus.',
       FlashcardPairMutationResult.conflict => AppLocalizations.of(context)!.cardAlreadyAdded,
+      FlashcardPairMutationResult.limitReached =>
+        AppLocalizations.of(context)!.freeSubscriptionLimitsExceeded,
     };
     Fluttertoast.showToast(msg: message, toastLength: Toast.LENGTH_SHORT);
+    if (result == FlashcardPairMutationResult.limitReached) {
+      _openSubscribePopup();
+    }
     return result == FlashcardPairMutationResult.applied;
   }
 

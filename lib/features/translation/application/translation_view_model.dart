@@ -23,7 +23,7 @@ final class TranslationViewModel extends StateNotifier<TranslationUiState> {
 
   void sessionChanged(TranslationSessionContext _) => invalidate();
 
-  Future<void> translate({
+  Future<TranslationResult?> translate({
     required String text,
     required String sourceLanguage,
     required String targetLanguage,
@@ -37,27 +37,30 @@ final class TranslationViewModel extends StateNotifier<TranslationUiState> {
     final token = ++_requestToken;
     if (!mounted || !request.isValid) {
       if (mounted) state = const TranslationUiState.initial();
-      return;
+      return null;
     }
     state = const TranslationUiState.loading();
     try {
       final result = await _repository.translate(request);
-      if (!_isCurrent(token, session)) return;
-      state = TranslationUiState.data(TranslationResult(
+      if (!_isCurrent(token, session)) return null;
+      final currentResult = TranslationResult(
         sourceText: request.text,
         text: result.text,
         sourceLanguage: result.sourceLanguage,
         targetLanguage: result.targetLanguage,
-      ));
+      );
+      state = TranslationUiState.data(currentResult);
+      return currentResult;
     } on TranslationError catch (error) {
-      if (!_isCurrent(token, session)) return;
+      if (!_isCurrent(token, session)) return null;
       state = TranslationUiState.error(error);
     } catch (error) {
-      if (!_isCurrent(token, session)) return;
+      if (!_isCurrent(token, session)) return null;
       state = TranslationUiState.error(
         TranslationError(TranslationErrorKind.unexpected, error),
       );
     }
+    return null;
   }
 
   bool _isCurrent(int token, TranslationSessionContext session) =>

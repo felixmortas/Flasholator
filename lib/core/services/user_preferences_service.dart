@@ -5,6 +5,7 @@ class UserPreferencesService {
   static const _counterKey = 'counter';
   static const _userDataCachedKey = 'userDataCached';
   static const _coupleLangKey = 'coupleLang';
+  static const _usedLanguagePairsKey = 'usedLanguagePairs';
 
   // ====================
   // === READ METHODS ===
@@ -28,6 +29,16 @@ class UserPreferencesService {
   static Future<String> getCoupleLang() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_coupleLangKey) ?? '';
+  }
+
+  static Future<List<String>> getUsedLanguagePairs() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_usedLanguagePairsKey) ?? <String>[];
+  }
+
+  static Future<void> setUsedLanguagePairs(List<String> pairs) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_usedLanguagePairsKey, pairs);
   }
 
   // =====================
@@ -65,6 +76,7 @@ class UserPreferencesService {
     await prefs.remove(_counterKey);
     await prefs.setBool(_userDataCachedKey, false);
     await prefs.remove(_coupleLangKey);
+    await prefs.remove(_usedLanguagePairsKey);
   }
 
   /// Clear all user data

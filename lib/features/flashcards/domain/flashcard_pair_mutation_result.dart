@@ -3,4 +3,5 @@ enum FlashcardPairMutationResult {
   applied,
   notFound,
   conflict,
+  limitReached,
 }

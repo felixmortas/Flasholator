@@ -52,6 +52,10 @@ Avec Flasholator, vous pouvez traduire les mots que vous ne connaissez pas et le
 - Import/Export des données de l'utilisateur.
 - Synchronisation régulière des données de l'utilisateur sur son Google Drive
 
+## Limites de l'offre gratuite
+
+Les plafonds développeur sont définis dans `lib/config/free_plan_limits.dart` et fournis par `freePlanLimitsProvider`. Par défaut : un couple de langues, 200 traductions et 20 paires de cartes. Chaque valeur peut être changée indépendamment ; `null` désactive le plafond correspondant. Les abonnés premium ne sont pas limités. Il n'existe pas de réglage utilisateur pour ces plafonds.
+
 __[Ajouter captures d'écran et tuto]__
 
 ## Roadmap :

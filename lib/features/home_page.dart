@@ -9,10 +9,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/core/providers/free_plan_limits_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
+import 'package:flasholator/features/translation/translation_providers.dart';
 import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
 import 'package:flasholator/features/shared/dialogs/language_selection_popup.dart';
@@ -29,8 +31,7 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  final flashcardsService =
-      FlashcardsService(); // Create an instance of FlashcardsService
+  late final FlashcardsService flashcardsService;
   final deeplTranslator =
       DeeplTranslator(); // Create an instance of DeeplTranslator
 
@@ -46,6 +47,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    flashcardsService = FlashcardsService(
+      limits: ref.read(freePlanLimitsProvider),
+      isPremium: () => ref.read(isSubscribedProvider),
+    );
     _tabController = TabController(length: 2, vsync: Navigator.of(context));
     _tabController.addListener(_onTabChange);
 
@@ -122,37 +127,70 @@ class _HomePageState extends ConsumerState<HomePage> {
       MethodChannel('com.felinx18.flasholator.translate_and_add_card');
 
   Future<void> _handleTextIntent() async {
+    final session = ref.read(translationSessionContextProvider);
     final isSubscribed = ref.read(isSubscribedProvider);
     final canTranslate = ref.read(canTranslateProvider);
-    final canAddCard = await flashcardsService.canAddCard();
+    final canAddCard = await ref.read(flashcardAccessProvider).canAddCard();
+    if (!mounted || ref.read(translationSessionContextProvider) != session) {
+      return;
+    }
 
     if (isSubscribed || (canTranslate && canAddCard)) {
       try {
         // Récupérer le texte sélectionné
         String? wordToTranslate =
             await _platform.invokeMethod<String>('getText');
-        if (wordToTranslate != null) {
+        if (wordToTranslate != null && wordToTranslate.trim().isNotEmpty &&
+            mounted && ref.read(translationSessionContextProvider) == session) {
           // Appeler la fonction de traduction
           String translatedWord =
               await deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
+
+          if (!mounted || ref.read(translationSessionContextProvider) != session) {
+            return;
+          }
+          if (wordToTranslate.trim().isEmpty ||
+              translatedWord.trim().isEmpty ||
+              translatedWord == AppLocalizations.of(context)!.connectionError) {
+            return;
+          }
+          if (!isSubscribed) {
+            await ref.read(userManagerProvider).incrementCounter(
+              isCurrent: () => mounted &&
+                  ref.read(translationSessionContextProvider) == session,
+            );
+            if (!mounted || ref.read(translationSessionContextProvider) != session) {
+              return;
+            }
+          }
 
           if (wordToTranslate != '' &&
               translatedWord != '' &&
               translatedWord != AppLocalizations.of(context)!.connectionError &&
               !await flashcardsService.checkIfFlashcardExists(
                   wordToTranslate, translatedWord)) {
+            if (!mounted || ref.read(translationSessionContextProvider) != session) {
+              return;
+            }
             wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
                 wordToTranslate.toLowerCase().substring(1);
             translatedWord = translatedWord.toLowerCase()[0].toUpperCase() +
                 translatedWord.toLowerCase().substring(1);
           }
 
-          Future<bool> isCardAdded = flashcardsService.addFlashcard(
+          if (!mounted || ref.read(translationSessionContextProvider) != session) {
+            return;
+          }
+
+          final isCardAdded = await flashcardsService.addFlashcard(
               wordToTranslate, translatedWord, "EN", "FR");
+          if (!mounted || ref.read(translationSessionContextProvider) != session) {
+            return;
+          }
 
           // Confirm that the card was added
           Fluttertoast.showToast(
-            msg: await isCardAdded
+            msg: isCardAdded
                 ? AppLocalizations.of(context)!.cardAdded
                 : AppLocalizations.of(context)!.cardAlreadyAdded,
             toastLength: Toast.LENGTH_SHORT,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/core/providers/free_plan_limits_provider.dart';
 import 'package:flasholator/core/services/auth_service.dart';
 import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
@@ -16,6 +16,7 @@ class UserManager {
   final AuthService _authService;
   final RevenueCatService _revenueCatService;
   final Ref ref;
+  Future<void> _counterMutation = Future<void>.value();
 
   UserManager(
       {required this.ref,
@@ -34,9 +35,54 @@ class UserManager {
   }
 
   Future<void> setCoupleLang(String sourceLang, String targetLang) async {
+    if (!await tryUseLanguagePair(sourceLang, targetLang, persist: false)) {
+      throw StateError('Limite de couples de langues atteinte');
+    }
     final data = {'coupleLang': '$sourceLang-$targetLang'};
 
     await updateUser(data);
+    await tryUseLanguagePair(sourceLang, targetLang);
+  }
+
+  Future<bool> tryUseLanguagePair(String sourceLang, String targetLang, {
+    bool persist = true,
+    bool Function()? isCurrent,
+  }) async {
+    if (ref.read(isSubscribedProvider)) return true;
+    final sessionUserId = getUserId();
+    String canonicalPair(String first, String second) =>
+        first.compareTo(second) <= 0 ? '$first-$second' : '$second-$first';
+    final pair = canonicalPair(sourceLang, targetLang);
+    final stored = (await UserPreferencesService.getUsedLanguagePairs())
+        .map((entry) {
+          final languages = entry.split('-');
+          return languages.length == 2
+              ? canonicalPair(languages[0], languages[1])
+              : entry;
+        })
+        .toSet();
+    final used = {...stored};
+    final currentPair = ref.read(coupleLangProvider);
+    final currentLanguages = currentPair.split('-');
+    if (currentLanguages.length == 2) {
+      used.add(canonicalPair(currentLanguages[0], currentLanguages[1]));
+    }
+    if (getUserId() != sessionUserId ||
+        (isCurrent != null && !isCurrent())) {
+      return false;
+    }
+    if (!ref.read(freePlanLimitsProvider).canUseLanguagePair(
+      usedPairCount: used.length,
+      alreadyUsed: used.contains(pair),
+      isPremium: false,
+    )) {
+      return false;
+    }
+    if (persist && !stored.contains(pair)) {
+      used.add(pair);
+      await UserPreferencesService.setUsedLanguagePairs(used.toList());
+    }
+    return true;
   }
 
   Future<void> banTranslation(BuildContext context) async {
@@ -45,16 +91,36 @@ class UserManager {
     await updateUser(data);
   }
 
-  Future<void> incrementCounter(BuildContext context) async {
+  Future<void> incrementCounter({
+    bool Function()? isCurrent,
+  }) {
+    final mutation = _counterMutation.then(
+      (_) => _incrementCounter(isCurrent: isCurrent),
+    );
+    _counterMutation = mutation.catchError((Object _) {});
+    return mutation;
+  }
+
+  Future<void> _incrementCounter({bool Function()? isCurrent}) async {
+    final sessionUserId = getUserId();
     final currentCounter = await UserPreferencesService.getCounter();
+    if (getUserId() != sessionUserId || (isCurrent != null && !isCurrent())) {
+      return;
+    }
+    if (ref.read(isSubscribedProvider)) {
+      return;
+    }
     final updatedCounter = currentCounter + 1;
 
-    updateLocal({'counter': updatedCounter});
-
-    // Si limite atteinte, bloquer les traductions
-    if (updatedCounter >= MAX_TRANSLATIONS) {
-      await banTranslation(context);
+    // Le compteur reste la source du quota : un ancien booléen persistant ne
+    // doit pas bloquer une limite relevée ou désactivée par configuration.
+    if (!ref.read(freePlanLimitsProvider).canTranslate(
+      count: currentCounter,
+      isPremium: false,
+    )) {
+      return;
     }
+    await updateLocal({'counter': updatedCounter});
   }
 
   Future<void> reauthenticateWithCredential(String password) async {
@@ -130,7 +196,7 @@ class UserManager {
 
   Future<void> deleteUser() async {
     final uid = _authService.getUserId();
-    if (uid != null) {
+    if (uid.isNotEmpty) {
       await _authService.deleteUser();
       await _firestoreDAO.deleteUser(uid);
       try {

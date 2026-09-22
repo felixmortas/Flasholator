@@ -78,9 +78,16 @@ class _LanguageSelectionPopupState extends State<LanguageSelectionPopup> {
         TextButton(
           onPressed: isValidSelection
               ? () async {
-                  await widget.onSave(selectedSource!, selectedTarget!);
-                  if (context.mounted) {
-                    Navigator.pop(context);
+                  try {
+                    await widget.onSave(selectedSource!, selectedTarget!);
+                    if (context.mounted) Navigator.pop(context);
+                  } on StateError {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(AppLocalizations.of(context)!
+                            .freeSubscriptionLimitsExceeded),
+                      ));
+                    }
                   }
                 }
               : null,

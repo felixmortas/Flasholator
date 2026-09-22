@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flasholator/core/services/db_wrapper.dart';
+import 'package:flasholator/core/providers/free_plan_limits_provider.dart';
+import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/features/flashcards/application/flashcard_collection_projections.dart';
 import 'package:flasholator/features/flashcards/data/flashcard_repository.dart';
 import 'package:flasholator/features/flashcards/domain/flashcard_collection.dart';
@@ -9,7 +11,10 @@ import 'package:flasholator/features/flashcards/domain/flashcard_collection.dart
 /// Dépendance locale surchargeable par les consommateurs et les tests.
 final flashcardRepositoryProvider = Provider<FlashcardRepository>((ref) {
   final database = AppDatabase();
-  final repository = DriftFlashcardRepository(database);
+  final repository = DriftFlashcardRepository(database, maxCardPairs: () {
+    if (ref.read(isSubscribedProvider)) return null;
+    return ref.read(freePlanLimitsProvider).cardPairs;
+  });
   ref.onDispose(() {
     unawaited(repository.dispose().whenComplete(database.close));
   });

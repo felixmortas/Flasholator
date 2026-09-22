@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flasholator/core/providers/free_plan_limits_provider.dart';
 
 final userDataProvider =
     StateNotifierProvider<UserDataNotifier, Map<String, dynamic>>(
@@ -6,7 +7,11 @@ final userDataProvider =
 );
 
 final canTranslateProvider = Provider<bool>((ref) {
-  return ref.watch(userDataProvider)['canTranslate'] as bool? ?? true;
+  final user = ref.watch(userDataProvider);
+  return ref.watch(freePlanLimitsProvider).canTranslate(
+    count: user['counter'] as int? ?? 0,
+    isPremium: user['isSubscribed'] as bool? ?? false,
+  );
 });
 
 final isSubscribedProvider = Provider<bool>((ref) {

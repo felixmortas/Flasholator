@@ -29,11 +29,16 @@ abstract interface class FlashcardRepository {
 /// Adaptateur local. Chaque décision et chaque écriture d'une paire vivent dans
 /// la même transaction afin que Drift puisse restaurer le snapshot sur erreur.
 final class DriftFlashcardRepository implements FlashcardRepository {
-  DriftFlashcardRepository(this._database, {DateTime Function()? clock})
-      : _clock = clock ?? DateTime.now;
+  DriftFlashcardRepository(this._database, {
+    DateTime Function()? clock,
+    int? Function()? maxCardPairs,
+  })
+      : _maxCardPairs = maxCardPairs,
+        _clock = clock ?? DateTime.now;
 
   final AppDatabase _database;
   final DateTime Function() _clock;
+  final int? Function()? _maxCardPairs;
   final StreamController<FlashcardCollectionSnapshot> _snapshots =
       StreamController<FlashcardCollectionSnapshot>.broadcast();
   Future<void> _serial = Future.value();
@@ -94,6 +99,14 @@ final class DriftFlashcardRepository implements FlashcardRepository {
         return _database.transaction(() async {
           final matches = await _matchingCards(pair);
           if (matches.isNotEmpty) return FlashcardPairMutationResult.conflict;
+
+          final maximum = _maxCardPairs?.call();
+          if (maximum != null) {
+            final existingCards = await _database.select(_database.flashcards).get();
+            if (existingCards.length + 2 > maximum * 2) {
+              return FlashcardPairMutationResult.limitReached;
+            }
+          }
 
           final addedDate = _clock();
           await _database

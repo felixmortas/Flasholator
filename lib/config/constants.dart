@@ -1,8 +1,4 @@
-/// Free plan limits
-
 const int INTERSTITIAL_FREQUENCY = 7;
-const int MAX_TRANSLATIONS = 10000;
-const int MAX_CARDS = 200;
 const double GOLDEN_NUMBER = 1.6180339887;
 
 /// Code → clé de traduction

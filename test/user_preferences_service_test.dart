@@ -27,4 +27,13 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('les couples utilisés sont persistés puis effacés avec le compte', () async {
+    expect(await UserPreferencesService.getUsedLanguagePairs(), isEmpty);
+    await UserPreferencesService.setUsedLanguagePairs(['EN-FR', 'ES-FR']);
+    expect(await UserPreferencesService.getUsedLanguagePairs(),
+        ['EN-FR', 'ES-FR']);
+    await UserPreferencesService.deleteUser();
+    expect(await UserPreferencesService.getUsedLanguagePairs(), isEmpty);
+  });
 }

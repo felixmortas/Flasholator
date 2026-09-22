@@ -85,6 +85,27 @@ void main() {
     expect(cards.map((card) => card.sourceLang), unorderedEquals(['FR', 'EN']));
   });
 
+  test('vérifie le plafond dans la transaction, sans publier une paire de trop',
+      () async {
+    final db = await database();
+    addTearDown(db.close);
+    int? maximum = 1;
+    final repository = DriftFlashcardRepository(
+      db, maxCardPairs: () => maximum);
+    expect(await repository.addPair(pair()), FlashcardPairMutationResult.applied);
+    expect(
+      await repository.addPair(pair(front: 'merci', back: 'thanks')),
+      FlashcardPairMutationResult.limitReached,
+    );
+    expect(await snapshot(db), hasLength(2));
+    maximum = null;
+    expect(
+      await repository.addPair(pair(front: 'merci', back: 'thanks')),
+      FlashcardPairMutationResult.applied,
+    );
+    expect(await snapshot(db), hasLength(4));
+  });
+
   test('modifie les deux faces et préserve les métadonnées persistées',
       () async {
     final db = await database();

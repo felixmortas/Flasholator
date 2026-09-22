@@ -130,10 +130,12 @@ void main() {
       () => const TranslationSessionContext(sessionId: 'u1', generation: 1),
     );
 
-    await viewModel.translate(text: 'hello', sourceLanguage: 'EN', targetLanguage: 'FR');
+    final result = await viewModel.translate(
+      text: 'hello', sourceLanguage: 'EN', targetLanguage: 'FR');
 
     expect(viewModel.state.phase, UiPhase.error);
     expect(viewModel.state.error, same(error));
+    expect(result, isNull);
   });
 
   test('ignore une réponse arrivée après une intention plus récente', () async {
@@ -149,11 +151,13 @@ void main() {
     final old = viewModel.translate(text: 'first', sourceLanguage: 'EN', targetLanguage: 'FR');
     final current = viewModel.translate(text: 'second', sourceLanguage: 'EN', targetLanguage: 'FR');
     second.complete(_result(repository.requests[1], 'second result'));
-    await current;
+    final currentResult = await current;
     first.complete(_result(repository.requests[0], 'old result'));
-    await old;
+    final oldResult = await old;
 
     expect(viewModel.state.result!.text, 'second result');
+    expect(currentResult, same(viewModel.state.result));
+    expect(oldResult, isNull);
   });
 
   test('invalide les réponses après changement de saisie ou de langues', () async {
@@ -167,7 +171,7 @@ void main() {
     final command = viewModel.translate(text: 'hello', sourceLanguage: 'EN', targetLanguage: 'FR');
     viewModel.invalidate();
     completion.complete(_result(repository.requests.single));
-    await command;
+    expect(await command, isNull);
 
     expect(viewModel.state.phase, UiPhase.initial);
   });

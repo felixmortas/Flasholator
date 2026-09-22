@@ -110,14 +110,23 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     });
   }
 
-  void _onLanguageChange(String? newValue, bool isSourceLanguage) {
-    if (ref.read(isSubscribedProvider)) {
+  Future<void> _onLanguageChange(String? newValue, bool isSourceLanguage) async {
+    if (newValue == null) return;
+    final session = ref.read(translationSessionContextProvider);
+    final source = isSourceLanguage ? newValue : languageSelection.sourceLanguage;
+    final target = isSourceLanguage ? languageSelection.targetLanguage : newValue;
+    final allowed = await ref.read(userManagerProvider)
+        .tryUseLanguagePair(source, target,
+          isCurrent: () => mounted &&
+              ref.read(translationSessionContextProvider) == session);
+    if (!mounted || ref.read(translationSessionContextProvider) != session) return;
+    if (allowed) {
       _invalidateTranslationRequests();
       setState(() {
         if (isSourceLanguage) {
-          languageSelection.sourceLanguage = newValue!;
+          languageSelection.sourceLanguage = newValue;
         } else {
-          languageSelection.targetLanguage = newValue!;
+          languageSelection.targetLanguage = newValue;
         }
         _lastTranslatedWord = '';
         isAddButtonDisabled = true;
@@ -162,15 +171,19 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     final targetLanguage = languageSelection.targetLanguage;
     _wordToTranslate = requestedText;
     setState(() => isTranslateButtonDisabled = true);
-    await ref.read(translationViewModelProvider.notifier).translate(
+    final session = ref.read(translationSessionContextProvider);
+    final result = await ref.read(translationViewModelProvider.notifier).translate(
           text: requestedText,
           sourceLanguage: sourceLanguage,
           targetLanguage: targetLanguage,
         );
-    final result = ref.read(translationViewModelProvider).result;
     if (!mounted ||
         result == null ||
+        ref.read(translationSessionContextProvider) != session ||
+        !identical(ref.read(translationViewModelProvider).result, result) ||
         _controller.text.trim() != requestedText ||
+        languageSelection.sourceLanguage != sourceLanguage ||
+        languageSelection.targetLanguage != targetLanguage ||
         result.sourceLanguage != sourceLanguage ||
         result.targetLanguage != targetLanguage) {
       if (mounted &&
@@ -193,13 +206,16 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
       isTranslateButtonDisabled = true;
     });
     if (!isSubscribed && mounted) {
-      await ref.read(userManagerProvider).incrementCounter(context);
+      await ref.read(userManagerProvider).incrementCounter(
+        isCurrent: () => mounted &&
+            ref.read(translationSessionContextProvider) == session &&
+            identical(ref.read(translationViewModelProvider).result, result),
+      );
     }
   }
 
   Future<void> _checkIfCanAddFlashcard() async {
     final isSubscribed = ref.read(isSubscribedProvider);
-    // Le contrôle historique reste inchangé pendant la migration des quotas.
     final canAddCard = await ref.read(flashcardAccessProvider).canAddCard();
     if (!mounted) return;
     if (isSubscribed || canAddCard) {
@@ -230,6 +246,10 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
           toastLength: Toast.LENGTH_SHORT,
         );
       }
+      return;
+    }
+    if (mutation.name == 'limitReached') {
+      _openSubscribePopup();
       return;
     }
     if (mutation.name == 'applied') setState(() => isAddButtonDisabled = true);

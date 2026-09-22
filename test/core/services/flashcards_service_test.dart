@@ -1,6 +1,6 @@
-import 'package:drift/drift.dart';
 import 'package:flasholator/core/services/db_wrapper.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
+import 'package:flasholator/config/free_plan_limits.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class MemoryDatabase extends DatabaseWrapper {
@@ -68,6 +68,35 @@ void main() {
 
     expect(clockCalls, 1);
     expect(db.inserted.map((card) => card.addedDate.value), [first, first]);
+  });
+
+  test('le plafond de paires est vérifié à l’ajout et ignoré pour premium',
+      () async {
+    final db = MemoryDatabase()
+      ..cards.addAll(List.generate(2, (index) => FlashcardData(
+        id: index + 1,
+        front: 'a$index',
+        back: 'b$index',
+        sourceLang: 'FR',
+        targetLang: 'EN',
+        addedDate: now,
+        easiness: 2.5,
+        interval: 1,
+        repetitions: 0,
+        timesReviewed: 0,
+      )));
+    var premium = false;
+    final service = FlashcardsService(
+      database: db,
+      limits: const FreePlanLimits(cardPairs: 1),
+      isPremium: () => premium,
+    );
+    expect(await service.canAddCard(), isFalse);
+    expect(await service.addFlashcard('merci', 'thanks', 'FR', 'EN'), isFalse);
+    expect(db.inserted, isEmpty);
+    premium = true;
+    expect(await service.canAddCard(), isTrue);
+    expect(await service.addFlashcard('merci', 'thanks', 'FR', 'EN'), isTrue);
   });
 
   test('reviewing an absent card does not persist a mutation', () async {
