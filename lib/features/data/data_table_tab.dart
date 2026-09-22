@@ -1,157 +1,100 @@
-import 'package:flasholator/features/shared/widgets/eraser_button.dart';
-import 'package:flasholator/style/grid_background_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
-import 'package:flasholator/core/services/flashcards_service.dart';
-import 'package:flasholator/config/constants.dart';
+import 'package:flasholator/features/data/data_providers.dart';
 import 'package:flasholator/features/data/widgets/all_languages_table.dart';
 import 'package:flasholator/features/data/widgets/couple_languages_table.dart';
 import 'package:flasholator/features/data/widgets/edit_flashcard_popup.dart';
+import 'package:flasholator/features/flashcards/application/flashcard_collection_projections.dart';
+import 'package:flasholator/features/flashcards/domain/flashcard_pair.dart';
+import 'package:flasholator/features/flashcards/domain/flashcard_pair_mutation_result.dart';
+import 'package:flasholator/features/flashcards/flashcard_providers.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
+import 'package:flasholator/features/shared/widgets/eraser_button.dart';
+import 'package:flasholator/features/translation/translation_providers.dart';
+import 'package:flasholator/l10n/app_localizations.dart';
+import 'package:flasholator/style/grid_background_painter.dart';
 
-// Add doc comments
 class DataTableTab extends ConsumerStatefulWidget {
-  final FlashcardsService flashcardsService;
-  final Function() updateQuestionText;
-  final ValueNotifier<bool> isAllLanguagesToggledNotifier;
+  const DataTableTab({super.key, required this.isAllLanguagesToggledNotifier});
 
-  const DataTableTab({
-    Key? key,
-    required this.flashcardsService,
-    required this.updateQuestionText,
-    required this.isAllLanguagesToggledNotifier,
-  }) : super(key: key);
+  final ValueNotifier<bool> isAllLanguagesToggledNotifier;
 
   @override
   ConsumerState<DataTableTab> createState() => DataTableTabState();
 }
 
 class DataTableTabState extends ConsumerState<DataTableTab> {
-  List<Map<dynamic, dynamic>> data = [];
-  LanguageSelection languageSelection = LanguageSelection.getInstance();
+  final LanguageSelection languageSelection = LanguageSelection.getInstance();
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchData(widget.isAllLanguagesToggledNotifier.value);
-  }
+  void updateSwitchState(bool newValue) =>
+      widget.isAllLanguagesToggledNotifier.value = newValue;
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  FlashcardPair _pairFromCard(FlashcardTablePair pair) => FlashcardPair(
+        front: pair.card.front,
+        back: pair.card.back,
+        sourceLang: pair.card.sourceLang,
+        targetLang: pair.card.targetLang,
+      );
 
-  void updateSwitchState(bool newValue) {
-    _fetchData(newValue);
-  }
+  FlashcardPair _pairFromValues(Map<String, String> values) => FlashcardPair(
+        front: values['front']!.trim(),
+        back: values['back']!.trim(),
+        sourceLang: values['sourceLang']!.trim(),
+        targetLang: values['targetLang']!.trim(),
+      );
 
-  Future<void> _fetchData(bool isAllLanguagesToggled) async {
-    final flashcards = await widget.flashcardsService.loadAllFlashcards();
-    final fetchedData = flashcards.map((f) => f.toMap()).toList();
-
-    List<Map<dynamic, dynamic>> newData;
-
-    if (isAllLanguagesToggled) {
-      newData = fetchedData
-          .where((row) => fetchedData.indexOf(row) % 2 == 0)
-          .toList();
-    } else {
-      newData = fetchedData
-          .where((row) =>
-              row['sourceLang'] == languageSelection.sourceLanguage &&
-              row['targetLang'] == languageSelection.targetLanguage)
-          .toList();
+  Future<bool> _mutate(
+      Future<FlashcardPairMutationResult?> Function() operation) async {
+    final result = await operation();
+    if (!mounted) return false;
+    if (result == null) {
+      Fluttertoast.showToast(msg: 'La modification n’a pas pu être enregistrée.');
+      return false;
     }
-
-    setState(() {
-      data = newData;
-      widget.isAllLanguagesToggledNotifier.value = isAllLanguagesToggled;
-    });
+    final message = switch (result) {
+      FlashcardPairMutationResult.applied => AppLocalizations.of(context)!.cardAdded,
+      FlashcardPairMutationResult.notFound => 'Cette paire n’existe plus.',
+      FlashcardPairMutationResult.conflict => AppLocalizations.of(context)!.cardAlreadyAdded,
+    };
+    Fluttertoast.showToast(msg: message, toastLength: Toast.LENGTH_SHORT);
+    return result == FlashcardPairMutationResult.applied;
   }
 
-  void addRow(Map<String, dynamic> row) {
-    print("enter add row in data table");
-    final front = row['front'];
-    final back = row['back'];
-    final sourceLanguage = row['sourceLang'];
-    final targetLanguage = row['targetLang'];
-
-    if (!data.contains(row)) {
-      print("Adding row to db: $row");
-      widget.flashcardsService
-          .addFlashcard(front, back, sourceLanguage, targetLanguage);
-      setState(() {
-        print("add row to table");
-        data.add(row);
-        print("row added to db and table !");
-      });
-      widget.updateQuestionText();
-    }
-  }
-
-  void removeRow(Map<dynamic, dynamic> row) {
-    widget.flashcardsService.removeFlashcard(row['front'], row['back']);
-    setState(() {
-      data.removeAt(data.indexOf(row));
-    });
-  }
-
-  void editRow(Map<String, String> newData, Map<dynamic, dynamic> row) {
-    final front = row['front'];
-    final back = row['back'];
-    final sourceLanguage = row['sourceLang'];
-    final targetLanguage = row['targetLang'];
-
-    if (data.contains(row)) {
-      widget.flashcardsService.editFlashcard(
-          front,
-          back,
-          sourceLanguage,
-          targetLanguage,
-          newData['front']!,
-          newData['back']!,
-          newData['sourceLang']!,
-          newData['targetLang']!);
-      setState(() {
-        row['sourceLang'] = newData['sourceLang'];
-        row['front'] = newData['front'];
-        row['back'] = newData['back'];
-        row['targetLang'] = newData['targetLang'];
-      });
-      widget.updateQuestionText();
-    }
-  }
-
-  void _openEditFlashcardPopup(Map<dynamic, dynamic> row) {
-    showDialog(
+  void _openEditFlashcardPopup(FlashcardTablePair pair) {
+    final values = <String, String>{
+      'front': pair.card.front,
+      'back': pair.card.back,
+      'sourceLang': pair.card.sourceLang,
+      'targetLang': pair.card.targetLang,
+    };
+    showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return EditFlashcardPopup(
-          row: row,
-          onEdit: editRow,
-          onDelete: removeRow,
-          languageDropdownEnabled: widget.isAllLanguagesToggledNotifier.value,
-          isEditPopup: true,
-        );
-      },
+      builder: (_) => EditFlashcardPopup(
+        row: values,
+        languageDropdownEnabled: widget.isAllLanguagesToggledNotifier.value,
+        isEditPopup: true,
+        onEdit: (replacement) => _mutate(() => ref
+            .read(dataTableViewModelProvider.notifier)
+            .edit(source: _pairFromCard(pair), replacement: _pairFromValues(replacement))),
+        onDelete: () => _mutate(() => ref
+            .read(dataTableViewModelProvider.notifier)
+            .delete(_pairFromCard(pair))),
+      ),
     );
   }
 
-  void _openSubscribePopup() {
-    final userManager = ref.read(userManagerProvider);
-    userManager.subscribeUser();
-  }
+  void _openSubscribePopup() => ref.read(userManagerProvider).subscribeUser();
 
   Future<void> _checkIfCanAddCard() async {
-    final isSubscribed = ref.read(isSubscribedProvider);
-    final canAddCard = await widget.flashcardsService.canAddCard();
-
-    if (isSubscribed || canAddCard) {
+    final canAddCard = await ref.read(flashcardAccessProvider).canAddCard();
+    if (!mounted) return;
+    if (ref.read(isSubscribedProvider) || canAddCard) {
       _openAddFlashcardPopup();
     } else {
       _openSubscribePopup();
@@ -159,122 +102,87 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   }
 
   void _openAddFlashcardPopup() {
-    Map<dynamic, dynamic> newRowData = {
-      'front': '',
-      'back': '',
-      'sourceLang': languageSelection.sourceLanguage,
-      'targetLang': languageSelection.targetLanguage
-    };
-
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return EditFlashcardPopup(
-          row: newRowData,
-          languageDropdownEnabled: widget.isAllLanguagesToggledNotifier.value,
-          isEditPopup: false,
-          onAdd: (Map<String, dynamic> row) {
-            addRow(row);
-          },
-        );
-      },
+      builder: (_) => EditFlashcardPopup(
+        row: {
+          'front': '',
+          'back': '',
+          'sourceLang': languageSelection.sourceLanguage,
+          'targetLang': languageSelection.targetLanguage,
+        },
+        languageDropdownEnabled: widget.isAllLanguagesToggledNotifier.value,
+        isEditPopup: false,
+        onAdd: (values) => _mutate(() => ref
+            .read(dataTableViewModelProvider.notifier)
+            .add(_pairFromValues(values))),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizedLanguageMap = LANGUAGE_KEYS.map(
-      (code, key) => MapEntry(
-          code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)),
-    );
+    final languages = LANGUAGE_KEYS.map((code, key) => MapEntry(
+        code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)));
+    final projection = ref.watch(flashcardTableProjectionProvider);
     final isSubscribed = ref.watch(isSubscribedProvider);
-
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      return GridBackground(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (isSubscribed)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: widget.isAllLanguagesToggledNotifier,
-                    builder: (context, value, child) {
-                      return EraserButton(
-                        onPressed: () {
-                          updateSwitchState(!value);
-                        },
-                        label: value
-                            ? "Afficher un seul couple de langues"
-                            : "Afficher tous les couples de langues",
-                        gradientColors: value
-                            ? [
-                                Colors.pink.shade300,
-                                Colors.pink.shade200,
-                              ]
-                            : [
-                                Colors.blue.shade300,
-                                Colors.blue.shade200,
-                              ],
-                        iconColor:
-                            value ? Colors.pink.shade700 : Colors.blue.shade700,
-                        textColor:
-                            value ? Colors.pink.shade800 : Colors.blue.shade800,
-                        isDisabled: false,
-                      );
-                    },
-                  ),
-                ),
-              Expanded(
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: widget.isAllLanguagesToggledNotifier,
-                  builder: (context, isAllLanguagesToggled, child) {
-                    if (isAllLanguagesToggled) {
-                      return AllLanguagesTable(
-                        data: data,
-                        onCellTap:
-                            _openEditFlashcardPopup, // Modified to pass only rowData
-                        languages: localizedLanguageMap,
-                      );
-                    } else {
-                      return CoupleLanguagesTable(
-                        data: data,
-                        sourceLanguage: localizedLanguageMap[
-                            languageSelection.sourceLanguage]!,
-                        targetLanguage: localizedLanguageMap[
-                            languageSelection.targetLanguage]!,
-
-                        onCellTap:
-                            _openEditFlashcardPopup, // Modified to pass only rowData
-                      );
-                    }
-                  },
+    return GridBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(children: [
+          if (isSubscribed)
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: ValueListenableBuilder<bool>(
+                valueListenable: widget.isAllLanguagesToggledNotifier,
+                builder: (_, value, __) => EraserButton(
+                  onPressed: () => updateSwitchState(!value),
+                  label: value ? 'Afficher un seul couple de langues' : 'Afficher tous les couples de langues',
+                  gradientColors: value ? [Colors.pink.shade300, Colors.pink.shade200] : [Colors.blue.shade300, Colors.blue.shade200],
+                  iconColor: value ? Colors.pink.shade700 : Colors.blue.shade700,
+                  textColor: value ? Colors.pink.shade800 : Colors.blue.shade800,
+                  isDisabled: false,
                 ),
               ),
-              SizedBox(
-                height: 50,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: EraserButton(
-                    onPressed: _checkIfCanAddCard,
-                    label: AppLocalizations.of(context)!.addAWord,
-                    gradientColors: [
-                      Colors.blue.shade300,
-                      Colors.blue.shade200,
-                    ],
-                    iconColor: Colors.white,
-                    textColor: Colors.white,
-                    isDisabled: false,
-                  ),
-                ),
+            ),
+          Expanded(
+            child: projection.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (table) => ValueListenableBuilder<bool>(
+                valueListenable: widget.isAllLanguagesToggledNotifier,
+                builder: (_, allLanguages, __) {
+                  final pairs = allLanguages
+                      ? table.pairs
+                      : table.pairs.where((pair) => pair.card.sourceLang == languageSelection.sourceLanguage && pair.card.targetLang == languageSelection.targetLanguage).toList(growable: false);
+                  return allLanguages
+                      ? AllLanguagesTable(data: pairs, onCellTap: _openEditFlashcardPopup, languages: languages)
+                      : CoupleLanguagesTable(
+                          data: pairs,
+                          sourceLanguage: languages[languageSelection.sourceLanguage]!,
+                          targetLanguage: languages[languageSelection.targetLanguage]!,
+                          onCellTap: _openEditFlashcardPopup,
+                        );
+                },
               ),
-            ],
+            ),
           ),
-        ),
-      );
-    });
+          SizedBox(
+            height: 50,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: EraserButton(
+                onPressed: _checkIfCanAddCard,
+                label: AppLocalizations.of(context)!.addAWord,
+                gradientColors: [Colors.blue.shade300, Colors.blue.shade200],
+                iconColor: Colors.white,
+                textColor: Colors.white,
+                isDisabled: false,
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
   }
 }

@@ -8,9 +8,9 @@ class EditFlashcardPopup extends StatefulWidget {
   final Map<dynamic, dynamic> row;
   final bool languageDropdownEnabled;
   final bool isEditPopup;
-  final Function(Map<String, String>, Map<dynamic, dynamic>)? onEdit;
-  final Function(Map<dynamic, dynamic>)? onDelete;
-  final Function(Map<String, dynamic>)? onAdd;
+  final Future<bool> Function(Map<String, String>)? onEdit;
+  final Future<bool> Function()? onDelete;
+  final Future<bool> Function(Map<String, String>)? onAdd;
 
   EditFlashcardPopup({
     required this.row,
@@ -51,24 +51,25 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
     super.dispose();
   }
 
-  void _setConfirmButton(String text) {
+  Future<bool> _setConfirmButton(String text) async {
     if (text == 'edit') {
-      widget.onEdit!({
+      return widget.onEdit!({
         'sourceLang': _sourceLanguage,
         'front': _wordController.text,
         'back': _translationController.text,
         'targetLang': _targetLanguage,
-      }, widget.row);
+      });
     } else if (text == 'delete') {
-      widget.onDelete!(widget.row);
+      return widget.onDelete!();
     } else if (text == 'add') {
-      widget.onAdd!({
+      return widget.onAdd!({
         'sourceLang': _sourceLanguage,
         'front': _wordController.text,
         'back': _translationController.text,
         'targetLang': _targetLanguage,
       });
     }
+    return true;
   }
 
   Color _getDarkerShade(Color color, double opacity) {
@@ -190,10 +191,11 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                               label: widget.isEditPopup
                                   ? AppLocalizations.of(context)!.remove
                                   : AppLocalizations.of(context)!.cancel,
-                              onPressed: () {
-                                _setConfirmButton(
+                              onPressed: () async {
+                                final navigator = Navigator.of(context);
+                                final confirmed = await _setConfirmButton(
                                     widget.isEditPopup ? 'delete' : 'cancel');
-                                Navigator.of(context).pop();
+                                if (confirmed && mounted) navigator.pop();
                               },
                               isPrimary: false,
                               postItColor: postItColor,
@@ -203,10 +205,11 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                               label: widget.isEditPopup
                                   ? AppLocalizations.of(context)!.edit
                                   : AppLocalizations.of(context)!.add,
-                              onPressed: () {
-                                _setConfirmButton(
+                              onPressed: () async {
+                                final navigator = Navigator.of(context);
+                                final confirmed = await _setConfirmButton(
                                     widget.isEditPopup ? 'edit' : 'add');
-                                Navigator.of(context).pop();
+                                if (confirmed && mounted) navigator.pop();
                               },
                               isPrimary: true,
                               postItColor: postItColor,

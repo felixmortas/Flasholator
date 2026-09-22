@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flasholator/features/flashcards/application/flashcard_collection_projections.dart';
 
 class CoupleLanguagesTable extends StatelessWidget {
-  final List<Map<dynamic, dynamic>> data;
+  final List<FlashcardTablePair> data;
   final String sourceLanguage;
   final String targetLanguage;
-  final Function(Map<dynamic, dynamic>) onCellTap;
+  final ValueChanged<FlashcardTablePair> onCellTap;
 
   const CoupleLanguagesTable({
     super.key,
@@ -77,7 +78,7 @@ class CoupleLanguagesTable extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            rowData['front'],
+                            rowData.card.front,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -92,7 +93,7 @@ class CoupleLanguagesTable extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            rowData['back'],
+                            rowData.card.back,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,

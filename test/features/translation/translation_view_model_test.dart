@@ -41,6 +41,7 @@ final class _FakeDeeplClient implements DeeplTranslationClient {
 
 TranslationResult _result(TranslationRequest request, [String text = 'Bonjour']) =>
     TranslationResult(
+      sourceText: request.text,
       text: text,
       sourceLanguage: request.sourceLanguage,
       targetLanguage: request.targetLanguage,

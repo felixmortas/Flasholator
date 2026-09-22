@@ -6,6 +6,10 @@ import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/features/translation/application/translation_session_context.dart';
 import 'package:flasholator/features/translation/application/translation_ui_state.dart';
 import 'package:flasholator/features/translation/application/translation_view_model.dart';
+import 'package:flasholator/features/translation/application/translation_save_state.dart';
+import 'package:flasholator/features/translation/application/translation_save_view_model.dart';
+import 'package:flasholator/features/flashcards/flashcard_providers.dart';
+import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/features/translation/data/deepl_translation_repository.dart';
 import 'package:flasholator/features/translation/data/legacy_deepl_translation_client.dart';
 import 'package:flasholator/features/translation/domain/translation_repository.dart';
@@ -47,3 +51,28 @@ final translationViewModelProvider =
       (_, next) => viewModel.sessionChanged(next));
   return viewModel;
 });
+
+final translationSaveViewModelProvider = StateNotifierProvider<
+    TranslationSaveViewModel, TranslationSaveState>((ref) {
+  final viewModel = TranslationSaveViewModel(
+    ref.watch(flashcardRepositoryProvider),
+    () => ref.read(translationSessionContextProvider),
+  );
+  ref.onDispose(viewModel.invalidate);
+  return viewModel;
+});
+
+/// Adaptateur des droits legacy, injectable sans le faire fuir dans une vue.
+abstract interface class FlashcardAccess {
+  Future<bool> canAddCard();
+}
+
+final class LegacyFlashcardAccess implements FlashcardAccess {
+  LegacyFlashcardAccess(this._service);
+  final FlashcardsService _service;
+  @override
+  Future<bool> canAddCard() => _service.canAddCard();
+}
+
+final flashcardAccessProvider = Provider<FlashcardAccess>((ref) =>
+    LegacyFlashcardAccess(FlashcardsService()));

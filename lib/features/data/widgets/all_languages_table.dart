@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flasholator/features/flashcards/application/flashcard_collection_projections.dart';
 
 class AllLanguagesTable extends StatelessWidget {
-  final List<Map<dynamic, dynamic>> data;
-  final Function(Map<dynamic, dynamic>) onCellTap;
+  final List<FlashcardTablePair> data;
+  final ValueChanged<FlashcardTablePair> onCellTap;
   final Map<String, String> languages;
 
   const AllLanguagesTable({
@@ -47,7 +48,7 @@ class AllLanguagesTable extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                languages[rowData['sourceLang']] ?? 'Unknown',
+                                languages[rowData.card.sourceLang] ?? 'Unknown',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
@@ -56,7 +57,7 @@ class AllLanguagesTable extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                rowData['front'],
+                                rowData.card.front,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -78,7 +79,7 @@ class AllLanguagesTable extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                languages[rowData['targetLang']] ?? 'Unknown',
+                                languages[rowData.card.targetLang] ?? 'Unknown',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
@@ -87,7 +88,7 @@ class AllLanguagesTable extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                rowData['back'],
+                                rowData.card.back,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

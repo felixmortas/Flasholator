@@ -8,7 +8,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
-import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/core/presentation/ui_phase.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
@@ -23,16 +22,7 @@ import 'package:flasholator/features/shared/widgets/bottom_overlay.dart';
 import 'package:flasholator/style/grid_background_painter.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
-  final FlashcardsService flashcardsService;
-  final Function(Map<String, dynamic>) addRow;
-  final Function() updateQuestionText;
-
-  const TranslateTab({
-    super.key,
-    required this.flashcardsService,
-    required this.addRow,
-    required this.updateQuestionText,
-  });
+  const TranslateTab({super.key});
 
   @override
   ConsumerState<TranslateTab> createState() => _TranslateTabState();
@@ -209,7 +199,8 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   Future<void> _checkIfCanAddFlashcard() async {
     final isSubscribed = ref.read(isSubscribedProvider);
-    final canAddCard = await widget.flashcardsService.canAddCard();
+    // Le contrôle historique reste inchangé pendant la migration des quotas.
+    final canAddCard = await ref.read(flashcardAccessProvider).canAddCard();
     if (!mounted) return;
     if (isSubscribed || canAddCard) {
       _addFlashcard();
@@ -220,53 +211,30 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   Future<void> _addFlashcard() async {
     final result = ref.read(translationViewModelProvider).result;
-    final translatedWord = result?.text ?? '';
     final sourceLanguage = _sourceLanguage;
     final targetLanguage = _targetLanguage;
-    final text = _wordToTranslate;
-    if (_wordToTranslate != '' &&
-        translatedWord != '' &&
-        translatedWord != AppLocalizations.of(context)!.connectionError &&
-        !await widget.flashcardsService
-            .checkIfFlashcardExists(_wordToTranslate, translatedWord)) {
-      if (!mounted ||
-          ref.read(translationViewModelProvider).result != result ||
-          _wordToTranslate != text ||
-          _sourceLanguage != sourceLanguage ||
-          _targetLanguage != targetLanguage) {
-        return;
+    if (result == null) return;
+    final mutation = await ref.read(translationSaveViewModelProvider.notifier).save(
+      result: result,
+      isCurrent: () => mounted &&
+          identical(ref.read(translationViewModelProvider).result, result) &&
+          _wordToTranslate == result.sourceText &&
+          _sourceLanguage == sourceLanguage &&
+          _targetLanguage == targetLanguage,
+    );
+    if (!mounted || mutation == null) {
+      if (mounted &&
+          ref.read(translationSaveViewModelProvider).error != null) {
+        Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.connectionError,
+          toastLength: Toast.LENGTH_SHORT,
+        );
       }
-      final formattedWord = text.toLowerCase()[0].toUpperCase() +
-          text.toLowerCase().substring(1);
-      final formattedTranslation = translatedWord.toLowerCase()[0].toUpperCase() +
-          translatedWord.toLowerCase().substring(1);
-
-      widget.addRow({
-        'front': formattedWord,
-        'back': formattedTranslation,
-        'sourceLang': sourceLanguage,
-        'targetLang': targetLanguage,
-      });
-      Future<bool> isCardAdded = widget.flashcardsService.addFlashcard(
-          formattedWord, formattedTranslation, sourceLanguage, targetLanguage);
-
-      final cardAdded = await isCardAdded;
-      if (!mounted ||
-          ref.read(translationViewModelProvider).result != result ||
-          _wordToTranslate != text ||
-          _sourceLanguage != sourceLanguage ||
-          _targetLanguage != targetLanguage) {
-        return;
-      }
-
-      widget.updateQuestionText();
-      setState(() {
-        isAddButtonDisabled = true;
-      });
-
-      // Confirm that the card was added
-      Fluttertoast.showToast(
-        msg: cardAdded
+      return;
+    }
+    if (mutation.name == 'applied') setState(() => isAddButtonDisabled = true);
+    Fluttertoast.showToast(
+        msg: mutation.name == 'applied'
             ? AppLocalizations.of(context)!.cardAdded
             : AppLocalizations.of(context)!.cardAlreadyAdded,
         toastLength: Toast.LENGTH_SHORT,
@@ -276,7 +244,6 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-    }
   }
 
   @override

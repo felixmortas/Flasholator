@@ -29,6 +29,7 @@ final class DeeplTranslationRepository implements TranslationRepository {
         throw const TranslationError(TranslationErrorKind.deepl);
       }
       return TranslationResult(
+        sourceText: request.text,
         text: text,
         sourceLanguage: request.sourceLanguage,
         targetLanguage: request.targetLanguage,

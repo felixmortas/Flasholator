@@ -180,10 +180,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  void dataTableTabFunction(Map<String, dynamic> row) {
-    dataTableTabKey.currentState?.addRow(row);
-  }
-
   void reviewTabFunction() {
     reviewTabKey.currentState
         ?.updateQuestionText(isAllLanguagesToggledNotifier.value);
@@ -248,18 +244,13 @@ class _HomePageState extends ConsumerState<HomePage> {
             child: TabBarView(
               children: [
                 TranslateTab(
-                  flashcardsService: flashcardsService,
-                  addRow: dataTableTabFunction,
-                  updateQuestionText: reviewTabFunction,
                 ),
                 ReviewTab(
                   key: reviewTabKey,
                   isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
                 ),
                 DataTableTab(
-                  flashcardsService: flashcardsService,
                   key: dataTableTabKey,
-                  updateQuestionText: reviewTabFunction,
                   isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,
                 )
               ],

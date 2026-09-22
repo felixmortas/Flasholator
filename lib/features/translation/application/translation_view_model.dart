@@ -5,6 +5,7 @@ import 'package:flasholator/features/translation/application/translation_ui_stat
 import 'package:flasholator/features/translation/domain/translation_error.dart';
 import 'package:flasholator/features/translation/domain/translation_repository.dart';
 import 'package:flasholator/features/translation/domain/translation_request.dart';
+import 'package:flasholator/features/translation/domain/translation_result.dart';
 
 /// Orchestre une intention remplaçable et ignore toute complétion périmée.
 final class TranslationViewModel extends StateNotifier<TranslationUiState> {
@@ -42,7 +43,12 @@ final class TranslationViewModel extends StateNotifier<TranslationUiState> {
     try {
       final result = await _repository.translate(request);
       if (!_isCurrent(token, session)) return;
-      state = TranslationUiState.data(result);
+      state = TranslationUiState.data(TranslationResult(
+        sourceText: request.text,
+        text: result.text,
+        sourceLanguage: result.sourceLanguage,
+        targetLanguage: result.targetLanguage,
+      ));
     } on TranslationError catch (error) {
       if (!_isCurrent(token, session)) return;
       state = TranslationUiState.error(error);
