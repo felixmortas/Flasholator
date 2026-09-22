@@ -60,6 +60,11 @@ class DatabaseWrapper {
     _db = _database ?? AppDatabase();
   }
 
+  /// Point de composition pour les nouveaux adaptateurs qui ont besoin des
+  /// primitives transactionnelles de Drift. Les méthodes historiques restent
+  /// volontairement inchangées.
+  AppDatabase get database => _db;
+
   /// Récupérer tous les enregistrements
   Future<List<FlashcardData>> getAll() async {
     return await _db.select(_db.flashcards).get();
