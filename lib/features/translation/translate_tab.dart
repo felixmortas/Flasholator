@@ -8,13 +8,13 @@ import 'package:share_plus/share_plus.dart';
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
-import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
+import 'package:flasholator/core/presentation/ui_phase.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
 import 'package:flasholator/features/shared/utils/lang_id_formater.dart';
 import 'package:flasholator/features/translation/widgets/language_dropdown.dart';
-import 'package:flasholator/features/translation/translation_request_guard.dart';
+import 'package:flasholator/features/translation/translation_providers.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 
 import 'package:flasholator/features/translation/widgets/switch_lang_button.dart';
@@ -24,17 +24,15 @@ import 'package:flasholator/style/grid_background_painter.dart';
 
 class TranslateTab extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
-  final DeeplTranslator deeplTranslator;
   final Function(Map<String, dynamic>) addRow;
   final Function() updateQuestionText;
 
   const TranslateTab({
-    Key? key,
+    super.key,
     required this.flashcardsService,
-    required this.deeplTranslator,
     required this.addRow,
     required this.updateQuestionText,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<TranslateTab> createState() => _TranslateTabState();
@@ -44,14 +42,13 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   final languageSelection = LanguageSelection();
   String? _lastCoupleLang;
   String _wordToTranslate = '';
-  String _translatedWord = '';
   bool isTranslateButtonDisabled = true;
   bool isAddButtonDisabled = true;
   String _lastTranslatedWord = '';
   String _sourceLanguage = '';
   String _targetLanguage = '';
-  final _translationRequests = TranslationRequestGuard();
   late List<MapEntry<String, String>> sortedLanguageEntries;
+  late final ProviderSubscription<String> _coupleLangSubscription;
 
   final TextEditingController _controller = TextEditingController();
 
@@ -59,6 +56,14 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   void initState() {
     super.initState();
     _controller.addListener(_updateButtonState);
+    _lastCoupleLang = ref.read(coupleLangProvider);
+    _applyCoupleLanguage(_lastCoupleLang!, invalidate: false);
+    _coupleLangSubscription = ref.listenManual<String>(
+      coupleLangProvider,
+      (previous, next) {
+        if (previous != next) _applyCoupleLanguage(next);
+      },
+    );
   }
 
   @override
@@ -72,34 +77,47 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   void dispose() {
     _controller.removeListener(_updateButtonState);
     _controller.dispose();
+    _coupleLangSubscription.close();
     super.dispose();
   }
 
   void _clearTextInput() {
     _invalidateTranslationRequests();
+    _controller.clear();
     setState(() {
-      _controller.clear();
       _wordToTranslate = '';
-      _translatedWord = '';
       _lastTranslatedWord = '';
       isTranslateButtonDisabled = true;
       isAddButtonDisabled = true;
     });
-    _updateButtonState();
   }
 
   void _updateButtonState() {
-    _invalidateTranslationRequests();
+    ref.read(translationViewModelProvider.notifier).invalidate();
     setState(() {
       isTranslateButtonDisabled =
           _controller.text.isEmpty || _controller.text == _lastTranslatedWord;
     });
   }
 
-  /// A translation is only allowed to publish if its input and language pair
-  /// are still current. This prevents a late DeepL response consuming quota.
   void _invalidateTranslationRequests() {
-    _translationRequests.invalidate();
+    ref.read(translationViewModelProvider.notifier).invalidate();
+  }
+
+  void _applyCoupleLanguage(String coupleLang, {bool invalidate = true}) {
+    if (invalidate) _invalidateTranslationRequests();
+    _lastCoupleLang = coupleLang;
+    if (coupleLang.contains('-')) {
+      final languages = coupleLang.split('-');
+      languageSelection.sourceLanguage = languages[0];
+      languageSelection.targetLanguage = languages[1];
+    }
+    if (!mounted) return;
+    setState(() {
+      _lastTranslatedWord = '';
+      isAddButtonDisabled = true;
+      isTranslateButtonDisabled = _controller.text.trim().isEmpty;
+    });
   }
 
   void _onLanguageChange(String? newValue, bool isSourceLanguage) {
@@ -111,10 +129,9 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         } else {
           languageSelection.targetLanguage = newValue!;
         }
-        _translatedWord = '';
         _lastTranslatedWord = '';
         isAddButtonDisabled = true;
-        _updateButtonState();
+        isTranslateButtonDisabled = _controller.text.trim().isEmpty;
       });
     } else {
       _openSubscribePopup();
@@ -127,6 +144,9 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
       final String tmp = languageSelection.sourceLanguage;
       languageSelection.sourceLanguage = languageSelection.targetLanguage;
       languageSelection.targetLanguage = tmp;
+      _lastTranslatedWord = '';
+      isAddButtonDisabled = true;
+      isTranslateButtonDisabled = _controller.text.trim().isEmpty;
     });
   }
 
@@ -147,47 +167,50 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   Future<void> _translate(bool isSubscribed) async {
-    if (!mounted) return;
+    final requestedText = _controller.text.trim();
+    final sourceLanguage = languageSelection.sourceLanguage;
+    final targetLanguage = languageSelection.targetLanguage;
+    _wordToTranslate = requestedText;
+    setState(() => isTranslateButtonDisabled = true);
+    await ref.read(translationViewModelProvider.notifier).translate(
+          text: requestedText,
+          sourceLanguage: sourceLanguage,
+          targetLanguage: targetLanguage,
+        );
+    final result = ref.read(translationViewModelProvider).result;
+    if (!mounted ||
+        result == null ||
+        _controller.text.trim() != requestedText ||
+        result.sourceLanguage != sourceLanguage ||
+        result.targetLanguage != targetLanguage) {
+      if (mounted &&
+          ref.read(translationViewModelProvider).phase != UiPhase.loading &&
+          _controller.text.trim() == requestedText &&
+          languageSelection.sourceLanguage == sourceLanguage &&
+          languageSelection.targetLanguage == targetLanguage) {
+        setState(() {
+          isTranslateButtonDisabled = _controller.text.isEmpty ||
+              _controller.text == _lastTranslatedWord;
+        });
+      }
+      return;
+    }
     setState(() {
+      _lastTranslatedWord = _wordToTranslate;
+      _sourceLanguage = result.sourceLanguage;
+      _targetLanguage = result.targetLanguage;
+      isAddButtonDisabled = false;
       isTranslateButtonDisabled = true;
     });
-    final requestId = _translationRequests.begin();
-    try {
-      _wordToTranslate = _controller.text.trim();
-      String translation = await widget.deeplTranslator.translate(
-        _wordToTranslate,
-        languageSelection.targetLanguage,
-        languageSelection.sourceLanguage,
-      );
-
-      await _translationRequests.publishIfCurrent(requestId, () async {
-        if (!mounted) return;
-        setState(() {
-          _translatedWord = translation;
-          _lastTranslatedWord = _wordToTranslate;
-          _sourceLanguage = languageSelection.sourceLanguage;
-          _targetLanguage = languageSelection.targetLanguage;
-          isAddButtonDisabled = false;
-          isTranslateButtonDisabled = true;
-        });
-
-        if (!isSubscribed && mounted) {
-          final userManager = ref.read(userManagerProvider);
-          await userManager.incrementCounter(context);
-        }
-      });
-    } catch (e) {
-      print('Error translating text: $e');
-    } finally {
-      if (mounted && _translationRequests.isCurrent(requestId)) {
-        _updateButtonState();
-      }
+    if (!isSubscribed && mounted) {
+      await ref.read(userManagerProvider).incrementCounter(context);
     }
   }
 
   Future<void> _checkIfCanAddFlashcard() async {
     final isSubscribed = ref.read(isSubscribedProvider);
     final canAddCard = await widget.flashcardsService.canAddCard();
+    if (!mounted) return;
     if (isSubscribed || canAddCard) {
       _addFlashcard();
     } else {
@@ -196,24 +219,45 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   }
 
   Future<void> _addFlashcard() async {
+    final result = ref.read(translationViewModelProvider).result;
+    final translatedWord = result?.text ?? '';
+    final sourceLanguage = _sourceLanguage;
+    final targetLanguage = _targetLanguage;
+    final text = _wordToTranslate;
     if (_wordToTranslate != '' &&
-        _translatedWord != '' &&
-        _translatedWord != AppLocalizations.of(context)!.connectionError &&
+        translatedWord != '' &&
+        translatedWord != AppLocalizations.of(context)!.connectionError &&
         !await widget.flashcardsService
-            .checkIfFlashcardExists(_wordToTranslate, _translatedWord)) {
-      _wordToTranslate = _wordToTranslate.toLowerCase()[0].toUpperCase() +
-          _wordToTranslate.toLowerCase().substring(1);
-      _translatedWord = _translatedWord.toLowerCase()[0].toUpperCase() +
-          _translatedWord.toLowerCase().substring(1);
+            .checkIfFlashcardExists(_wordToTranslate, translatedWord)) {
+      if (!mounted ||
+          ref.read(translationViewModelProvider).result != result ||
+          _wordToTranslate != text ||
+          _sourceLanguage != sourceLanguage ||
+          _targetLanguage != targetLanguage) {
+        return;
+      }
+      final formattedWord = text.toLowerCase()[0].toUpperCase() +
+          text.toLowerCase().substring(1);
+      final formattedTranslation = translatedWord.toLowerCase()[0].toUpperCase() +
+          translatedWord.toLowerCase().substring(1);
 
       widget.addRow({
-        'front': _wordToTranslate,
-        'back': _translatedWord,
-        'sourceLang': _sourceLanguage,
-        'targetLang': _targetLanguage,
+        'front': formattedWord,
+        'back': formattedTranslation,
+        'sourceLang': sourceLanguage,
+        'targetLang': targetLanguage,
       });
       Future<bool> isCardAdded = widget.flashcardsService.addFlashcard(
-          _wordToTranslate, _translatedWord, _sourceLanguage, _targetLanguage);
+          formattedWord, formattedTranslation, sourceLanguage, targetLanguage);
+
+      final cardAdded = await isCardAdded;
+      if (!mounted ||
+          ref.read(translationViewModelProvider).result != result ||
+          _wordToTranslate != text ||
+          _sourceLanguage != sourceLanguage ||
+          _targetLanguage != targetLanguage) {
+        return;
+      }
 
       widget.updateQuestionText();
       setState(() {
@@ -222,7 +266,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
       // Confirm that the card was added
       Fluttertoast.showToast(
-        msg: await isCardAdded
+        msg: cardAdded
             ? AppLocalizations.of(context)!.cardAdded
             : AppLocalizations.of(context)!.cardAlreadyAdded,
         toastLength: Toast.LENGTH_SHORT,
@@ -237,17 +281,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
 
   @override
   Widget build(BuildContext context) {
-    final coupleLang = ref.watch(coupleLangProvider);
-
-    if (coupleLang != _lastCoupleLang) {
-      _invalidateTranslationRequests();
-      _lastCoupleLang = coupleLang;
-
-      if (coupleLang.contains('-')) {
-        languageSelection.sourceLanguage = coupleLang.split('-')[0];
-        languageSelection.targetLanguage = coupleLang.split('-')[1];
-      }
-    }
+    final translationState = ref.watch(translationViewModelProvider);
 
     return GridBackground(
       child: Scaffold(
@@ -312,13 +346,17 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                     const Divider(),
                     const SizedBox(height: 12),
                     _TranslatedText(
-                      translatedWord: _translatedWord,
+                      translatedWord: translationState.result?.text ??
+                          (translationState.phase == UiPhase.error
+                              ? AppLocalizations.of(context)!.connectionError
+                              : ''),
                       onVolumePressed: () {},
                       onAlternativePressed: () {},
                       onSharePressed: () {
-                        if (_translatedWord.isNotEmpty) {
+                        final translatedWord = translationState.result?.text ?? '';
+                        if (translatedWord.isNotEmpty) {
                           Share.share(
-                            'Grâce à Flasholator, je vais pouvoir retenir éternellement ce mot que je viens de traduire : $_translatedWord\n\n'
+                            'Grâce à Flasholator, je vais pouvoir retenir éternellement ce mot que je viens de traduire : $translatedWord\n\n'
                             '📱 Toi aussi télécharge Flasholator pour avoir une mémoire d\'éléphant !',
                             subject: 'Apprendre avec Flasholator',
                           );
@@ -328,7 +366,8 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                     const SizedBox(height: 16),
                     _ActionButtons(
                       isTranslateDisabled: isTranslateButtonDisabled,
-                      isAddDisabled: isAddButtonDisabled,
+                      isAddDisabled: isAddButtonDisabled ||
+                          translationState.phase != UiPhase.data,
                       onTranslate: _checkIfCanTranslate,
                       onAdd: _checkIfCanAddFlashcard,
                     ),
@@ -366,7 +405,7 @@ class _InputFieldWithClear extends StatelessWidget {
             border: InputBorder.none,
             hintText: AppLocalizations.of(context)!
                 .writeOrPasteYourTextHereForTranslation,
-            hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5)),
+            hintStyle: TextStyle(color: Colors.grey.withValues(alpha: 0.5)),
             counterText: "",
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,

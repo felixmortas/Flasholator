@@ -249,7 +249,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 TranslateTab(
                   flashcardsService: flashcardsService,
-                  deeplTranslator: deeplTranslator,
                   addRow: dataTableTabFunction,
                   updateQuestionText: reviewTabFunction,
                 ),
