@@ -15,6 +15,7 @@ import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/features/translation/translate_tab.dart';
 import 'package:flasholator/features/translation/translation_providers.dart';
+import 'package:flasholator/features/authentication/auth_session_repository.dart';
 import 'package:flasholator/features/review/review_tab.dart';
 import 'package:flasholator/features/data/data_table_tab.dart';
 import 'package:flasholator/features/shared/dialogs/language_selection_popup.dart';
@@ -48,6 +49,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     flashcardsService = FlashcardsService(
+      userId: ref.read(authSessionRepositoryProvider).account?.uid,
       limits: ref.read(freePlanLimitsProvider),
       isPremium: () => ref.read(isSubscribedProvider),
     );

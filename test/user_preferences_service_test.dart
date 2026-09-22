@@ -36,4 +36,21 @@ void main() {
     await UserPreferencesService.deleteUser();
     expect(await UserPreferencesService.getUsedLanguagePairs(), isEmpty);
   });
+
+  test('la purge conserve les préférences hors session', () async {
+    SharedPreferences.setMockInitialValues({'theme': 'dark'});
+    await UserPreferencesService.updateUser({'counter': 4});
+    await UserPreferencesService.clearUserData();
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('theme'), 'dark');
+    expect(await UserPreferencesService.getCounter(), 0);
+  });
+
+  test('les couples utilisés restent propres à chaque compte', () async {
+    await UserPreferencesService.setUsedLanguagePairs(['FR-EN'], uid: 'A');
+    await UserPreferencesService.clearUserData();
+    expect(await UserPreferencesService.getUsedLanguagePairs(uid: 'B'), isEmpty);
+    expect(await UserPreferencesService.getUsedLanguagePairs(uid: 'A'),
+        ['FR-EN']);
+  });
 }

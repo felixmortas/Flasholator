@@ -7,10 +7,16 @@ import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/features/flashcards/application/flashcard_collection_projections.dart';
 import 'package:flasholator/features/flashcards/data/flashcard_repository.dart';
 import 'package:flasholator/features/flashcards/domain/flashcard_collection.dart';
+import 'package:flasholator/features/authentication/auth_session_repository.dart';
 
 /// Dépendance locale surchargeable par les consommateurs et les tests.
 final flashcardRepositoryProvider = Provider<FlashcardRepository>((ref) {
-  final database = AppDatabase();
+  final session = ref.watch(authSessionRepositoryProvider);
+  final uid = session.account?.uid;
+  if (session.status != AuthSessionStatus.ready || uid == null) {
+    throw StateError('Aucune session active pour les flashcards.');
+  }
+  final database = AppDatabase(null, uid);
   final repository = DriftFlashcardRepository(database, maxCardPairs: () {
     if (ref.read(isSubscribedProvider)) return null;
     return ref.read(freePlanLimitsProvider).cardPairs;

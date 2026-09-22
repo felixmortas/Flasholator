@@ -16,6 +16,33 @@ class UserManager {
   final RevenueCatService _revenueCatService;
   final Ref ref;
   Future<void> _counterMutation = Future<void>.value();
+  String? _sessionUid;
+  bool _sessionBound = false;
+  int _sessionGeneration = 0;
+
+  /// Invalide immédiatement les opérations anciennes, avant toute attente.
+  void beginSession(String? uid, int generation) {
+    _sessionUid = uid;
+    _sessionBound = true;
+    _sessionGeneration = generation;
+  }
+
+  bool _isCurrent(String uid, int generation) =>
+      _sessionUid == uid && _sessionGeneration == generation &&
+      _authService.getUserId() == uid;
+
+  bool Function() _guard(String uid, int generation) =>
+      () => _isCurrent(uid, generation);
+
+  Future<void> clearSessionData(int generation) async {
+    if (generation != _sessionGeneration) return;
+    final owner = await UserPreferencesService.getCacheOwnerUid();
+    if (generation != _sessionGeneration) return;
+    if (_sessionUid == null || owner != _sessionUid) {
+      await UserPreferencesService.clearUserData();
+    }
+    if (generation == _sessionGeneration) userNotifier.clear();
+  }
 
   UserManager(
       {required this.ref,
@@ -34,13 +61,19 @@ class UserManager {
   }
 
   Future<void> setCoupleLang(String sourceLang, String targetLang) async {
-    if (!await tryUseLanguagePair(sourceLang, targetLang, persist: false)) {
+    final uid = getUserId();
+    final generation = _sessionGeneration;
+    if (!await tryUseLanguagePair(sourceLang, targetLang, persist: false,
+        isCurrent: () => !_sessionBound || _isCurrent(uid, generation))) {
       throw StateError('Limite de couples de langues atteinte');
     }
+    if (_sessionBound && !_isCurrent(uid, generation)) return;
     final data = {'coupleLang': '$sourceLang-$targetLang'};
 
     await updateUser(data);
-    await tryUseLanguagePair(sourceLang, targetLang);
+    if (_isCurrent(uid, generation)) {
+      await tryUseLanguagePair(sourceLang, targetLang);
+    }
   }
 
   Future<bool> tryUseLanguagePair(String sourceLang, String targetLang, {
@@ -49,10 +82,12 @@ class UserManager {
   }) async {
     if (ref.read(isSubscribedProvider)) return true;
     final sessionUserId = getUserId();
+    final generation = _sessionGeneration;
     String canonicalPair(String first, String second) =>
         first.compareTo(second) <= 0 ? '$first-$second' : '$second-$first';
     final pair = canonicalPair(sourceLang, targetLang);
-    final stored = (await UserPreferencesService.getUsedLanguagePairs())
+    final stored = (await UserPreferencesService.getUsedLanguagePairs(
+        uid: _sessionBound ? sessionUserId : null))
         .map((entry) {
           final languages = entry.split('-');
           return languages.length == 2
@@ -66,7 +101,8 @@ class UserManager {
     if (currentLanguages.length == 2) {
       used.add(canonicalPair(currentLanguages[0], currentLanguages[1]));
     }
-    if (getUserId() != sessionUserId ||
+    if (( _sessionBound && !_isCurrent(sessionUserId, generation)) ||
+        getUserId() != sessionUserId ||
         (isCurrent != null && !isCurrent())) {
       return false;
     }
@@ -79,7 +115,11 @@ class UserManager {
     }
     if (persist && !stored.contains(pair)) {
       used.add(pair);
-      await UserPreferencesService.setUsedLanguagePairs(used.toList());
+      await UserPreferencesService.setUsedLanguagePairs(used.toList(),
+          uid: _sessionBound ? sessionUserId : null,
+          isCurrent: !_sessionBound ? isCurrent : () =>
+              _isCurrent(sessionUserId, generation) &&
+              (isCurrent == null || isCurrent()));
     }
     return true;
   }
@@ -102,8 +142,10 @@ class UserManager {
 
   Future<void> _incrementCounter({bool Function()? isCurrent}) async {
     final sessionUserId = getUserId();
+    final generation = _sessionGeneration;
     final currentCounter = await UserPreferencesService.getCounter();
-    if (getUserId() != sessionUserId || (isCurrent != null && !isCurrent())) {
+    if ((_sessionBound && !_isCurrent(sessionUserId, generation)) ||
+        getUserId() != sessionUserId || (isCurrent != null && !isCurrent())) {
       return;
     }
     if (ref.read(isSubscribedProvider)) {
@@ -119,7 +161,9 @@ class UserManager {
     )) {
       return;
     }
-    await updateLocal({'counter': updatedCounter});
+    await updateLocal({'counter': updatedCounter},
+        isCurrent: () => (!_sessionBound || _isCurrent(sessionUserId, generation)) &&
+            (isCurrent == null || isCurrent()));
   }
 
   Future<void> reauthenticateWithCredential(String password) async {
@@ -162,49 +206,64 @@ class UserManager {
   Future<void> subscribeUser() async {
     final bool wasSubscribed = userNotifier.isSubscribed;
     final userId = getUserId();
+    final generation = _sessionGeneration;
     await _revenueCatService.presentPaywall(userId);
+    if (_sessionBound && !_isCurrent(userId, generation)) return;
     if (!wasSubscribed) {
       final bool isSubscribed = await isUserSubscribed();
-      if (isSubscribed) {
-        updateLocal({"isSubscribed": isSubscribed});
+      if (isSubscribed && (!_sessionBound || _isCurrent(userId, generation))) {
+        await updateLocal({"isSubscribed": isSubscribed},
+            isCurrent: () => !_sessionBound || _isCurrent(userId, generation));
       }
     }
   }
 
   Future<void> signOut() async {
+    final generation = _sessionGeneration;
     try {
       await _revenueCatService.logOut();
     } finally {
       await _authService.signOut();
-      await clearLocalData();
+      if (generation == _sessionGeneration) await clearLocalData();
     }
   }
 
   Future<void> clearLocalData() async {
+    final generation = _sessionGeneration;
     await UserPreferencesService.clearUserData();
-    userNotifier.clear();
+    if (generation == _sessionGeneration) userNotifier.clear();
   }
 
   Future<void> deleteUser() async {
     final uid = _authService.getUserId();
+    final generation = _sessionGeneration;
     if (uid.isNotEmpty) {
       await _authService.deleteUser();
       await _firestoreDAO.deleteUser(uid);
       try {
         await _revenueCatService.logOut();
       } finally {
-        await UserPreferencesService.deleteUser();
-        userNotifier.clear();
+        if (generation == _sessionGeneration) {
+          await UserPreferencesService.deleteUser(uid: uid);
+          if (generation == _sessionGeneration) userNotifier.clear();
+        }
       }
     }
   }
 
   Future<void> syncNotifierFromCache() async {
+    final uid = getUserId();
+    final generation = _sessionGeneration;
     final data = await UserPreferencesService.loadUserData();
-    userNotifier.update(data..['isSubscribed'] = await isUserSubscribed());
+    data['isSubscribed'] = await isUserSubscribed();
+    if (!_sessionBound || _isCurrent(uid, generation)) {
+      userNotifier.update(data);
+    }
   }
 
   Future<void> syncLocalFromFirestore() async {
+    final uid = getUserId();
+    final generation = _sessionGeneration;
     final userDoc = await getUserFromFirestore();
     final userDocData = userDoc.data() as Map<String, dynamic>;
     final bool canTranslate = userDocData['canTranslate'] ?? false;
@@ -217,20 +276,28 @@ class UserManager {
       'isSubscribed': isSubscribed,
     };
 
-    await updateLocal(data);
+    await updateLocal(data, isCurrent: _guard(uid, generation));
   }
 
-  Future<void> updateLocal(Map<String, dynamic> data) async {
-    await UserPreferencesService.updateUser(data);
-    userNotifier.update(data);
+  Future<void> updateLocal(Map<String, dynamic> data,
+      {bool Function()? isCurrent}) async {
+    final uid = getUserId();
+    final generation = _sessionGeneration;
+    bool current() => (isCurrent == null || isCurrent()) &&
+        (!_sessionBound || _isCurrent(uid, generation));
+    await UserPreferencesService.updateUser(data,
+        uid: _sessionBound ? uid : null, isCurrent: current);
+    if (current()) userNotifier.update(data);
   }
 
   Future<void> updateUser(Map<String, dynamic> data) async {
     final uid = _authService.getUserId();
+    final generation = _sessionGeneration;
 
     await _firestoreDAO.updateUser(uid, data);
-    await UserPreferencesService.updateUser(data);
-    userNotifier.update(data);
+    if (_sessionBound && !_isCurrent(uid, generation)) return;
+    await updateLocal(data, isCurrent: () =>
+        !_sessionBound || _isCurrent(uid, generation));
   }
 
   Future<bool> isUserDataCached() async {

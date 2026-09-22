@@ -1,11 +1,20 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPreferencesService {
+  static Future<void> _writes = Future<void>.value();
+
+  static Future<T> _serialize<T>(Future<T> Function() action) {
+    final result = _writes.then((_) => action());
+    _writes = result.then<void>((_) {}, onError: (_, __) {});
+    return result;
+  }
   static const _canTranslateKey = 'canTranslate';
   static const _counterKey = 'counter';
   static const _userDataCachedKey = 'userDataCached';
   static const _coupleLangKey = 'coupleLang';
   static const _usedLanguagePairsKey = 'usedLanguagePairs';
+  static const _isSubscribedKey = 'isSubscribed';
+  static const _cacheOwnerUidKey = 'userCacheOwnerUid';
 
   // ====================
   // === READ METHODS ===
@@ -26,32 +35,47 @@ class UserPreferencesService {
     return prefs.getBool(_userDataCachedKey) ?? false;
   }
 
+  static Future<String?> getCacheOwnerUid() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_cacheOwnerUidKey);
+  }
+
   static Future<String> getCoupleLang() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_coupleLangKey) ?? '';
   }
 
-  static Future<List<String>> getUsedLanguagePairs() async {
+  static String _pairsKey(String? uid) => uid == null
+      ? _usedLanguagePairsKey
+      : '$_usedLanguagePairsKey.$uid';
+
+  static Future<List<String>> getUsedLanguagePairs({String? uid}) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList(_usedLanguagePairsKey) ?? <String>[];
+    return prefs.getStringList(_pairsKey(uid)) ?? <String>[];
   }
 
-  static Future<void> setUsedLanguagePairs(List<String> pairs) async {
+  static Future<void> setUsedLanguagePairs(List<String> pairs,
+      {String? uid, bool Function()? isCurrent}) => _serialize(() async {
+    if (isCurrent != null && !isCurrent()) return;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_usedLanguagePairsKey, pairs);
-  }
+    if (isCurrent != null && !isCurrent()) return;
+    await prefs.setStringList(_pairsKey(uid), pairs);
+  });
 
   // =====================
   // === WRITE METHODS ===
   // =====================
 
   /// Enregistre les champs utilisateur localement
-  static Future<void> updateUser(Map<String, dynamic> fields) async {
+  static Future<void> updateUser(Map<String, dynamic> fields,
+      {String? uid, bool Function()? isCurrent}) => _serialize(() async {
+    if (isCurrent != null && !isCurrent()) return;
     final prefs = await SharedPreferences.getInstance();
 
     for (final entry in fields.entries) {
       final key = entry.key;
       final value = entry.value;
+      if (isCurrent != null && !isCurrent()) return;
 
       if (value is bool) {
         await prefs.setBool(key, value);
@@ -66,24 +90,34 @@ class UserPreferencesService {
       }
     }
 
-    await _updateCachedFlag(prefs, fields);
-  }
+    if (isCurrent == null || isCurrent()) {
+      await _updateCachedFlag(prefs, fields);
+      if (uid != null) await prefs.setString(_cacheOwnerUidKey, uid);
+    }
+  });
 
   /// Supprime toutes les données utilisateur enregistrées localement
-  static Future<void> deleteUser() async {
+  static Future<void> deleteUser({String? uid}) => _serialize(() async {
+    await _clearUserData();
+    if (uid != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_pairsKey(uid));
+    }
+  });
+
+  static Future<void> _clearUserData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_canTranslateKey);
     await prefs.remove(_counterKey);
     await prefs.setBool(_userDataCachedKey, false);
     await prefs.remove(_coupleLangKey);
     await prefs.remove(_usedLanguagePairsKey);
+    await prefs.remove(_isSubscribedKey);
+    await prefs.remove(_cacheOwnerUidKey);
   }
 
   /// Clear all user data
-  static Future<void> clearUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-  }
+  static Future<void> clearUserData() => _serialize(_clearUserData);
 
   // =========================
   // === BULK LOAD METHOD ===

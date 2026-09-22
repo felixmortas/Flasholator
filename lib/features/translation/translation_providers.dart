@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/free_plan_limits_provider.dart';
-import 'package:flasholator/core/providers/auth_service_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/features/translation/application/translation_session_context.dart';
 import 'package:flasholator/features/translation/application/translation_ui_state.dart';
@@ -14,6 +12,7 @@ import 'package:flasholator/core/services/flashcards_service.dart';
 import 'package:flasholator/features/translation/data/deepl_translation_repository.dart';
 import 'package:flasholator/features/translation/data/legacy_deepl_translation_client.dart';
 import 'package:flasholator/features/translation/domain/translation_repository.dart';
+import 'package:flasholator/features/authentication/auth_session_repository.dart';
 
 final deeplTranslationClientProvider = Provider<DeeplTranslationClient>((ref) {
   return LegacyDeeplTranslationClient(DeeplTranslator());
@@ -36,9 +35,11 @@ TranslationSessionContext translationSessionContextFromLegacyUser(
 }
 
 final translationSessionContextProvider = Provider<TranslationSessionContext>((ref) {
-  return translationSessionContextFromLegacyUser(
-    ref.watch(userDataProvider),
-    authUserId: ref.watch(authServiceProvider).getUserId(),
+  final session = ref.watch(authSessionRepositoryProvider);
+  return TranslationSessionContext(
+    sessionId: session.status == AuthSessionStatus.ready
+        ? session.account!.uid : '',
+    generation: session.generation,
   );
 });
 
@@ -77,5 +78,6 @@ final class LegacyFlashcardAccess implements FlashcardAccess {
 
 final flashcardAccessProvider = Provider<FlashcardAccess>((ref) =>
     LegacyFlashcardAccess(FlashcardsService(
+      userId: ref.watch(authSessionRepositoryProvider).account?.uid,
       limits: ref.watch(freePlanLimitsProvider),
     )));

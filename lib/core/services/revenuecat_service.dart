@@ -20,19 +20,27 @@ class RevenueCatService {
 
   static Future<void>? _configuration;
   static String? _activeUserId;
+  static Future<void> _identityQueue = Future<void>.value();
 
-  Future<void> initRevenueCat(String userId) async {
+  static Future<void> _queueIdentity(Future<void> Function() operation) {
+    final result = _identityQueue.then((_) => operation());
+    _identityQueue = result.catchError((Object _) {});
+    return result;
+  }
+
+  Future<void> initRevenueCat(String userId) => _queueIdentity(() async {
     if (_configuration == null) {
-      _activeUserId = userId;
-      _configuration = _configure(userId).onError((error, stackTrace) {
+      final configuration = _configure(userId);
+      _configuration = configuration;
+      try {
+        await configuration;
+        _activeUserId = userId;
+      } catch (_) {
         _configuration = null;
         _activeUserId = null;
-        Error.throwWithStackTrace(
-          error ?? StateError('Échec de l’initialisation RevenueCat'),
-          stackTrace,
-        );
-      });
-      return _configuration!;
+        rethrow;
+      }
+      return;
     }
 
     await _configuration;
@@ -45,7 +53,7 @@ class RevenueCatService {
       }
       _activeUserId = userId;
     }
-  }
+  });
 
   Future<void> _configure(String userId) async {
     final configureClient = _configureClient;
@@ -110,7 +118,7 @@ class RevenueCatService {
     }
   }
 
-  Future<void> logOut() async {
+  Future<void> logOut() => _queueIdentity(() async {
     // Un compte Firebase non vérifié peut être déconnecté avant toute
     // configuration RevenueCat.
     if (_configuration == null) return;
@@ -123,11 +131,12 @@ class RevenueCatService {
       await Purchases.logOut();
     }
     _activeUserId = null;
-  }
+  });
 
   @visibleForTesting
   static void resetForTesting() {
     _configuration = null;
     _activeUserId = null;
+    _identityQueue = Future<void>.value();
   }
 }

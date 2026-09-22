@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flasholator/core/providers/auth_service_provider.dart';
 import 'package:flasholator/core/providers/firestore_users_dao_provider.dart';
 import 'package:flasholator/core/providers/revenuecat_provider.dart';
@@ -19,6 +22,9 @@ class _MockAuthService extends Mock implements AuthService {}
 class _MockFirestoreUsersDao extends Mock implements FirestoreUsersDAO {}
 
 class _MockRevenueCatService extends Mock implements RevenueCatService {}
+// Le SDK scelle le snapshot ; le mock reste limité au résultat de data().
+// ignore: subtype_of_sealed_class
+class _UserDocument extends Mock implements DocumentSnapshot<Map<String, dynamic>> {}
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -138,5 +144,157 @@ void main() {
       () => auth.updateDisplayName('Alice'),
       () => auth.sendEmailVerification(),
     ]);
+  });
+
+  test('une écriture Firestore tardive ne repeuple pas le cache de B', () async {
+    final auth = _MockAuthService();
+    final firestore = _MockFirestoreUsersDao();
+    final pending = Completer<void>();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => firestore.updateUser('A', any()))
+        .thenAnswer((_) => pending.future);
+    final container = ProviderContainer(overrides: [
+      authServiceProvider.overrideWithValue(auth),
+      firestoreUsersDAOProvider.overrideWithValue(firestore),
+      revenueCatServiceProvider.overrideWithValue(_MockRevenueCatService()),
+    ]);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider);
+    manager.beginSession('A', 1);
+    final write = manager.updateUser({'coupleLang': 'FR-EN'});
+    manager.beginSession('B', 2);
+    when(() => auth.getUserId()).thenReturn('B');
+    await manager.clearSessionData(2);
+    pending.complete();
+    await write;
+    expect(await UserPreferencesService.getCoupleLang(), '');
+    expect(container.read(coupleLangProvider), '');
+  });
+
+  test('le couple de langues est restauré depuis Firestore', () async {
+    final auth = _MockAuthService();
+    final firestore = _MockFirestoreUsersDao();
+    final revenueCat = _MockRevenueCatService();
+    final document = _UserDocument();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => firestore.getUser('A')).thenAnswer((_) async => document);
+    when(() => document.data()).thenReturn({
+      'coupleLang': 'FR-EN', 'canTranslate': true,
+    });
+    when(() => revenueCat.isSubscribed()).thenAnswer((_) async => false);
+    final container = ProviderContainer(overrides: [
+      authServiceProvider.overrideWithValue(auth),
+      firestoreUsersDAOProvider.overrideWithValue(firestore),
+      revenueCatServiceProvider.overrideWithValue(revenueCat),
+    ]);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider);
+    manager.beginSession('A', 1);
+    await manager.syncLocalFromFirestore();
+    await manager.syncNotifierFromCache();
+    expect(container.read(coupleLangProvider), 'FR-EN');
+    expect(await UserPreferencesService.getCoupleLang(), 'FR-EN');
+  });
+
+  test('un couple choisi est persisté puis restauré à la reconnexion', () async {
+    final auth = _MockAuthService();
+    final firestore = _MockFirestoreUsersDao();
+    final revenueCat = _MockRevenueCatService();
+    final document = _UserDocument();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => firestore.updateUser('A', any()))
+        .thenAnswer((_) async {});
+    when(() => firestore.getUser('A')).thenAnswer((_) async => document);
+    when(() => document.data()).thenReturn({
+      'coupleLang': 'FR-EN', 'canTranslate': true,
+    });
+    when(() => revenueCat.isSubscribed()).thenAnswer((_) async => false);
+
+    ProviderContainer makeContainer() => ProviderContainer(overrides: [
+      authServiceProvider.overrideWithValue(auth),
+      firestoreUsersDAOProvider.overrideWithValue(firestore),
+      revenueCatServiceProvider.overrideWithValue(revenueCat),
+    ]);
+
+    final first = makeContainer();
+    final firstManager = first.read(userManagerProvider);
+    firstManager.beginSession('A', 1);
+    await firstManager.setCoupleLang('FR', 'EN');
+    expect(first.read(coupleLangProvider), 'FR-EN');
+    first.dispose();
+
+    final second = makeContainer();
+    addTearDown(second.dispose);
+    final secondManager = second.read(userManagerProvider);
+    secondManager.beginSession('A', 2);
+    await secondManager.clearSessionData(2);
+    await secondManager.syncLocalFromFirestore();
+    await secondManager.syncNotifierFromCache();
+    expect(second.read(coupleLangProvider), 'FR-EN');
+    verify(() => firestore.updateUser('A', any())).called(1);
+  });
+
+  test('la même identité reconnectée invalide ses anciennes mutations', () async {
+    final auth = _MockAuthService();
+    final firestore = _MockFirestoreUsersDao();
+    final pending = Completer<void>();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => firestore.updateUser('A', any()))
+        .thenAnswer((_) => pending.future);
+    final container = ProviderContainer(overrides: [
+      authServiceProvider.overrideWithValue(auth),
+      firestoreUsersDAOProvider.overrideWithValue(firestore),
+      revenueCatServiceProvider.overrideWithValue(_MockRevenueCatService()),
+    ]);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider);
+    manager.beginSession('A', 1);
+    final oldWrite = manager.updateUser({'coupleLang': 'FR-EN'});
+    manager.beginSession('A', 2);
+    await manager.clearSessionData(2);
+    pending.complete();
+    await oldWrite;
+    expect(await UserPreferencesService.getCoupleLang(), '');
+  });
+
+  test('redémarrage du même uid conserve le compteur local', () async {
+    final container = quotaContainer();
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider);
+    manager.beginSession('u1', 1);
+    await manager.updateLocal({'counter': 37});
+    manager.beginSession('u1', 2);
+    await manager.clearSessionData(2);
+    expect(await UserPreferencesService.getCounter(), 37);
+    expect(await UserPreferencesService.getCacheOwnerUid(), 'u1');
+  });
+
+  test('A vers B purge le compteur local de A', () async {
+    final auth = _MockAuthService();
+    when(() => auth.getUserId()).thenReturn('A');
+    final container = ProviderContainer(overrides: [
+      authServiceProvider.overrideWithValue(auth),
+      firestoreUsersDAOProvider.overrideWithValue(_MockFirestoreUsersDao()),
+      revenueCatServiceProvider.overrideWithValue(_MockRevenueCatService()),
+    ]);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider);
+    manager.beginSession('A', 1);
+    await manager.updateLocal({'counter': 37});
+    manager.beginSession('B', 2);
+    when(() => auth.getUserId()).thenReturn('B');
+    await manager.clearSessionData(2);
+    expect(await UserPreferencesService.getCounter(), 0);
+    expect(await UserPreferencesService.getCacheOwnerUid(), isNull);
+  });
+
+  test('un ancien cache sans uid propriétaire est purgé', () async {
+    await UserPreferencesService.updateUser({'counter': 37});
+    final container = quotaContainer();
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider);
+    manager.beginSession('u1', 1);
+    await manager.clearSessionData(1);
+    expect(await UserPreferencesService.getCounter(), 0);
   });
 }

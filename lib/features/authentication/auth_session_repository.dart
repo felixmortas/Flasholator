@@ -6,6 +6,7 @@ import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/auth_service.dart';
 import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flasholator/features/shared/utils/language_selection.dart';
 
 enum AuthSessionStatus { loading, signedOut, verificationPending, ready, error }
 
@@ -39,15 +40,13 @@ class AuthSessionRepository extends StateNotifier<AuthSessionState> {
   AuthSessionRepository(this._auth, this._manager)
       : super(const AuthSessionState(AuthSessionStatus.loading)) {
     _subscription = _auth.authStateChanges().listen(
-      (user) => unawaited(_accept(user).catchError((Object _) {})),
-      onError: (Object error, StackTrace stack) {
-        _generation++;
-        _pendingUid = null;
-        _pendingHydration = null;
-        if (mounted) {
-          state = AuthSessionState(AuthSessionStatus.error,
-              account: state.account, error: error, generation: _generation);
+      (user) {
+        if (!_signingOut) {
+          unawaited(_accept(user).catchError((Object _) {}));
         }
+      },
+      onError: (Object error, StackTrace stack) {
+        unawaited(_handleStreamError(error));
       },
     );
   }
@@ -58,26 +57,84 @@ class AuthSessionRepository extends StateNotifier<AuthSessionState> {
   int _generation = 0;
   String? _pendingUid;
   Future<void>? _pendingHydration;
+  Future<void> _purge = Future<void>.value();
+  bool _signingOut = false;
+
+  Future<void> _handleStreamError(Object error) async {
+    final generation = ++_generation;
+    _manager.beginSession(null, generation);
+    LanguageSelection.getInstance().reset();
+    _pendingUid = null;
+    _pendingHydration = null;
+    if (mounted) {
+      state = AuthSessionState(AuthSessionStatus.loading,
+          generation: generation);
+    }
+    try {
+      await _clearFor(generation);
+    } catch (_) {
+      // L'erreur initiale du flux reste celle présentée à l'utilisateur.
+    }
+    if (mounted && generation == _generation) {
+      state = AuthSessionState(AuthSessionStatus.error,
+          error: error, generation: generation);
+    }
+  }
+
+  Future<void> _clearFor(int generation) {
+    final purge = _purge.then((_) => _manager.clearSessionData(generation));
+    _purge = purge.catchError((Object _) {});
+    return purge;
+  }
 
   Future<void> _accept(User? user, {bool force = false}) async {
+    if (!mounted) return;
     if (user == null) {
-      _generation++;
+      final generation = ++_generation;
+      _manager.beginSession(null, generation);
+      LanguageSelection.getInstance().reset();
       _pendingUid = null;
       _pendingHydration = null;
+      state = AuthSessionState(AuthSessionStatus.loading,
+          generation: generation);
+      try {
+        await _clearFor(generation);
+      } catch (error) {
+        if (mounted && generation == _generation) {
+          state = AuthSessionState(AuthSessionStatus.error,
+              error: error, generation: generation);
+        }
+        rethrow;
+      }
       if (mounted) {
-        state = AuthSessionState(AuthSessionStatus.signedOut,
-            generation: _generation);
+        if (generation == _generation) {
+          state = AuthSessionState(AuthSessionStatus.signedOut,
+              generation: generation);
+        }
       }
       return;
     }
     final account = AuthAccount.fromFirebase(user);
     if (!account.emailVerified) {
-      _generation++;
+      final generation = ++_generation;
+      _manager.beginSession(account.uid, generation);
+      LanguageSelection.getInstance().reset();
       _pendingUid = null;
       _pendingHydration = null;
-      if (mounted) {
-        state = AuthSessionState(AuthSessionStatus.verificationPending,
-            account: account, generation: _generation);
+      state = AuthSessionState(AuthSessionStatus.loading,
+          account: account, generation: generation);
+      try {
+        await _clearFor(generation);
+        if (mounted && generation == _generation) {
+          state = AuthSessionState(AuthSessionStatus.verificationPending,
+              account: account, generation: generation);
+        }
+      } catch (error) {
+        if (mounted && generation == _generation) {
+          state = AuthSessionState(AuthSessionStatus.error,
+              account: account, error: error, generation: generation);
+        }
+        rethrow;
       }
       return;
     }
@@ -90,11 +147,15 @@ class AuthSessionRepository extends StateNotifier<AuthSessionState> {
       return _pendingHydration!;
     }
     final generation = ++_generation;
+    _manager.beginSession(account.uid, generation);
+    LanguageSelection.getInstance().reset();
     _pendingUid = account.uid;
     state = AuthSessionState(AuthSessionStatus.loading,
         account: account, generation: generation);
     final hydration = () async {
       try {
+        await _clearFor(generation);
+        if (!mounted || generation != _generation) return;
         await _manager.initRevenueCat();
         if (!mounted || generation != _generation) return;
         await _manager.syncLocalFromFirestore();
@@ -154,7 +215,35 @@ class AuthSessionRepository extends StateNotifier<AuthSessionState> {
   Future<void> resendVerification() => _manager.sendEmailVerification();
   Future<void> resetPassword(String email) =>
       _manager.sendPasswordResetEmail(email);
-  Future<void> signOut() => _manager.signOut();
+  Future<void> signOut() async {
+    if (_signingOut) return;
+    _signingOut = true;
+    final generation = ++_generation;
+    _manager.beginSession(null, generation);
+    LanguageSelection.getInstance().reset();
+    _pendingUid = null;
+    _pendingHydration = null;
+    state = AuthSessionState(AuthSessionStatus.loading,
+        generation: generation);
+    final purge = _clearFor(generation);
+    Object? failure;
+    StackTrace? failureStack;
+    try {
+      await _manager.signOut();
+    } catch (error, stack) {
+      failure = error;
+      failureStack = stack;
+    }
+    try {
+      await purge;
+    } catch (error, stack) {
+      failure ??= error;
+      failureStack ??= stack;
+    }
+    _signingOut = false;
+    await _accept(_auth.currentUser);
+    if (failure != null) Error.throwWithStackTrace(failure, failureStack!);
+  }
   String get userEmail => _manager.getUserEmail();
   AuthSessionState get session => state;
   Future<void> retry() => _accept(_auth.currentUser, force: true);

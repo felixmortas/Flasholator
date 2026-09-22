@@ -101,6 +101,8 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
       final languages = coupleLang.split('-');
       languageSelection.sourceLanguage = languages[0];
       languageSelection.targetLanguage = languages[1];
+    } else {
+      languageSelection.reset();
     }
     if (!mounted) return;
     setState(() {

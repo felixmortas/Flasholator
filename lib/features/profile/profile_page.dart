@@ -15,6 +15,7 @@ import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
+import 'package:flasholator/features/authentication/auth_session_repository.dart';
 
 import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
 
@@ -74,8 +75,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       content: AppLocalizations.of(context)!.confirmLogout,
     );
     if (confirmed) {
-      await userManager.signOut();
-      Navigator.pop(context); // Ferme la page de profil
+      final session = ref.read(authSessionRepositoryProvider.notifier);
+      try {
+        await session.signOut();
+      } finally {
+        if (context.mounted && session.session.status != AuthSessionStatus.ready) {
+          Navigator.pop(context); // Ferme la page de profil
+        }
+      }
     }
   }
 

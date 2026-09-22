@@ -16,4 +16,9 @@ class LanguageSelection {
   static LanguageSelection getInstance() {
     return _instance;
   }
+
+  void reset() {
+    sourceLanguage = INITIAL_SOURCE_LANGUAGE;
+    targetLanguage = INITIAL_TARGET_LANGUAGE;
+  }
 }

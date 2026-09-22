@@ -29,6 +29,7 @@ void main() {
     when(() => user.email).thenReturn('a@example.com');
     when(() => user.emailVerified).thenReturn(true);
     when(() => manager.initRevenueCat()).thenAnswer((_) async {});
+    when(() => manager.clearSessionData(any())).thenAnswer((_) async {});
     when(() => manager.syncLocalFromFirestore()).thenAnswer((_) async {});
     when(() => manager.syncNotifierFromCache()).thenAnswer((_) async {});
     repository = AuthSessionRepository(auth, manager);
@@ -88,6 +89,7 @@ void main() {
   test('verified email hydrates after refresh; unverified stays pending', () async {
     when(() => user.emailVerified).thenReturn(false);
     changes.add(user);
+    await Future<void>.delayed(Duration.zero);
     expect(repository.session.status, AuthSessionStatus.verificationPending);
     when(() => manager.isEmailVerified()).thenAnswer((_) async => false);
     expect(await repository.checkVerification(), isFalse);
@@ -121,6 +123,8 @@ void main() {
     changes.add(user);
     await Future<void>.delayed(Duration.zero);
     changes.addError(StateError('stream failed'));
+    expect(repository.session.status, AuthSessionStatus.loading);
+    await Future<void>.delayed(Duration.zero);
     expect(repository.session.status, AuthSessionStatus.error);
     await repository.retry();
     expect(repository.session.status, AuthSessionStatus.ready);
@@ -135,6 +139,7 @@ void main() {
     when(() => user.emailVerified).thenReturn(false);
     when(() => manager.isEmailVerified()).thenAnswer((_) => verification.future);
     changes.add(user);
+    await Future<void>.delayed(Duration.zero);
     final pending = repository.checkVerification();
     when(() => auth.currentUser).thenReturn(null);
     changes.add(null);
@@ -152,6 +157,7 @@ void main() {
     when(() => manager.updateUser({'canTranslate': true}))
         .thenAnswer((_) => update.future);
     changes.add(user);
+    await Future<void>.delayed(Duration.zero);
     final pending = repository.checkVerification();
     await Future<void>.delayed(Duration.zero);
     when(() => auth.currentUser).thenReturn(null);
@@ -159,6 +165,66 @@ void main() {
     update.complete();
     expect(await pending, isFalse);
     verifyNever(() => manager.initRevenueCat());
+    expect(repository.session.status, AuthSessionStatus.signedOut);
+  });
+
+  test('le compte suivant attend la purge du précédent', () async {
+    final purge = Completer<void>();
+    when(() => manager.clearSessionData(any())).thenAnswer((_) => purge.future);
+    changes.add(user);
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.session.status, AuthSessionStatus.loading);
+    verifyNever(() => manager.initRevenueCat());
+    purge.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.session.status, AuthSessionStatus.ready);
+  });
+
+  test('une erreur de purge interdit la session prête', () async {
+    when(() => manager.clearSessionData(any()))
+        .thenAnswer((_) async => throw StateError('purge'));
+    changes.add(user);
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.session.status, AuthSessionStatus.error);
+    verifyNever(() => manager.initRevenueCat());
+  });
+
+  test('une reconnexion du même uid invalide la génération précédente', () async {
+    final oldHydration = Completer<void>();
+    var calls = 0;
+    when(() => manager.syncLocalFromFirestore()).thenAnswer((_) {
+      calls++;
+      return calls == 1 ? oldHydration.future : Future<void>.value();
+    });
+    changes.add(user);
+    await Future<void>.delayed(Duration.zero);
+    changes.add(null);
+    await Future<void>.delayed(Duration.zero);
+    changes.add(user);
+    await Future<void>.delayed(Duration.zero);
+    final currentGeneration = repository.session.generation;
+    expect(repository.session.status, AuthSessionStatus.ready);
+    oldHydration.complete();
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.session.generation, currentGeneration);
+    expect(repository.session.status, AuthSessionStatus.ready);
+  });
+
+  test('signOut attend Firebase avant de publier signedOut', () async {
+    changes.add(user);
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.session.status, AuthSessionStatus.ready);
+    final firebaseSignOut = Completer<void>();
+    when(() => manager.signOut()).thenAnswer((_) => firebaseSignOut.future);
+
+    final pending = repository.signOut();
+    expect(repository.session.status, AuthSessionStatus.loading);
+    changes.add(null);
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.session.status, AuthSessionStatus.loading);
+    when(() => auth.currentUser).thenReturn(null);
+    firebaseSignOut.complete();
+    await pending;
     expect(repository.session.status, AuthSessionStatus.signedOut);
   });
 }

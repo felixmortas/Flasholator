@@ -13,11 +13,12 @@ class FlashcardsService {
 
   FlashcardsService({
     DatabaseWrapper? database,
+    String? userId,
     DateTime Function()? clock,
     FreePlanLimits limits = const FreePlanLimits(),
     bool Function()? isPremium,
   })
-      : _db = database ?? DatabaseWrapper(),
+      : _db = database ?? DatabaseWrapper(userId: userId),
         _clock = clock ?? DateTime.now,
         _limits = limits,
         _isPremium = isPremium ?? _freeUser;

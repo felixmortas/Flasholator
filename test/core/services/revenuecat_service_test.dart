@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flasholator/core/services/revenuecat_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,5 +35,37 @@ void main() {
     await second.initRevenueCat('u2');
     expect(configured, ['u1']);
     expect(identified, ['u2', 'u2']);
+  });
+
+  test('login A, logout et login B concurrents restent ordonnés', () async {
+    final configureA = Completer<void>();
+    final logout = Completer<void>();
+    final events = <String>[];
+    final service = RevenueCatService(
+      configure: (uid) async {
+        events.add('configure $uid');
+        await configureA.future;
+      },
+      logOut: () async {
+        events.add('logout');
+        await logout.future;
+      },
+      logIn: (uid) async => events.add('login $uid'),
+    );
+
+    final a = service.initRevenueCat('A');
+    final signOut = service.logOut();
+    final b = service.initRevenueCat('B');
+    await Future<void>.delayed(Duration.zero);
+    expect(events, ['configure A']);
+    configureA.complete();
+    await a;
+    await Future<void>.delayed(Duration.zero);
+    expect(events, ['configure A', 'logout']);
+    logout.complete();
+    await Future.wait([signOut, b]);
+    expect(events, ['configure A', 'logout', 'login B']);
+    await service.initRevenueCat('B');
+    expect(events, ['configure A', 'logout', 'login B']);
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,14 +31,22 @@ class Flashcards extends Table {
 // C'est le cœur de Drift. Elle connecte les définitions de tables à un fichier de base de données.
 @DriftDatabase(tables: [Flashcards])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
+  AppDatabase([QueryExecutor? executor, String? userId])
+      : super(executor ?? _openConnection(userId));
 
   @override
   int get schemaVersion => 1;
 
-  static QueryExecutor _openConnection() {
+  static String databaseNameForUser(String? userId) {
+    final accountSuffix = userId == null || userId.isEmpty
+        ? ''
+        : '_${base64Url.encode(utf8.encode(userId)).replaceAll('=', '')}';
+    return 'flashcards_collection$accountSuffix';
+  }
+
+  static QueryExecutor _openConnection(String? userId) {
     return driftDatabase(
-      name: 'flashcards_collection',
+      name: databaseNameForUser(userId),
       native: const DriftNativeOptions(
         databaseDirectory: getApplicationSupportDirectory,
       ),
@@ -50,14 +60,16 @@ class AppDatabase extends _$AppDatabase {
 class DatabaseWrapper {
   late AppDatabase _db;
   final AppDatabase? _database;
+  final String? _userId;
 
   /// An existing database is useful for tests and leaves the production
   /// constructor behaviour unchanged.
-  DatabaseWrapper({AppDatabase? database}) : _database = database;
+  DatabaseWrapper({AppDatabase? database, String? userId})
+      : _database = database, _userId = userId;
 
   /// Initialisation de la base de données. Doit être appelée avant toute autre opération.
   Future<void> init() async {
-    _db = _database ?? AppDatabase();
+    _db = _database ?? AppDatabase(null, _userId);
   }
 
   /// Point de composition pour les nouveaux adaptateurs qui ont besoin des
