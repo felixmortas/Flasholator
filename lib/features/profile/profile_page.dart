@@ -353,8 +353,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => StatsPage(
-                              flashcardsService: widget.flashcardsService),
+                          builder: (context) => const StatsPage(),
                         ),
                       );
                     },

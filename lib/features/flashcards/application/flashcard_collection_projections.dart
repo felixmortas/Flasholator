@@ -64,20 +64,21 @@ final class FlashcardCollectionProjections {
   }
 
   static FlashcardStatisticsProjection statistics(
-      FlashcardCollectionSnapshot snapshot) {
-    final pairs = _selectedPairs(snapshot);
+      FlashcardCollectionSnapshot snapshot,
+      {DateTime? startDate,
+      DateTime? endDate}) {
+    final pairs = _selectedPairs(snapshot).where((pair) {
+      final date = _pairDate(pair);
+      return (startDate == null || !date.isBefore(startDate)) &&
+          (endDate == null || !date.isAfter(endDate));
+    }).toList(growable: false);
     final cards = pairs.expand((pair) => pair.cards).toList(growable: false);
     final languages = <LanguagePair>{
       for (final card in cards) LanguagePair(card.sourceLang, card.targetLang)
     };
     final counts = <DateTime, int>{};
     for (final pair in pairs) {
-      final date = _dayOf(pair.cards
-          .reduce(
-            (earliest, card) =>
-                card.addedDate.isBefore(earliest.addedDate) ? card : earliest,
-          )
-          .addedDate);
+      final date = _pairDate(pair);
       counts[date] = (counts[date] ?? 0) + 1;
     }
     final series = counts.entries
@@ -157,6 +158,11 @@ final class FlashcardCollectionProjections {
 
   static DateTime _dayOf(DateTime date) =>
       DateTime(date.year, date.month, date.day);
+
+  static DateTime _pairDate(_SelectedPair pair) => _dayOf(pair.cards
+      .reduce((earliest, card) =>
+          card.addedDate.isBefore(earliest.addedDate) ? card : earliest)
+      .addedDate);
 
   static (num, num, num, num) _averages(
       int totalWords, List<TimeSeriesData> series) {
