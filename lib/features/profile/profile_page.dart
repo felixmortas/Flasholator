@@ -13,10 +13,10 @@ import 'package:flasholator/features/authentication/widgets/change_password_dial
 import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
+import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/features/authentication/auth_session_repository.dart';
 import 'package:flasholator/features/profile/profile_subscription_section.dart';
-
 
 class ProfilePage extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
@@ -66,7 +66,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       try {
         await session.signOut();
       } finally {
-        if (context.mounted && session.session.status != AuthSessionStatus.ready) {
+        if (context.mounted &&
+            session.session.status != AuthSessionStatus.ready) {
           Navigator.pop(context); // Ferme la page de profil
         }
       }
@@ -181,6 +182,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ConsentForm.showPrivacyOptionsForm((formError) {
       if (formError != null) {
         debugPrint("${formError.errorCode}: ${formError.message}");
+      }
+      if (mounted) {
+        ref.invalidate(adEligibilityProvider);
+        ref.invalidate(bannerAdProvider);
+        ref.read(adServiceProvider).clearInterstitial();
       }
     });
   }

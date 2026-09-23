@@ -116,15 +116,21 @@ class PrivacyAndAdsBootstrapStep implements BootstrapStep {
   Future<void> initialize() async {
     if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS)) return;
 
-    final canRequestAds = await ConsentManager.initialize();
-    if (Platform.isIOS &&
-        await AppTrackingTransparency.trackingAuthorizationStatus ==
-            TrackingStatus.notDetermined) {
-      await Future<void>.delayed(const Duration(seconds: 1));
-      await AppTrackingTransparency.requestTrackingAuthorization();
+    try {
+      await ConsentManager.initialize();
+    } on Object {
+      // Une indisponibilité UMP ferme l'accès aux annonces, sans bloquer l'app.
     }
-    if (canRequestAds) {
-      AdService.shared.loadInterstitial();
+    if (Platform.isIOS) {
+      try {
+        if (await AppTrackingTransparency.trackingAuthorizationStatus ==
+            TrackingStatus.notDetermined) {
+          await Future<void>.delayed(const Duration(seconds: 1));
+          await AppTrackingTransparency.requestTrackingAuthorization();
+        }
+      } on Object {
+        // Une autorisation ATT inconnue ou indisponible bloque les annonces.
+      }
     }
   }
 }

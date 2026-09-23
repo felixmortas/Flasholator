@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flasholator/style/app_colors.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/free_plan_limits_provider.dart';
+import 'package:flasholator/core/providers/ad_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
 import 'package:flasholator/core/services/deepl_translator.dart';
 import 'package:flasholator/core/services/flashcards_service.dart';
@@ -31,7 +33,8 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage>
+    with WidgetsBindingObserver {
   late final FlashcardsService flashcardsService;
   final deeplTranslator =
       DeeplTranslator(); // Create an instance of DeeplTranslator
@@ -48,6 +51,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     flashcardsService = FlashcardsService(
       userId: ref.read(authSessionRepositoryProvider).account?.uid,
       limits: ref.read(freePlanLimitsProvider),
@@ -67,10 +71,20 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _tabController.removeListener(_onTabChange);
     _tabController.dispose();
     isAllLanguagesToggledNotifier.dispose(); // Dispose du notifier
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(adEligibilityProvider);
+      ref.invalidate(bannerAdProvider);
+      ref.read(adServiceProvider).clearInterstitial();
+    }
   }
 
   Future<void> _initAndroidIntegration() async {
@@ -139,13 +153,16 @@ class _HomePageState extends ConsumerState<HomePage> {
         // Récupérer le texte sélectionné
         String? wordToTranslate =
             await _platform.invokeMethod<String>('getText');
-        if (wordToTranslate != null && wordToTranslate.trim().isNotEmpty &&
-            mounted && ref.read(translationSessionContextProvider) == session) {
+        if (wordToTranslate != null &&
+            wordToTranslate.trim().isNotEmpty &&
+            mounted &&
+            ref.read(translationSessionContextProvider) == session) {
           // Appeler la fonction de traduction
           String translatedWord =
               await deeplTranslator.translate(wordToTranslate, 'FR', 'EN');
 
-          if (!mounted || ref.read(translationSessionContextProvider) != session) {
+          if (!mounted ||
+              ref.read(translationSessionContextProvider) != session) {
             return;
           }
           if (wordToTranslate.trim().isEmpty ||
@@ -155,10 +172,12 @@ class _HomePageState extends ConsumerState<HomePage> {
           }
           if (!isSubscribed) {
             await ref.read(userManagerProvider).incrementCounter(
-              isCurrent: () => mounted &&
-                  ref.read(translationSessionContextProvider) == session,
-            );
-            if (!mounted || ref.read(translationSessionContextProvider) != session) {
+                  isCurrent: () =>
+                      mounted &&
+                      ref.read(translationSessionContextProvider) == session,
+                );
+            if (!mounted ||
+                ref.read(translationSessionContextProvider) != session) {
               return;
             }
           }
@@ -168,7 +187,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               translatedWord != AppLocalizations.of(context)!.connectionError &&
               !await flashcardsService.checkIfFlashcardExists(
                   wordToTranslate, translatedWord)) {
-            if (!mounted || ref.read(translationSessionContextProvider) != session) {
+            if (!mounted ||
+                ref.read(translationSessionContextProvider) != session) {
               return;
             }
             wordToTranslate = wordToTranslate.toLowerCase()[0].toUpperCase() +
@@ -177,13 +197,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                 translatedWord.toLowerCase().substring(1);
           }
 
-          if (!mounted || ref.read(translationSessionContextProvider) != session) {
+          if (!mounted ||
+              ref.read(translationSessionContextProvider) != session) {
             return;
           }
 
           final isCardAdded = await flashcardsService.addFlashcard(
               wordToTranslate, translatedWord, "EN", "FR");
-          if (!mounted || ref.read(translationSessionContextProvider) != session) {
+          if (!mounted ||
+              ref.read(translationSessionContextProvider) != session) {
             return;
           }
 
@@ -237,6 +259,21 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<bool>>(adEligibilityProvider, (previous, next) {
+      final ads = ref.read(adServiceProvider);
+      if (next.valueOrNull != true) {
+        ads.clearInterstitial();
+        return;
+      }
+      unawaited(ads.loadInterstitial(() async =>
+          mounted &&
+          !ref.read(isSubscribedProvider) &&
+          await ref.read(adAuthorizationProvider).canShowAds()));
+    });
+    ref.listen<bool>(isSubscribedProvider, (previous, next) {
+      ref.read(adServiceProvider).clearInterstitial();
+      if (!next) isAllLanguagesToggledNotifier.value = false;
+    });
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -280,8 +317,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           Expanded(
             child: TabBarView(
               children: [
-                TranslateTab(
-                ),
+                TranslateTab(),
                 ReviewTab(
                   key: reviewTabKey,
                   isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,

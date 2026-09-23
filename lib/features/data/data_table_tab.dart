@@ -34,7 +34,8 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
   final LanguageSelection languageSelection = LanguageSelection.getInstance();
 
   void updateSwitchState(bool newValue) =>
-      widget.isAllLanguagesToggledNotifier.value = newValue;
+      widget.isAllLanguagesToggledNotifier.value =
+          newValue && ref.read(isSubscribedProvider);
 
   FlashcardPair _pairFromCard(FlashcardTablePair pair) => FlashcardPair(
         front: pair.card.front,
@@ -55,13 +56,16 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     final result = await operation();
     if (!mounted) return false;
     if (result == null) {
-      Fluttertoast.showToast(msg: 'La modification n’a pas pu être enregistrée.');
+      Fluttertoast.showToast(
+          msg: 'La modification n’a pas pu être enregistrée.');
       return false;
     }
     final message = switch (result) {
-      FlashcardPairMutationResult.applied => AppLocalizations.of(context)!.cardAdded,
+      FlashcardPairMutationResult.applied =>
+        AppLocalizations.of(context)!.cardAdded,
       FlashcardPairMutationResult.notFound => 'Cette paire n’existe plus.',
-      FlashcardPairMutationResult.conflict => AppLocalizations.of(context)!.cardAlreadyAdded,
+      FlashcardPairMutationResult.conflict =>
+        AppLocalizations.of(context)!.cardAlreadyAdded,
       FlashcardPairMutationResult.limitReached =>
         AppLocalizations.of(context)!.freeSubscriptionLimitsExceeded,
     };
@@ -87,7 +91,9 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
         isEditPopup: true,
         onEdit: (replacement) => _mutate(() => ref
             .read(dataTableViewModelProvider.notifier)
-            .edit(source: _pairFromCard(pair), replacement: _pairFromValues(replacement))),
+            .edit(
+                source: _pairFromCard(pair),
+                replacement: _pairFromValues(replacement))),
         onDelete: () => _mutate(() => ref
             .read(dataTableViewModelProvider.notifier)
             .delete(_pairFromCard(pair))),
@@ -100,12 +106,14 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
       final result = await ref.read(userManagerProvider).subscribeUser();
       if (mounted && result == SubscriptionActionResult.failed) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
+            content:
+                Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
+            content:
+                Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
       }
     }
   }
@@ -156,10 +164,16 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
                 valueListenable: widget.isAllLanguagesToggledNotifier,
                 builder: (_, value, __) => EraserButton(
                   onPressed: () => updateSwitchState(!value),
-                  label: value ? 'Afficher un seul couple de langues' : 'Afficher tous les couples de langues',
-                  gradientColors: value ? [Colors.pink.shade300, Colors.pink.shade200] : [Colors.blue.shade300, Colors.blue.shade200],
-                  iconColor: value ? Colors.pink.shade700 : Colors.blue.shade700,
-                  textColor: value ? Colors.pink.shade800 : Colors.blue.shade800,
+                  label: value
+                      ? 'Afficher un seul couple de langues'
+                      : 'Afficher tous les couples de langues',
+                  gradientColors: value
+                      ? [Colors.pink.shade300, Colors.pink.shade200]
+                      : [Colors.blue.shade300, Colors.blue.shade200],
+                  iconColor:
+                      value ? Colors.pink.shade700 : Colors.blue.shade700,
+                  textColor:
+                      value ? Colors.pink.shade800 : Colors.blue.shade800,
                   isDisabled: false,
                 ),
               ),
@@ -171,15 +185,27 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
               data: (table) => ValueListenableBuilder<bool>(
                 valueListenable: widget.isAllLanguagesToggledNotifier,
                 builder: (_, allLanguages, __) {
-                  final pairs = allLanguages
+                  final showAll = isSubscribed && allLanguages;
+                  final pairs = showAll
                       ? table.pairs
-                      : table.pairs.where((pair) => pair.card.sourceLang == languageSelection.sourceLanguage && pair.card.targetLang == languageSelection.targetLanguage).toList(growable: false);
-                  return allLanguages
-                      ? AllLanguagesTable(data: pairs, onCellTap: _openEditFlashcardPopup, languages: languages)
+                      : table.pairs
+                          .where((pair) =>
+                              pair.card.sourceLang ==
+                                  languageSelection.sourceLanguage &&
+                              pair.card.targetLang ==
+                                  languageSelection.targetLanguage)
+                          .toList(growable: false);
+                  return showAll
+                      ? AllLanguagesTable(
+                          data: pairs,
+                          onCellTap: _openEditFlashcardPopup,
+                          languages: languages)
                       : CoupleLanguagesTable(
                           data: pairs,
-                          sourceLanguage: languages[languageSelection.sourceLanguage]!,
-                          targetLanguage: languages[languageSelection.targetLanguage]!,
+                          sourceLanguage:
+                              languages[languageSelection.sourceLanguage]!,
+                          targetLanguage:
+                              languages[languageSelection.targetLanguage]!,
                           onCellTap: _openEditFlashcardPopup,
                         );
                 },

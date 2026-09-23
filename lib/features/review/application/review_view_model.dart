@@ -64,6 +64,12 @@ final class ReviewViewModel extends StateNotifier<ReviewState> {
     );
   }
 
+  void disablePremiumEditing() {
+    if (state.isEditing) {
+      state = state.copyWith(isEditing: false, clearOverrideQuality: true);
+    }
+  }
+
   void evaluateWrittenAnswer(String answer) {
     final card = state.card;
     if (card == null || !state.isEditing) return;

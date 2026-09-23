@@ -39,7 +39,12 @@ class ReviewTabState extends ConsumerState<ReviewTab> {
       if (effect is ReviewScoreAcceptedEffect &&
           !ref.read(isSubscribedProvider) &&
           Random().nextInt(INTERSTITIAL_FREQUENCY) == 0) {
-        ref.read(adServiceProvider).showInterstitial();
+        final authorization = ref.read(adAuthorizationProvider);
+        final ads = ref.read(adServiceProvider);
+        unawaited(ads.showInterstitial(() async =>
+            mounted &&
+            !ref.read(isSubscribedProvider) &&
+            await authorization.canShowAds()));
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -55,6 +60,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> {
   }
 
   void _reload(bool allLanguages) {
+    allLanguages = allLanguages && ref.read(isSubscribedProvider);
     widget.isAllLanguagesToggledNotifier.value = allLanguages;
     ref.read(reviewViewModelProvider.notifier).load(
           allLanguages: allLanguages,
@@ -85,6 +91,13 @@ class ReviewTabState extends ConsumerState<ReviewTab> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<bool>(isSubscribedProvider, (previous, next) {
+      if (!next) {
+        ref.read(reviewViewModelProvider.notifier).disablePremiumEditing();
+        _reload(false);
+      }
+      if (next == true && previous == false) _reload(false);
+    });
     ref.listen<ReviewState>(reviewViewModelProvider, (previous, next) {
       if (previous?.card?.id != next.card?.id) _editingController.clear();
     });

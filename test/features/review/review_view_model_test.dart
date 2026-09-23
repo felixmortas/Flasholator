@@ -74,6 +74,21 @@ FlashcardCollectionSnapshot _due() =>
 void main() {
   final now = DateTime.utc(2026, 1, 1);
 
+  test('perte de premium ferme la saisie de réponse sans effacer la carte',
+      () async {
+    final viewModel = ReviewViewModel(_Repository(_due()), () => now);
+    addTearDown(viewModel.dispose);
+    await Future<void>.delayed(Duration.zero);
+    viewModel.toggleEditing();
+    viewModel.evaluateWrittenAnswer('hello');
+    expect(viewModel.state.isEditing, isTrue);
+    expect(viewModel.state.overrideQuality, isNotNull);
+    viewModel.disablePremiumEditing();
+    expect(viewModel.state.isEditing, isFalse);
+    expect(viewModel.state.overrideQuality, isNull);
+    expect(viewModel.state.card, isNotNull);
+  });
+
   test(
       'charge une carte due, la révèle, puis produit un unique effet après score',
       () async {

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
@@ -10,11 +9,9 @@ class AdService {
   // ---------- Interstitial ----------
   InterstitialAd? _interstitialAd;
   bool _isInterstitialLoaded = false;
+  bool _isInterstitialLoading = false;
 
   // ---------- Banner ----------
-  BannerAd? _bannerAd;
-  bool _isBannerLoaded = false;
-  bool _isBannerLoadedOnce = false;
 
   // ---------- IDs ----------
   final String interstitialAdUnitId =
@@ -43,44 +40,85 @@ class AdService {
     }
   }
 
-  // ---------- INTERSTITIAL ----------
-  void loadInterstitial() {
-    InterstitialAd.load(
-      adUnitId: interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
-          _interstitialAd = ad;
-          _isInterstitialLoaded = true;
-          _interstitialAd?.setImmersiveMode(true);
-          _interstitialAd?.fullScreenContentCallback =
-              FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (InterstitialAd ad) {
-              ad.dispose();
-              loadInterstitial();
-            },
-            onAdFailedToShowFullScreenContent:
-                (InterstitialAd ad, AdError error) {
-              ad.dispose();
-              loadInterstitial();
-            },
-          );
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          _isInterstitialLoaded = false;
-          _interstitialAd = null;
-        },
-      ),
-    );
+  Future<bool> _authorized(Future<bool> Function() eligible) async {
+    try {
+      return await eligible();
+    } on Object {
+      return false;
+    }
   }
 
-  void showInterstitial() {
-    if (_isInterstitialLoaded && _interstitialAd != null) {
-      _interstitialAd?.show();
-      _isInterstitialLoaded = false;
-    } else {
-      loadInterstitial();
+  // ---------- INTERSTITIAL ----------
+  Future<void> loadInterstitial(Future<bool> Function() eligible) async {
+    if (_isInterstitialLoaded || _isInterstitialLoading) return;
+    if (!await _authorized(eligible)) {
+      clearInterstitial();
+      return;
     }
+    _isInterstitialLoading = true;
+    try {
+      InterstitialAd.load(
+        adUnitId: interstitialAdUnitId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) async {
+            _isInterstitialLoading = false;
+            if (!await _authorized(eligible)) {
+              ad.dispose();
+              return;
+            }
+            _interstitialAd = ad;
+            _isInterstitialLoaded = true;
+            _interstitialAd?.setImmersiveMode(true);
+            _interstitialAd?.fullScreenContentCallback =
+                FullScreenContentCallback(
+              onAdDismissedFullScreenContent: (InterstitialAd ad) {
+                ad.dispose();
+                _interstitialAd = null;
+                _isInterstitialLoaded = false;
+              },
+              onAdFailedToShowFullScreenContent:
+                  (InterstitialAd ad, AdError error) {
+                ad.dispose();
+                _interstitialAd = null;
+                _isInterstitialLoaded = false;
+              },
+            );
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            _isInterstitialLoading = false;
+            _isInterstitialLoaded = false;
+            _interstitialAd = null;
+          },
+        ),
+      );
+    } on Object {
+      _isInterstitialLoading = false;
+      clearInterstitial();
+    }
+  }
+
+  Future<void> showInterstitial(Future<bool> Function() eligible) async {
+    if (!await _authorized(eligible)) {
+      clearInterstitial();
+      return;
+    }
+    if (_isInterstitialLoaded && _interstitialAd != null) {
+      try {
+        _interstitialAd?.show();
+        _isInterstitialLoaded = false;
+      } on Object {
+        clearInterstitial();
+      }
+    } else {
+      await loadInterstitial(eligible);
+    }
+  }
+
+  void clearInterstitial() {
+    _interstitialAd?.dispose();
+    _interstitialAd = null;
+    _isInterstitialLoaded = false;
   }
 
   // ---------- BANNER ----------
@@ -128,8 +166,7 @@ class AdService {
 
   // ---------- DISPOSE ----------
   void dispose() {
-    _bannerAd?.dispose();
-    _interstitialAd?.dispose();
+    clearInterstitial();
   }
 }
 

@@ -6,12 +6,17 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Importez vos providers ici
 import 'package:flasholator/core/providers/ad_provider.dart';
+import 'package:flasholator/core/providers/user_data_provider.dart';
 
 class AdBannerWidget extends ConsumerWidget {
   const AdBannerWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final eligible = ref.watch(adEligibilityProvider);
+    if (ref.watch(isSubscribedProvider) || eligible.valueOrNull != true) {
+      return const SizedBox.shrink();
+    }
     // On peut obtenir la largeur ici, directement dans le contexte du widget
     final screenWidth = MediaQuery.of(context).size.width;
 
