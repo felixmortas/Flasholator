@@ -4,10 +4,7 @@ class FirestoreUsersDAO {
   final FirebaseFirestore _firestore;
 
   FirestoreUsersDAO({required FirebaseFirestore firestore})
-      : _firestore = FirebaseFirestore.instance;
-
-  // Constructeur pour les tests
-  FirestoreUsersDAO.test(this._firestore);
+      : _firestore = firestore;
 
   Future<void> deleteUser(String uid) async {
     await _firestore.collection('users').doc(uid).delete();

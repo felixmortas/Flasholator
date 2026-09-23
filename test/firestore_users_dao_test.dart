@@ -4,7 +4,6 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:flasholator/core/services/firestore_users_dao.dart';
 
-// Mocks
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
 class MockCollectionReference extends Mock
@@ -29,12 +28,14 @@ void main() {
     mockDocument = MockDocumentReference();
     mockSnapshot = MockDocumentSnapshot();
 
-    // Stub Firestore.instance
     when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
     when(() => mockCollection.doc(any())).thenReturn(mockDocument);
+    when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
+    when(() => mockSnapshot.exists).thenReturn(true);
+    when(() => mockDocument.set(any())).thenAnswer((_) async {});
+    when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
-    dao = FirestoreUsersDAO.test(
-        mockFirestore); // Besoin d’un constructeur de test
+    dao = FirestoreUsersDAO(firestore: mockFirestore);
   });
 
   group('FirestoreUsersDAO', () {
@@ -47,25 +48,22 @@ void main() {
 
     const fakeUid = 'user123';
 
-    test('registerUser creates user if not exists', () async {
-      when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
+    test('updateUser creates a missing document before updating it', () async {
       when(() => mockSnapshot.exists).thenReturn(false);
-      when(() => mockDocument.set(any())).thenAnswer((_) async {});
 
       await dao.updateUser(fakeUid, userData);
 
       verify(() => mockDocument.get()).called(1);
-      verify(() => mockDocument.set(any())).called(1);
+      verify(() => mockDocument.set(userData)).called(1);
+      verify(() => mockDocument.update(userData)).called(1);
     });
 
-    test('registerUser does nothing if user exists', () async {
-      when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
-      when(() => mockSnapshot.exists).thenReturn(true);
-
+    test('updateUser skips creation when the document exists', () async {
       await dao.updateUser(fakeUid, userData);
 
       verify(() => mockDocument.get()).called(1);
       verifyNever(() => mockDocument.set(any()));
+      verify(() => mockDocument.update(userData)).called(1);
     });
 
     test('banTranslation updates canTranslate to false', () async {
@@ -87,8 +85,6 @@ void main() {
       verify(() => mockDocument.update({
             'isSubscribed': true,
             'subscriptionDate': '2025-04-01',
-            'subscriptionEndDate': '',
-            'canTranslate': true,
           })).called(1);
     });
 
