@@ -30,7 +30,7 @@ class _LanguageSelectionPopupState extends State<LanguageSelectionPopup> {
     super.didChangeDependencies();
     sortedLanguageEntries = getSortedLanguageEntries(
       context,
-      LANGUAGE_KEYS,
+      languageKeys,
     );
     selectedSource = languageSelection.sourceLanguage;
     selectedTarget = languageSelection.targetLanguage;

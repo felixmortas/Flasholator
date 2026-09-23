@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -69,7 +70,7 @@ class AuthService {
       );
       await user.reauthenticateWithCredential(credential);
     } on Exception catch (e) {
-      print("Error reauthenticating user: $e");
+      developer.log("Error reauthenticating user: $e");
     }
   }
 
@@ -91,7 +92,7 @@ class AuthService {
       await user.updatePassword(newPassword);
     } on Exception catch (e) {
       // Gérer les erreurs
-      print("Error changing password: $e");
+      developer.log("Error changing password: $e");
     }
   }
 

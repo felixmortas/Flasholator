@@ -7,7 +7,7 @@ import 'package:flasholator/l10n/app_localizations.dart';
 class TimeSeriesChart extends StatefulWidget {
   final StatsData data;
 
-  const TimeSeriesChart({Key? key, required this.data}) : super(key: key);
+  const TimeSeriesChart({super.key, required this.data});
 
   @override
   State<TimeSeriesChart> createState() => _TimeSeriesChartState();
@@ -41,7 +41,7 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
           children: [
             Text(
               AppLocalizations.of(context)!.addedWords,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
             ToggleButtons(
@@ -58,16 +58,16 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
               },
               children: [
                 Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(AppLocalizations.of(context)!.day)),
                 Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(AppLocalizations.of(context)!.week)),
                 Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(AppLocalizations.of(context)!.month)),
                 Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(AppLocalizations.of(context)!.year)),
               ],
             ),
@@ -75,13 +75,13 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
             SizedBox(
               height: 250,
               child: LayoutBuilder(builder: (context, constraints) {
-                return Container(
+                return SizedBox(
                   width: constraints.maxWidth,
                   child: LineChart(
                     LineChartData(
                       minY: minY,
                       maxY: maxY,
-                      gridData: FlGridData(show: true),
+                      gridData: const FlGridData(show: true),
                       titlesData: FlTitlesData(
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
@@ -128,7 +128,7 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
                                 return Transform.rotate(
                                   angle: -0.6,
                                   child: Text(label,
-                                      style: TextStyle(fontSize: 10)),
+                                      style: const TextStyle(fontSize: 10)),
                                 );
                               }),
                         ),
@@ -145,14 +145,14 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
                                 value.toInt().toString(),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 12),
                               );
                             },
                           ),
                         ),
-                        topTitles: AxisTitles(
+                        topTitles: const AxisTitles(
                             sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: AxisTitles(
+                        rightTitles: const AxisTitles(
                             sideTitles: SideTitles(showTitles: false)),
                       ),
                       borderData: FlBorderData(show: true),
@@ -168,7 +168,8 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
                           color: Colors.blue,
                           barWidth: 4,
                           belowBarData: BarAreaData(
-                              show: true, color: Colors.blue.withOpacity(0.3)),
+                              show: true,
+                              color: Colors.blue.withValues(alpha: 0.3)),
                         ),
                       ],
                     ),

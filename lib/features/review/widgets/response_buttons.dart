@@ -8,12 +8,12 @@ class ReviewControls extends StatefulWidget {
   final void Function(int) onQualityPress;
 
   const ReviewControls({
-    Key? key,
+    super.key,
     required this.isResponseHidden,
     required this.overrideDisplayWithResult,
     required this.overrideQuality,
     required this.onQualityPress,
-  }) : super(key: key);
+  });
 
   @override
   State<ReviewControls> createState() => _ReviewControlsState();
@@ -127,9 +127,9 @@ class _ReviewControlsState extends State<ReviewControls> {
   ) {
     return Expanded(
       child: DragTarget<int>(
-        onWillAccept: (data) =>
-            data == 1, // accepte seulement les cartes réponses
-        onAccept: (_) => onPressed(),
+        onWillAcceptWithDetails: (details) =>
+            details.data == 1, // accepte seulement les cartes réponses
+        onAcceptWithDetails: (_) => onPressed(),
         builder: (context, candidateData, rejectedData) {
           final isHovered = candidateData.isNotEmpty;
           return Padding(
@@ -139,7 +139,9 @@ class _ReviewControlsState extends State<ReviewControls> {
                 // Dégradé de couleur pastel comme une gomme
                 gradient: LinearGradient(
                   colors: isHovered
-                      ? gradientColors.map((c) => c.withOpacity(0.7)).toList()
+                      ? gradientColors
+                          .map((c) => c.withValues(alpha: 0.7))
+                          .toList()
                       : gradientColors,
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

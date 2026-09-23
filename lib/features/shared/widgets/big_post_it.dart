@@ -10,14 +10,14 @@ class BigPostIt extends StatelessWidget {
   final double height;
 
   const BigPostIt({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.callToAction,
     required this.postItColor,
     required this.width,
     required this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +35,13 @@ class BigPostIt extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 2,
               offset: const Offset(0, 1),
               spreadRadius: 0,
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 4,
               offset: const Offset(2, 3),
               spreadRadius: -1,
@@ -137,6 +137,6 @@ class BigPostIt extends StatelessWidget {
   Color _getDarkerShade(Color color, double opacity) {
     final hsl = HSLColor.fromColor(color);
     final darkened = hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0));
-    return darkened.toColor().withOpacity(opacity);
+    return darkened.toColor().withValues(alpha: opacity);
   }
 }

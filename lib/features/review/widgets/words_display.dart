@@ -13,7 +13,7 @@ class WordsDisplay extends StatelessWidget {
   final bool isCardConsumed;
 
   const WordsDisplay({
-    Key? key,
+    super.key,
     required this.questionLang,
     required this.questionText,
     required this.responseLang,
@@ -21,7 +21,7 @@ class WordsDisplay extends StatelessWidget {
     required this.isResponseHidden,
     required this.onDisplayAnswer,
     required this.isCardConsumed,
-  }) : super(key: key);
+  });
 
   Widget _buildPostItCard({
     required String langTag,
@@ -47,13 +47,13 @@ class WordsDisplay extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 2,
               offset: const Offset(0, 1),
               spreadRadius: 0,
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 4,
               offset: const Offset(2, 3),
               spreadRadius: -1,
@@ -144,13 +144,13 @@ class WordsDisplay extends StatelessWidget {
   Color _getDarkerShade(Color color, double opacity) {
     final hsl = HSLColor.fromColor(color);
     final darkened = hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0));
-    return darkened.toColor().withOpacity(opacity);
+    return darkened.toColor().withValues(alpha: opacity);
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = screenWidth / GOLDEN_NUMBER;
+    final cardWidth = screenWidth / goldenNumber;
     final cardHeight = cardWidth / 1.4;
 
     return Column(

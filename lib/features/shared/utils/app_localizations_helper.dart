@@ -3,7 +3,7 @@ import 'package:flasholator/config/constants.dart';
 
 extension LocalizedLanguageName on AppLocalizations {
   String getTranslatedLanguageName(String code) {
-    final key = LANGUAGE_KEYS[code.toUpperCase()];
+    final key = languageKeys[code.toUpperCase()];
     if (key == null) return code;
 
     switch (key) {

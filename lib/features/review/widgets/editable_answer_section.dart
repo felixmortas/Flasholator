@@ -22,7 +22,7 @@ class EditableAnswerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double borderRadius = 25 * GOLDEN_NUMBER;
+    const double borderRadius = 25 * goldenNumber;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 300),
@@ -82,12 +82,12 @@ class EditableAnswerSection extends StatelessWidget {
               ),
 
               // Poignée centrale en haut
-              TopHandle(backgroundColor: BottomBlockStyles.borderColor),
+              const TopHandle(backgroundColor: BottomBlockStyles.borderColor),
 
               // Coins protecteurs
-              CornerProtection(
+              const CornerProtection(
                   isLeft: true, color: BottomBlockStyles.borderColor),
-              CornerProtection(
+              const CornerProtection(
                   isLeft: false, color: BottomBlockStyles.borderColor),
             ],
           ),

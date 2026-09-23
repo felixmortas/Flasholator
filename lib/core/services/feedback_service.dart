@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FeedbackService {
@@ -13,7 +14,7 @@ class FeedbackService {
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print("Erreur lors de l'envoi du feedback: $e");
+      developer.log("Erreur lors de l'envoi du feedback: $e");
       rethrow;
     }
   }

@@ -9,6 +9,7 @@ class EraserButton extends StatelessWidget {
   final bool isDisabled;
 
   const EraserButton({
+    super.key,
     required this.onPressed,
     required this.label,
     required this.gradientColors,

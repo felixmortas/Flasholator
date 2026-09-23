@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -23,12 +24,12 @@ class DeeplTranslator {
         final json = jsonDecode(utf8.decode(response.bodyBytes));
         translationResult = json['translations'][0]['text'];
       } else {
-        print('Request failed with status: ${response.statusCode}');
+        developer.log('Request failed with status: ${response.statusCode}');
         translationResult = null;
       }
     } catch (e, stackTrace) {
-      print('Error: $e');
-      print('Stack Trace: $stackTrace');
+      developer.log('Error: $e');
+      developer.log('Stack Trace: $stackTrace');
       translationResult = 'Erreur de connexion';
     }
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flasholator/features/authentication/widgets/review_card.dart';
 
 class ReviewsSection extends StatelessWidget {
-  const ReviewsSection({Key? key}) : super(key: key);
+  const ReviewsSection({super.key});
 
   @override
   Widget build(BuildContext context) {

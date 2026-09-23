@@ -1,8 +1,8 @@
-const int INTERSTITIAL_FREQUENCY = 7;
-const double GOLDEN_NUMBER = 1.6180339887;
+const int interstitialFrequency = 7;
+const double goldenNumber = 1.6180339887;
 
 /// Code → clé de traduction
-const Map<String, String> LANGUAGE_KEYS = {
+const Map<String, String> languageKeys = {
   'AR': 'lang_ar',
   'BG': 'lang_bg',
   'CS': 'lang_cs',
@@ -38,5 +38,5 @@ const Map<String, String> LANGUAGE_KEYS = {
   'ZH': 'lang_zh',
 };
 
-const String INITIAL_SOURCE_LANGUAGE = 'EN';
-const String INITIAL_TARGET_LANGUAGE = 'FR';
+const String initialSourceLanguage = 'EN';
+const String initialTargetLanguage = 'FR';

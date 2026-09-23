@@ -39,14 +39,14 @@ class LanguageDropdown extends StatelessWidget {
           boxShadow: [
             // Ombre principale - effet de profondeur
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 2,
               offset: const Offset(0, 1),
               spreadRadius: 0,
             ),
             // Ombre sur le côté pour la courbure
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 4,
               offset: const Offset(2, 3),
               spreadRadius: -1,
@@ -64,9 +64,9 @@ class LanguageDropdown extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.yellow.shade700.withOpacity(0.4),
-                    Colors.yellow.shade600.withOpacity(0.25),
-                    Colors.yellow.shade500.withOpacity(0.1),
+                    Colors.yellow.shade700.withValues(alpha: 0.4),
+                    Colors.yellow.shade600.withValues(alpha: 0.25),
+                    Colors.yellow.shade500.withValues(alpha: 0.1),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -76,7 +76,7 @@ class LanguageDropdown extends StatelessWidget {
                 // Texture de la bande adhésive
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.yellow.shade800.withOpacity(0.15),
+                    color: Colors.yellow.shade800.withValues(alpha: 0.15),
                     blurRadius: 1,
                     offset: const Offset(0, 1),
                   ),

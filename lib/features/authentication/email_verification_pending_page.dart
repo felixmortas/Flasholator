@@ -20,7 +20,9 @@ class _EmailVerificationPendingPageState
 
   Future<void> resendVerificationEmail() async {
     await ref.read(authViewModelProvider.notifier).resendVerification();
-    if (mounted) setState(() => _sent = ref.read(authViewModelProvider).completed);
+    if (mounted) {
+      setState(() => _sent = ref.read(authViewModelProvider).completed);
+    }
   }
 
   Future<void> checkVerificationStatus() async {

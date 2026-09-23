@@ -16,7 +16,7 @@ class BottomBlock extends StatelessWidget {
     required this.children,
     this.backgroundColor = Colors.white,
     this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-    this.borderRadius = 25 * GOLDEN_NUMBER,
+    this.borderRadius = 25 * goldenNumber,
     this.showDragHandle = true,
     this.borderColor = BottomBlockStyles.borderColor,
   });

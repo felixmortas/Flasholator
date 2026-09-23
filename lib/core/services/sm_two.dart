@@ -21,13 +21,9 @@ class SMTwo {
   factory SMTwo.firstReview(int quality,
       {DateTime? reviewDate, String? dateFormat}) {
     // Review the flashcard for the first time
-    if (reviewDate == null) {
-      reviewDate = DateTime.now();
-    }
+    reviewDate ??= DateTime.now();
 
-    if (dateFormat == null) {
-      dateFormat = 'yyyy-MM-dd';
-    }
+    dateFormat ??= 'yyyy-MM-dd';
 
     return SMTwo(easiness: 2.5, interval: 0, repetitions: 0)
         .review(quality, reviewDate: reviewDate, dateFormat: dateFormat);
@@ -35,15 +31,9 @@ class SMTwo {
 
   SMTwo review(int quality, {DateTime? reviewDate, String? dateFormat}) {
     // Review the flashcard for the second time and onwards
-    if (reviewDate == null) {
-      // If the reviewDate is null, assign the default value
-      reviewDate = DateTime.now();
-    }
+    reviewDate ??= DateTime.now();
 
-    if (dateFormat == null) {
-      // If the dateFormat is null, assign the default value
-      dateFormat = 'yyyy-MM-dd';
-    }
+    dateFormat ??= 'yyyy-MM-dd';
 
     if (quality < 3) {
       // If the quality is less than 3, reset the easiness and repetitions

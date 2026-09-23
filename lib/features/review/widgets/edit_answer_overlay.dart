@@ -6,10 +6,10 @@ class EditAnswerOverlay extends StatelessWidget {
   final TextEditingController controller;
 
   const EditAnswerOverlay({
-    Key? key,
+    super.key,
     required this.isExpanded,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class EditAnswerOverlay extends StatelessWidget {
                   enabledBorder: InputBorder.none,
                   hintText: AppLocalizations.of(context)!.writeYourResponseHere,
                   hintStyle: TextStyle(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: Colors.grey.withValues(alpha: 0.5),
                   ),
                   isDense: true,
                 ),

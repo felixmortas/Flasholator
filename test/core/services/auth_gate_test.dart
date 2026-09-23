@@ -10,10 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _Auth extends Mock implements AuthService {}
+
 class _Manager extends Mock implements UserManager {}
 
 class _Session extends AuthSessionRepository {
-  _Session(AuthService auth, UserManager manager) : super(auth, manager);
+  _Session(super.auth, super.manager);
 
   var retries = 0;
   void show(AuthSessionStatus status) => state = AuthSessionState(status);
@@ -37,10 +38,10 @@ void main() {
       overrides: [
         authSessionRepositoryProvider.overrideWith((ref) => session),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const AuthGate(readyPage: Text('Accueil prêt')),
+        home: AuthGate(readyPage: Text('Accueil prêt')),
       ),
     ));
     expect(find.byType(CircularProgressIndicator), findsOneWidget);

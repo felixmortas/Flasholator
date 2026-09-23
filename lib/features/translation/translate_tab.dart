@@ -61,7 +61,7 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    sortedLanguageEntries = getSortedLanguageEntries(context, LANGUAGE_KEYS);
+    sortedLanguageEntries = getSortedLanguageEntries(context, languageKeys);
   }
 
   @override
@@ -122,7 +122,9 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
         .tryUseLanguagePair(source, target,
           isCurrent: () => mounted &&
               ref.read(translationSessionContextProvider) == session);
-    if (!mounted || ref.read(translationSessionContextProvider) != session) return;
+    if (!mounted || ref.read(translationSessionContextProvider) != session) {
+      return;
+    }
     if (allowed) {
       _invalidateTranslationRequests();
       setState(() {

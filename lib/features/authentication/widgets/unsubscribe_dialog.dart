@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 
 import 'package:flasholator/l10n/app_localizations.dart';
-import 'package:flasholator/core/services/feedback_service.dart';
 
 class UnsubscribeDialog extends StatefulWidget {
   final VoidCallback onUnsubscribe;
 
-  const UnsubscribeDialog({Key? key, required this.onUnsubscribe})
-      : super(key: key);
+  const UnsubscribeDialog({super.key, required this.onUnsubscribe});
 
   @override
-  _UnsubscribeDialogState createState() => _UnsubscribeDialogState();
+  State<UnsubscribeDialog> createState() => _UnsubscribeDialogState();
 }
 
 class _UnsubscribeDialogState extends State<UnsubscribeDialog> {
   String? _selectedReason;
   final TextEditingController _feedbackController = TextEditingController();
-  final FeedbackService _feedbackService = FeedbackService();
+
+  @override
+  void dispose() {
+    _feedbackController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

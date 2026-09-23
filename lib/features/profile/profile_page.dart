@@ -291,8 +291,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ],
             ),
             body: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(25 * GOLDEN_NUMBER,
-                  16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER, 16 * GOLDEN_NUMBER),
+              padding: const EdgeInsets.fromLTRB(25 * goldenNumber,
+                  16 * goldenNumber, 16 * goldenNumber, 16 * goldenNumber),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -305,7 +305,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const SizedBox(width: 12 * GOLDEN_NUMBER),
+                      const SizedBox(width: 12 * goldenNumber),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,7 +326,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16 * GOLDEN_NUMBER),
+                  const SizedBox(height: 16 * goldenNumber),
 
                   // CTA Premium
                   // ElevatedButton(
@@ -336,7 +336,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   //   ),
                   //   child: const Text("Invitez vos proches, obtenez du premium gratuitement"),
                   // ),
-                  // const SizedBox(height: 24 * GOLDEN_NUMBER),
+                  // const SizedBox(height: 24 * goldenNumber),
 
                   // Section Stats
 
@@ -351,7 +351,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     },
                     child: Text(AppLocalizations.of(context)!.statistics),
                   ),
-                  const SizedBox(height: 24 * GOLDEN_NUMBER),
+                  const SizedBox(height: 24 * goldenNumber),
                   _sectionTitle(AppLocalizations.of(context)!.myAccount),
                   _infoRow(AppLocalizations.of(context)!.email,
                       userManager.getUserEmail(),
@@ -365,14 +365,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   // ),
 
                   const ProfileSubscriptionSection(),
-                  const SizedBox(height: 24 * GOLDEN_NUMBER),
+                  const SizedBox(height: 24 * goldenNumber),
                   _sectionTitle(AppLocalizations.of(context)!.social),
                   ListTile(
                     leading: const Icon(Icons.star_rate_outlined),
                     title: Text(AppLocalizations.of(context)!.rateTheApp),
                     onTap: () => _rateApp(),
                   ),
-                  const SizedBox(height: 24 * GOLDEN_NUMBER),
+                  const SizedBox(height: 24 * goldenNumber),
                   _sectionTitle(AppLocalizations.of(context)!.about),
                   _linkTile(
                       AppLocalizations.of(context)!.changelog, _openChangelog),
@@ -385,7 +385,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   if (_showPrivacyButton)
                     _linkTile(
                         AppLocalizations.of(context)!.privacy, updateConsent),
-                  const SizedBox(height: 32 * GOLDEN_NUMBER),
+                  const SizedBox(height: 32 * goldenNumber),
                   ElevatedButton.icon(
                     onPressed: () => _signOut(context),
                     icon: const Icon(Icons.logout),
@@ -428,7 +428,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
 Widget _sectionTitle(String text) {
   return Padding(
-    padding: const EdgeInsets.only(bottom: 8 * GOLDEN_NUMBER),
+    padding: const EdgeInsets.only(bottom: 8 * goldenNumber),
     child: Text(text,
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   );

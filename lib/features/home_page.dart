@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:async';
 import 'dart:io';
 import 'package:flasholator/style/app_colors.dart';
@@ -26,8 +27,8 @@ import 'package:flasholator/features/profile/profile_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -223,7 +224,7 @@ class _HomePageState extends ConsumerState<HomePage>
           );
         }
       } on PlatformException catch (e) {
-        print("Failed to get text: '${e.message}'.");
+        developer.log("Failed to get text: '${e.message}'.");
       }
     } else {
       // Inform that the card was NOT added
@@ -317,7 +318,7 @@ class _HomePageState extends ConsumerState<HomePage>
           Expanded(
             child: TabBarView(
               children: [
-                TranslateTab(),
+                const TranslateTab(),
                 ReviewTab(
                   key: reviewTabKey,
                   isAllLanguagesToggledNotifier: isAllLanguagesToggledNotifier,

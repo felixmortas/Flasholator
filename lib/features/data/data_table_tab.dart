@@ -149,7 +149,7 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
 
   @override
   Widget build(BuildContext context) {
-    final languages = LANGUAGE_KEYS.map((code, key) => MapEntry(
+    final languages = languageKeys.map((code, key) => MapEntry(
         code, AppLocalizations.of(context)!.getTranslatedLanguageName(code)));
     final projection = ref.watch(flashcardTableProjectionProvider);
     final isSubscribed = ref.watch(isSubscribedProvider);

@@ -58,7 +58,7 @@ class AppTheme {
       // Thème pour les cartes (Card)
       cardTheme: CardThemeData(
         elevation: 2,
-        shadowColor: AppColors.lightGrey.withOpacity(0.2),
+        shadowColor: AppColors.lightGrey.withValues(alpha: 0.2),
         color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
@@ -87,11 +87,9 @@ class AppTheme {
         seedColor: AppColors.primary,
         primary: AppColors.primary,
         secondary: AppColors.secondary,
-        background: AppColors.background,
         surface: Colors.white,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
-        onBackground: AppColors.textDark,
         onSurface: AppColors.textDark,
         error: Colors.red,
         onError: Colors.white,

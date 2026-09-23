@@ -1,6 +1,3 @@
-import 'package:http/http.dart';
-import 'dart:convert';
-
 // https://www2.deepl.com/jsonrpc?client=chrome-extension,1.12.3
 
 // headers = {

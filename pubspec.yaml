@@ -65,6 +65,7 @@ dependencies:
   app_tracking_transparency: ^2.0.6+1
 
 
+  collection: ^1.19.1
 flutter_launcher_icons:
   android: true
   ios: true

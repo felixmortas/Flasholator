@@ -10,12 +10,12 @@ class DateRangePickerRow extends StatelessWidget {
   final ValueChanged<DateTime> onEndDateChanged;
 
   const DateRangePickerRow({
-    Key? key,
+    super.key,
     required this.startDate,
     required this.endDate,
     required this.onStartDateChanged,
     required this.onEndDateChanged,
-  }) : super(key: key);
+  });
 
   Future<void> _pickDate(
     BuildContext context,

@@ -6,7 +6,7 @@ import 'package:flasholator/core/models/stats_model.dart';
 class RankingSection extends StatelessWidget {
   final StatsData data;
 
-  const RankingSection({Key? key, required this.data}) : super(key: key);
+  const RankingSection({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -50,19 +50,19 @@ class RankingSection extends StatelessWidget {
                 TableRow(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 8),
                       child: Text(AppLocalizations.of(context)!.word,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 8),
                       child: Text(AppLocalizations.of(context)!.value,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 8),
                       child: Text(AppLocalizations.of(context)!.languages,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),

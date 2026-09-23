@@ -4,8 +4,8 @@ import 'package:flasholator/config/constants.dart';
 class LanguageSelection {
   static final LanguageSelection _instance = LanguageSelection._internal();
 
-  String sourceLanguage = INITIAL_SOURCE_LANGUAGE;
-  String targetLanguage = INITIAL_TARGET_LANGUAGE;
+  String sourceLanguage = initialSourceLanguage;
+  String targetLanguage = initialTargetLanguage;
 
   factory LanguageSelection() {
     return _instance;
@@ -18,7 +18,7 @@ class LanguageSelection {
   }
 
   void reset() {
-    sourceLanguage = INITIAL_SOURCE_LANGUAGE;
-    targetLanguage = INITIAL_TARGET_LANGUAGE;
+    sourceLanguage = initialSourceLanguage;
+    targetLanguage = initialTargetLanguage;
   }
 }

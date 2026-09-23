@@ -12,7 +12,8 @@ class EditFlashcardPopup extends StatefulWidget {
   final Future<bool> Function()? onDelete;
   final Future<bool> Function(Map<String, String>)? onAdd;
 
-  EditFlashcardPopup({
+  const EditFlashcardPopup({
+    super.key,
     required this.row,
     required this.languageDropdownEnabled,
     required this.isEditPopup,
@@ -22,7 +23,7 @@ class EditFlashcardPopup extends StatefulWidget {
   });
 
   @override
-  _EditFlashcardPopupState createState() => _EditFlashcardPopupState();
+  State<EditFlashcardPopup> createState() => _EditFlashcardPopupState();
 }
 
 class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
@@ -75,7 +76,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
   Color _getDarkerShade(Color color, double opacity) {
     final hsl = HSLColor.fromColor(color);
     final darkened = hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0));
-    return darkened.toColor().withOpacity(opacity);
+    return darkened.toColor().withValues(alpha: opacity);
   }
 
   @override
@@ -100,13 +101,13 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
             borderRadius: BorderRadius.circular(4),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 2,
                 offset: const Offset(0, 1),
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 8,
                 offset: const Offset(3, 4),
                 spreadRadius: -1,
@@ -270,7 +271,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: Colors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: _getDarkerShade(postItColor, 0.2),
@@ -283,7 +284,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(4),
             ),
             child: DropdownButton<String>(
@@ -304,7 +305,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
                       }
                     }
                   : null,
-              items: LANGUAGE_KEYS.keys.map((String key) {
+              items: languageKeys.keys.map((String key) {
                 return DropdownMenuItem<String>(
                   value: key,
                   child: Text(
@@ -325,7 +326,7 @@ class _EditFlashcardPopupState extends State<EditFlashcardPopup> {
             ),
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.white.withOpacity(0.7),
+              fillColor: Colors.white.withValues(alpha: 0.7),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide.none,

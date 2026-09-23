@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SwitchLangButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const SwitchLangButton({Key? key, required this.onPressed}) : super(key: key);
+  const SwitchLangButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

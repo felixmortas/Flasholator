@@ -29,11 +29,11 @@ abstract interface class FlashcardRepository {
 /// Adaptateur local. Chaque décision et chaque écriture d'une paire vivent dans
 /// la même transaction afin que Drift puisse restaurer le snapshot sur erreur.
 final class DriftFlashcardRepository implements FlashcardRepository {
-  DriftFlashcardRepository(this._database, {
+  DriftFlashcardRepository(
+    this._database, {
     DateTime Function()? clock,
     int? Function()? maxCardPairs,
-  })
-      : _maxCardPairs = maxCardPairs,
+  })  : _maxCardPairs = maxCardPairs,
         _clock = clock ?? DateTime.now;
 
   final AppDatabase _database;
@@ -102,7 +102,8 @@ final class DriftFlashcardRepository implements FlashcardRepository {
 
           final maximum = _maxCardPairs?.call();
           if (maximum != null) {
-            final existingCards = await _database.select(_database.flashcards).get();
+            final existingCards =
+                await _database.select(_database.flashcards).get();
             if (existingCards.length + 2 > maximum * 2) {
               return FlashcardPairMutationResult.limitReached;
             }
@@ -132,8 +133,9 @@ final class DriftFlashcardRepository implements FlashcardRepository {
 
           if (source.key != replacement.key) {
             final replacementCards = await _matchingCards(replacement);
-            if (replacementCards.isNotEmpty)
+            if (replacementCards.isNotEmpty) {
               return FlashcardPairMutationResult.conflict;
+            }
           }
 
           final forward = _singleFace(sourceCards, source.face);
@@ -194,8 +196,9 @@ final class DriftFlashcardRepository implements FlashcardRepository {
   Future<FlashcardReviewResult> reviewCard(
           {required int id, required int quality}) =>
       _enqueue(() async {
-        if (_disposed)
+        if (_disposed) {
           throw StateError('Le repository de flashcards est fermé.');
+        }
         if (quality < 2 || quality > 5) {
           throw ArgumentError.value(quality, 'quality',
               'La qualité doit être comprise entre 2 et 5.');
@@ -212,9 +215,10 @@ final class DriftFlashcardRepository implements FlashcardRepository {
           final updated = await _database
               .update(_database.flashcards)
               .replace(reviewed.toDriftCompanion());
-          if (!updated)
+          if (!updated) {
             throw StateError(
                 'La transaction n\'a pas modifié la carte révisée.');
+          }
           return FlashcardReviewResult.applied;
         });
         if (result == FlashcardReviewResult.applied) {

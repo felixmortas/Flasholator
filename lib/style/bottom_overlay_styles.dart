@@ -28,7 +28,7 @@ class BottomBlockStyles {
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.15),
+          color: Colors.black.withValues(alpha: 0.15),
           blurRadius: 12,
           offset: const Offset(0, -3),
         ),
@@ -134,7 +134,7 @@ class TopHandle extends StatelessWidget {
               width: 35,
               height: 8,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),

@@ -7,8 +7,7 @@ import 'package:flasholator/features/authentication/widgets/review_section.dart'
 class UnsubscribePage extends StatelessWidget {
   final VoidCallback onUnsubscribe;
 
-  const UnsubscribePage({Key? key, required this.onUnsubscribe})
-      : super(key: key);
+  const UnsubscribePage({super.key, required this.onUnsubscribe});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,8 @@ class UnsubscribePage extends StatelessWidget {
             children: [
               Text(
                 AppLocalizations.of(context)!.reconsiderMessage,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(

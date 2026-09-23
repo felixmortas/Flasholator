@@ -6,7 +6,7 @@ import 'package:flasholator/core/models/stats_model.dart';
 class SummarySection extends StatelessWidget {
   final StatsData data;
 
-  const SummarySection({Key? key, required this.data}) : super(key: key);
+  const SummarySection({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {

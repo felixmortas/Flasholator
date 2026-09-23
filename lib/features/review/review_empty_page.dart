@@ -8,7 +8,7 @@ import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/style/grid_background_painter.dart';
 
 class ReviewPageEmpty extends StatelessWidget {
-  const ReviewPageEmpty({Key? key}) : super(key: key);
+  const ReviewPageEmpty({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class ReviewPageEmpty extends StatelessWidget {
             SafeArea(
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 24 * GOLDEN_NUMBER),
+                    const EdgeInsets.symmetric(horizontal: 24 * goldenNumber),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -95,12 +95,12 @@ class ReviewPageEmpty extends StatelessWidget {
                     Expanded(
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.symmetric(
-                                horizontal: 20 * GOLDEN_NUMBER)
-                            .copyWith(bottom: 20 * GOLDEN_NUMBER),
+                                horizontal: 20 * goldenNumber)
+                            .copyWith(bottom: 20 * goldenNumber),
                         child: Text(
                           AppLocalizations.of(context)!.coolAIFeatureComingSoon,
                           style: const TextStyle(
-                            fontSize: 16 * GOLDEN_NUMBER,
+                            fontSize: 16 * goldenNumber,
                             color: Colors.black87,
                             height: 1.4,
                             fontFamily: 'MomoSignature',

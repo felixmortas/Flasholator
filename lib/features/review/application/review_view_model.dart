@@ -57,7 +57,9 @@ final class ReviewViewModel extends StateNotifier<ReviewState> {
   void toggleEditing() {
     if (state.phase != ReviewPhase.data ||
         state.card == null ||
-        state.isScoring) return;
+        state.isScoring) {
+      return;
+    }
     state = state.copyWith(
       isEditing: !state.isEditing,
       clearOverrideQuality: state.isEditing,
@@ -85,7 +87,9 @@ final class ReviewViewModel extends StateNotifier<ReviewState> {
         card == null ||
         !state.isRevealed ||
         quality < 2 ||
-        quality > 5) return;
+        quality > 5) {
+      return;
+    }
     _scoreLocked = true;
     ++_generation;
     state = state.copyWith(isScoring: true, clearError: true);
@@ -112,8 +116,9 @@ final class ReviewViewModel extends StateNotifier<ReviewState> {
       }
     } finally {
       _scoreLocked = false;
-      if (!_disposed && state.isScoring)
+      if (!_disposed && state.isScoring) {
         state = state.copyWith(isScoring: false);
+      }
     }
   }
 

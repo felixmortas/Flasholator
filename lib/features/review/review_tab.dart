@@ -38,7 +38,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> {
         ref.read(reviewViewModelProvider.notifier).effects.listen((effect) {
       if (effect is ReviewScoreAcceptedEffect &&
           !ref.read(isSubscribedProvider) &&
-          Random().nextInt(INTERSTITIAL_FREQUENCY) == 0) {
+          Random().nextInt(interstitialFrequency) == 0) {
         final authorization = ref.read(adAuthorizationProvider);
         final ads = ref.read(adServiceProvider);
         unawaited(ads.showInterstitial(() async =>
@@ -84,8 +84,10 @@ class ReviewTabState extends ConsumerState<ReviewTab> {
       await Future<void>.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
     }
-    if (cardId == null || ref.read(reviewViewModelProvider).card?.id != cardId)
+    if (cardId == null ||
+        ref.read(reviewViewModelProvider).card?.id != cardId) {
       return;
+    }
     viewModel.reveal();
   }
 
@@ -145,7 +147,7 @@ class ReviewTabState extends ConsumerState<ReviewTab> {
                 if (state.isRevealed)
                   Container(
                     color: keyboardHeight > 0
-                        ? Colors.white.withOpacity(0.95)
+                        ? Colors.white.withValues(alpha: 0.95)
                         : Colors.transparent,
                     child: ReviewControls(
                       isResponseHidden: !state.isRevealed,
