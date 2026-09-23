@@ -2,10 +2,54 @@ import 'dart:async';
 
 import 'package:flasholator/core/services/revenuecat_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 void main() {
   setUp(RevenueCatService.resetForTesting);
   tearDown(RevenueCatService.resetForTesting);
+
+  test('le paywall expose achat, restauration, annulation et attente', () async {
+    for (final outcome in PaywallResult.values) {
+      final service = RevenueCatService(showPaywall: () async => outcome);
+      expect(await service.presentPaywall('A'), outcome);
+    }
+  });
+
+  test('seul le droit pro confirmé est exposé après restauration', () async {
+    final active = RevenueCatService(
+      readEntitlement: () async => true,
+      restoreEntitlement: () async => true,
+    );
+    final inactive = RevenueCatService(
+      readEntitlement: () async => false,
+      restoreEntitlement: () async => false,
+    );
+    expect(await active.isSubscribed(), isTrue);
+    expect(await active.restorePurchases(), isTrue);
+    expect(await inactive.isSubscribed(), isFalse);
+    expect(await inactive.restorePurchases(), isFalse);
+  });
+
+  test('le paywall web signale un lancement refusé et attend le retour',
+      () async {
+    final rejected = RevenueCatService(
+      web: true,
+      canOpenPaywall: (_) async => true,
+      openPaywall: (_) async => false,
+    );
+    await expectLater(rejected.presentPaywall('A'), throwsA(isA<StateError>()));
+    Uri? opened;
+    final launched = RevenueCatService(
+      web: true,
+      canOpenPaywall: (_) async => true,
+      openPaywall: (url) async {
+        opened = url;
+        return true;
+      },
+    );
+    expect(await launched.presentPaywall('A'), PaywallResult.notPresented);
+    expect(opened?.pathSegments.last, 'A');
+  });
 
   test('unverified Firebase account can sign out before configuration', () async {
     var logouts = 0;

@@ -430,6 +430,36 @@ abstract class AppLocalizations {
   /// **'Subscription activated.'**
   String get subscriptionActivated;
 
+  /// No description provided for @subscriptionRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription restored.'**
+  String get subscriptionRestored;
+
+  /// No description provided for @restorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get restorePurchases;
+
+  /// No description provided for @noPurchasesToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No active subscription was found.'**
+  String get noPurchasesToRestore;
+
+  /// No description provided for @subscriptionCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check your subscription. Please try again.'**
+  String get subscriptionCheckFailed;
+
+  /// No description provided for @subscriptionPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for purchase confirmation. Your subscription will update when you return to the app.'**
+  String get subscriptionPending;
+
   /// No description provided for @confirmCancelSubscription.
   ///
   /// In en, this message translates to:

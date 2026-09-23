@@ -11,11 +11,13 @@ import 'package:flasholator/config/free_plan_limits.dart';
 import 'package:flasholator/core/services/auth_service.dart';
 import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/revenuecat_service.dart';
+import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 class _MockAuthService extends Mock implements AuthService {}
 
@@ -28,6 +30,221 @@ class _UserDocument extends Mock implements DocumentSnapshot<Map<String, dynamic
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  ProviderContainer premiumContainer(_MockAuthService auth,
+      _MockRevenueCatService revenueCat) => ProviderContainer(overrides: [
+        authServiceProvider.overrideWithValue(auth),
+        firestoreUsersDAOProvider.overrideWithValue(_MockFirestoreUsersDao()),
+        revenueCatServiceProvider.overrideWithValue(revenueCat),
+      ]);
+
+  test('achat confirmé active premium sans toucher les données', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.purchased);
+    when(() => revenueCat.isSubscribed()).thenAnswer((_) async => true);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    await manager.updateLocal({'counter': 12, 'coupleLang': 'FR-EN'});
+
+    expect(await manager.subscribeUser(), SubscriptionActionResult.activated);
+    expect(container.read(isSubscribedProvider), isTrue);
+    expect((await UserPreferencesService.loadUserData())['counter'], 12);
+    expect((await UserPreferencesService.loadUserData())['coupleLang'], 'FR-EN');
+  });
+
+  test('restauration confirmée active premium', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.restorePurchases()).thenAnswer((_) async => true);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    expect(await manager.restorePurchases(), SubscriptionActionResult.activated);
+    expect(container.read(isSubscribedProvider), isTrue);
+  });
+
+  test('restauration sans droit confirmé retire un ancien droit', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.restorePurchases()).thenAnswer((_) async => false);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    await manager.updateLocal({'isSubscribed': true, 'counter': 6});
+    expect(await manager.restorePurchases(), SubscriptionActionResult.deactivated);
+    expect(container.read(isSubscribedProvider), isFalse);
+    expect((await UserPreferencesService.loadUserData())['counter'], 6);
+  });
+
+  test('annulation et attente ne donnent aucun droit', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.cancelled);
+    when(() => revenueCat.isSubscribed()).thenAnswer((_) async => false);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    await manager.updateLocal({'counter': 8});
+    expect(await manager.subscribeUser(), SubscriptionActionResult.cancelled);
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.notPresented);
+    expect(await manager.subscribeUser(), SubscriptionActionResult.pending);
+    expect(container.read(isSubscribedProvider), isFalse);
+    expect((await UserPreferencesService.loadUserData())['counter'], 8);
+  });
+
+  test('erreur du paywall ne confirme aucun nouveau droit', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.error);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    expect(await manager.subscribeUser(), SubscriptionActionResult.failed);
+    expect(container.read(isSubscribedProvider), isFalse);
+    verifyNever(() => revenueCat.isSubscribed());
+  });
+
+  test('échec réseau garde les droits et les données', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.purchased);
+    when(() => revenueCat.isSubscribed())
+        .thenAnswer((_) async => throw StateError('offline'));
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    await manager.updateLocal({'isSubscribed': true, 'counter': 19});
+    await expectLater(manager.subscribeUser(), throwsA(isA<StateError>()));
+    expect(container.read(isSubscribedProvider), isTrue);
+    expect((await UserPreferencesService.loadUserData())['counter'], 19);
+  });
+
+  test('expiration confirmée retire premium et garde les données', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.cancelled);
+    when(() => revenueCat.isSubscribed()).thenAnswer((_) async => false);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    await manager.updateLocal({'isSubscribed': true, 'counter': 19});
+    expect(await manager.subscribeUser(), SubscriptionActionResult.deactivated);
+    expect(container.read(isSubscribedProvider), isFalse);
+    expect((await UserPreferencesService.loadUserData())['counter'], 19);
+  });
+
+  test('retour tardif de A ne donne aucun droit à B', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    final pending = Completer<PaywallResult>();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A')).thenAnswer((_) => pending.future);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    final purchase = manager.subscribeUser();
+    manager.beginSession('B', 2);
+    when(() => auth.getUserId()).thenReturn('B');
+    await manager.clearSessionData(2);
+    pending.complete(PaywallResult.purchased);
+    expect(await purchase, SubscriptionActionResult.ignored);
+    expect(container.read(isSubscribedProvider), isFalse);
+    verifyNever(() => revenueCat.isSubscribed());
+  });
+
+  test('retour tardif de la confirmation de A ne modifie pas B', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    final pending = Completer<bool>();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.purchased);
+    when(() => revenueCat.isSubscribed()).thenAnswer((_) => pending.future);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    final purchase = manager.subscribeUser();
+    await Future<void>.delayed(Duration.zero);
+    manager.beginSession('B', 2);
+    when(() => auth.getUserId()).thenReturn('B');
+    await manager.clearSessionData(2);
+    pending.complete(true);
+    expect(await purchase, SubscriptionActionResult.ignored);
+    expect(container.read(isSubscribedProvider), isFalse);
+  });
+
+  test('une ancienne confirmation ne remplace pas une restauration récente',
+      () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    final oldConfirmation = Completer<bool>();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.presentPaywall('A'))
+        .thenAnswer((_) async => PaywallResult.purchased);
+    when(() => revenueCat.isSubscribed())
+        .thenAnswer((_) => oldConfirmation.future);
+    when(() => revenueCat.restorePurchases()).thenAnswer((_) async => false);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    final oldPurchase = manager.subscribeUser();
+    await Future<void>.delayed(Duration.zero);
+    expect(await manager.restorePurchases(), SubscriptionActionResult.unchanged);
+    oldConfirmation.complete(true);
+    expect(await oldPurchase, SubscriptionActionResult.ignored);
+    expect(container.read(isSubscribedProvider), isFalse);
+  });
+
+  test('une restauration tardive de A ne modifie pas B', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    final pending = Completer<bool>();
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.restorePurchases()).thenAnswer((_) => pending.future);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    final restore = manager.restorePurchases();
+    manager.beginSession('B', 2);
+    when(() => auth.getUserId()).thenReturn('B');
+    await manager.clearSessionData(2);
+    pending.complete(true);
+    expect(await restore, SubscriptionActionResult.ignored);
+    expect(container.read(isSubscribedProvider), isFalse);
+  });
+
+  test('rafraîchissement au retour active puis retire le droit expiré', () async {
+    final auth = _MockAuthService();
+    final revenueCat = _MockRevenueCatService();
+    var active = true;
+    when(() => auth.getUserId()).thenReturn('A');
+    when(() => revenueCat.isSubscribed()).thenAnswer((_) async => active);
+    final container = premiumContainer(auth, revenueCat);
+    addTearDown(container.dispose);
+    final manager = container.read(userManagerProvider)..beginSession('A', 1);
+    await manager.updateLocal({'counter': 5});
+    expect(await manager.refreshSubscription(), SubscriptionActionResult.activated);
+    expect(container.read(isSubscribedProvider), isTrue);
+    active = false;
+    expect(await manager.refreshSubscription(), SubscriptionActionResult.deactivated);
+    expect(container.read(isSubscribedProvider), isFalse);
+    expect((await UserPreferencesService.loadUserData())['counter'], 5);
+  });
 
   ProviderContainer quotaContainer({FreePlanLimits limits = const FreePlanLimits()}) {
     final auth = _MockAuthService();

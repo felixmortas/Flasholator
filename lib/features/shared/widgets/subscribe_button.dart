@@ -5,9 +5,9 @@ import 'package:flasholator/l10n/app_localizations.dart';
 // Create custom button activating a methode passed in parameter
 
 class SubscribeButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
-  const SubscribeButton({Key? key, required this.onPressed}) : super(key: key);
+  const SubscribeButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

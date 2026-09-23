@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/features/data/data_providers.dart';
 import 'package:flasholator/features/data/widgets/all_languages_table.dart';
 import 'package:flasholator/features/data/widgets/couple_languages_table.dart';
@@ -94,7 +95,20 @@ class DataTableTabState extends ConsumerState<DataTableTab> {
     );
   }
 
-  void _openSubscribePopup() => ref.read(userManagerProvider).subscribeUser();
+  Future<void> _openSubscribePopup() async {
+    try {
+      final result = await ref.read(userManagerProvider).subscribeUser();
+      if (mounted && result == SubscriptionActionResult.failed) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
+      }
+    }
+  }
 
   Future<void> _checkIfCanAddCard() async {
     final canAddCard = await ref.read(flashcardAccessProvider).canAddCard();

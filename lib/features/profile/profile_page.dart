@@ -14,18 +14,17 @@ import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/l10n/app_localizations.dart';
 import 'package:flasholator/core/services/consent_manager.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
-import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/features/authentication/auth_session_repository.dart';
+import 'package:flasholator/features/profile/profile_subscription_section.dart';
 
-import 'package:flasholator/features/shared/widgets/subscribe_button.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   final FlashcardsService flashcardsService;
 
   const ProfilePage({
     required this.flashcardsService,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
@@ -45,6 +44,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Future<void> _checkPrivacyOptionsRequirement() async {
     if (!kIsWeb) {
       final required = await ConsentManager.isPrivacyOptionsRequired();
+      if (!mounted) return;
       setState(() {
         _showPrivacyButton = required;
       });
@@ -52,19 +52,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       setState(() {
         _showPrivacyButton = false;
       });
-    }
-  }
-
-  Future<void> _subscribe() async {
-    final bool wasSubscribed = ref.read(isSubscribedProvider);
-    await userManager.subscribeUser();
-    final isSubscribed = ref.read(isSubscribedProvider);
-
-    if (isSubscribed && !wasSubscribed) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)!.subscriptionActivated)),
-      );
     }
   }
 
@@ -92,8 +79,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     try {
       await userManager.deleteUser();
+      if (!context.mounted) return;
       Navigator.pop(context);
     } on Exception catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content:
@@ -108,7 +97,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       builder: (_) => ChangePasswordDialog(
         onConfirm: (currentPassword, newPassword) async {
           await userManager.changePassword(currentPassword, newPassword);
-
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text(AppLocalizations.of(context)!.passwordUpdated)),
@@ -169,8 +158,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   try {
                     await userManager
                         .reauthenticateWithCredential(controller.text);
+                    if (!context.mounted) return;
                     Navigator.pop(context, true);
                   } catch (e) {
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                           content: Text(
@@ -198,10 +189,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     // TODO: implement email change
   }
 
-  void _toggleNotifications(bool val) {
-    // TODO: implement notifications toggle
-  }
-
   void _rateApp() async {
     final appName = Uri.encodeComponent('Flasholator');
     Uri uri;
@@ -222,11 +209,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.error)),
         );
       }
     } catch (_) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.error)),
       );
@@ -266,7 +255,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final String userName = userManager.getUserName();
-
     return FutureBuilder<bool>(
       future: userManager.isUserDataCached(),
       builder: (context, snapshot) {
@@ -274,8 +262,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));
         }
-
-        final isSubscribed = ref.watch(isSubscribedProvider);
 
         return GridBackground(
           child: Scaffold(
@@ -372,18 +358,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   //   title: const Text("Notifications cartes à réviser"),
                   // ),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                            isSubscribed
-                                ? AppLocalizations.of(context)!.subscribed
-                                : AppLocalizations.of(context)!.notSubscribed,
-                            style: const TextStyle(fontSize: 16)),
-                      ),
-                      if (!isSubscribed) SubscribeButton(onPressed: _subscribe)
-                    ],
-                  ),
+                  const ProfileSubscriptionSection(),
                   const SizedBox(height: 24 * GOLDEN_NUMBER),
                   _sectionTitle(AppLocalizations.of(context)!.social),
                   ListTile(

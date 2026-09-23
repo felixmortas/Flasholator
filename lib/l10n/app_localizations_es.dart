@@ -185,6 +185,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get subscriptionActivated => 'Suscripción activada.';
 
   @override
+  String get subscriptionRestored => 'Suscripción restaurada.';
+
+  @override
+  String get restorePurchases => 'Restaurar compras';
+
+  @override
+  String get noPurchasesToRestore =>
+      'No se encontró ninguna suscripción activa.';
+
+  @override
+  String get subscriptionCheckFailed =>
+      'No se pudo verificar la suscripción. Inténtalo de nuevo.';
+
+  @override
+  String get subscriptionPending =>
+      'Esperando la confirmación de la compra. La suscripción se actualizará al volver a la aplicación.';
+
+  @override
   String get confirmCancelSubscription =>
       '¿Desea cancelar su suscripción? Conservará el acceso hasta el final del período.';
 

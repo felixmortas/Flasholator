@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:flasholator/config/constants.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
 import 'package:flasholator/core/providers/user_manager_provider.dart';
+import 'package:flasholator/core/services/user_manager.dart';
 import 'package:flasholator/core/presentation/ui_phase.dart';
 import 'package:flasholator/features/shared/utils/app_localizations_helper.dart';
 import 'package:flasholator/features/shared/utils/language_selection.dart';
@@ -151,9 +152,19 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
     });
   }
 
-  void _openSubscribePopup() {
-    final userManager = ref.read(userManagerProvider);
-    userManager.subscribeUser();
+  Future<void> _openSubscribePopup() async {
+    try {
+      final result = await ref.read(userManagerProvider).subscribeUser();
+      if (mounted && result == SubscriptionActionResult.failed) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)!.subscriptionCheckFailed)));
+      }
+    }
   }
 
   void _checkIfCanTranslate() {

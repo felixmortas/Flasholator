@@ -8,13 +8,31 @@ class RevenueCatService {
     Future<void> Function(String userId)? configure,
     Future<void> Function(String userId)? logIn,
     Future<void> Function()? logOut,
+    Future<PaywallResult> Function()? showPaywall,
+    Future<bool> Function()? readEntitlement,
+    Future<bool> Function()? restoreEntitlement,
+    bool? web,
+    Future<bool> Function(Uri)? canOpenPaywall,
+    Future<bool> Function(Uri)? openPaywall,
   })  : _configureClient = configure,
         _logInClient = logIn,
-        _logOutClient = logOut;
+        _logOutClient = logOut,
+        _showPaywall = showPaywall,
+        _readEntitlement = readEntitlement,
+        _restoreEntitlement = restoreEntitlement,
+        _web = web ?? kIsWeb,
+        _canOpenPaywall = canOpenPaywall,
+        _openPaywall = openPaywall;
 
   final Future<void> Function(String userId)? _configureClient;
   final Future<void> Function(String userId)? _logInClient;
   final Future<void> Function()? _logOutClient;
+  final Future<PaywallResult> Function()? _showPaywall;
+  final Future<bool> Function()? _readEntitlement;
+  final Future<bool> Function()? _restoreEntitlement;
+  final bool _web;
+  final Future<bool> Function(Uri)? _canOpenPaywall;
+  final Future<bool> Function(Uri)? _openPaywall;
   static const String _androidApiKey = 'goog_yrvYeFcZAwKnCSkdHaMeUAIUPFb';
   static const String _webApiKey = 'rcb_sb_NQccqqpXcoNQongucDBbMULZZ';
 
@@ -72,24 +90,30 @@ class RevenueCatService {
   }
 
   Future<bool> isSubscribed() async {
+    if (_readEntitlement != null) return _readEntitlement!();
     final customerInfo = await getCustomerInfo();
-    final isActive = customerInfo.entitlements.active.containsKey("pro");
-    return isActive;
+    return customerInfo.entitlements.active.containsKey('pro');
   }
 
-  Future presentPaywall(String userId) async {
-    if (kIsWeb) {
+  Future<PaywallResult> presentPaywall(String userId) async {
+    if (_showPaywall != null) return _showPaywall!();
+    if (_web) {
       final url = Uri.parse('https://pay.rev.cat/xnwjzccdwcxdalbd/$userId');
-      if (await canLaunchUrl(url)) {
-        await launchUrl(
+      if (await (_canOpenPaywall?.call(url) ?? canLaunchUrl(url))) {
+        final launched = await (_openPaywall?.call(url) ?? launchUrl(
           url,
-          mode: LaunchMode.externalApplication, // Ouvre dans un nouvel onglet
-        );
+          mode: LaunchMode.externalApplication,
+        ));
+        if (!launched) {
+          throw StateError('Impossible d\'ouvrir le lien du paywall');
+        }
+        // Le paiement externe est en attente de confirmation RevenueCat.
+        return PaywallResult.notPresented;
       } else {
-        throw 'Impossible d\'ouvrir le lien du paywall';
+        throw StateError('Impossible d\'ouvrir le lien du paywall');
       }
     } else {
-      return await RevenueCatUI.presentPaywall();
+      return RevenueCatUI.presentPaywall();
     }
   }
 
@@ -110,12 +134,10 @@ class RevenueCatService {
     }
   }
 
-  Future<void> restorePurchases() async {
-    try {
-      await Purchases.restorePurchases();
-    } catch (e) {
-      rethrow;
-    }
+  Future<bool> restorePurchases() async {
+    if (_restoreEntitlement != null) return _restoreEntitlement!();
+    final customerInfo = await Purchases.restorePurchases();
+    return customerInfo.entitlements.active.containsKey('pro');
   }
 
   Future<void> logOut() => _queueIdentity(() async {

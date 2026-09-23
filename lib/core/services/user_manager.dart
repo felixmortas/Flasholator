@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 import 'package:flasholator/core/providers/free_plan_limits_provider.dart';
 import 'package:flasholator/core/services/auth_service.dart';
@@ -9,6 +10,16 @@ import 'package:flasholator/core/services/firestore_users_dao.dart';
 import 'package:flasholator/core/services/user_preferences_service.dart';
 import 'package:flasholator/core/services/revenuecat_service.dart';
 import 'package:flasholator/core/providers/user_data_provider.dart';
+
+enum SubscriptionActionResult {
+  activated,
+  deactivated,
+  unchanged,
+  cancelled,
+  pending,
+  failed,
+  ignored,
+}
 
 class UserManager {
   final FirestoreUsersDAO _firestoreDAO;
@@ -19,12 +30,14 @@ class UserManager {
   String? _sessionUid;
   bool _sessionBound = false;
   int _sessionGeneration = 0;
+  int _subscriptionOperation = 0;
 
   /// Invalide immédiatement les opérations anciennes, avant toute attente.
   void beginSession(String? uid, int generation) {
     _sessionUid = uid;
     _sessionBound = true;
     _sessionGeneration = generation;
+    _subscriptionOperation++;
   }
 
   bool _isCurrent(String uid, int generation) =>
@@ -203,19 +216,74 @@ class UserManager {
     await _authService.login(email, password);
   }
 
-  Future<void> subscribeUser() async {
-    final bool wasSubscribed = userNotifier.isSubscribed;
+  Future<SubscriptionActionResult> subscribeUser() async {
     final userId = getUserId();
     final generation = _sessionGeneration;
-    await _revenueCatService.presentPaywall(userId);
-    if (_sessionBound && !_isCurrent(userId, generation)) return;
-    if (!wasSubscribed) {
-      final bool isSubscribed = await isUserSubscribed();
-      if (isSubscribed && (!_sessionBound || _isCurrent(userId, generation))) {
-        await updateLocal({"isSubscribed": isSubscribed},
-            isCurrent: () => !_sessionBound || _isCurrent(userId, generation));
-      }
+    final operation = ++_subscriptionOperation;
+    final outcome = await _revenueCatService.presentPaywall(userId);
+    if (!_isSubscriptionOperationCurrent(userId, generation, operation)) {
+      return SubscriptionActionResult.ignored;
     }
+    if (outcome == PaywallResult.notPresented) {
+      return SubscriptionActionResult.pending;
+    }
+    if (outcome == PaywallResult.error) {
+      return SubscriptionActionResult.failed;
+    }
+    final result = await _reconcileSubscription(userId, generation, operation);
+    return outcome == PaywallResult.cancelled &&
+            result == SubscriptionActionResult.unchanged
+        ? SubscriptionActionResult.cancelled
+        : result;
+  }
+
+  Future<SubscriptionActionResult> restorePurchases() async {
+    final userId = getUserId();
+    final generation = _sessionGeneration;
+    final operation = ++_subscriptionOperation;
+    final confirmed = await _revenueCatService.restorePurchases();
+    if (!_isSubscriptionOperationCurrent(userId, generation, operation)) {
+      return SubscriptionActionResult.ignored;
+    }
+    return _applySubscription(userId, generation, operation, confirmed);
+  }
+
+  /// Relit RevenueCat après le retour d'un paywall externe ou au premier plan.
+  Future<SubscriptionActionResult> refreshSubscription() async {
+    final userId = getUserId();
+    final generation = _sessionGeneration;
+    final operation = ++_subscriptionOperation;
+    return _reconcileSubscription(userId, generation, operation);
+  }
+
+  bool _isSubscriptionOperationCurrent(
+          String userId, int generation, int operation) =>
+      operation == _subscriptionOperation &&
+      _authService.getUserId() == userId &&
+      (!_sessionBound || _isCurrent(userId, generation));
+
+  Future<SubscriptionActionResult> _reconcileSubscription(
+      String userId, int generation, int operation) async {
+    final confirmed = await isUserSubscribed();
+    return _applySubscription(userId, generation, operation, confirmed);
+  }
+
+  Future<SubscriptionActionResult> _applySubscription(
+      String userId, int generation, int operation, bool confirmed) async {
+    if (!_isSubscriptionOperationCurrent(userId, generation, operation)) {
+      return SubscriptionActionResult.ignored;
+    }
+    final previous = userNotifier.isSubscribed;
+    await updateLocal({'isSubscribed': confirmed},
+        isCurrent: () => _isSubscriptionOperationCurrent(
+            userId, generation, operation));
+    if (!_isSubscriptionOperationCurrent(userId, generation, operation)) {
+      return SubscriptionActionResult.ignored;
+    }
+    if (confirmed == previous) return SubscriptionActionResult.unchanged;
+    return confirmed
+        ? SubscriptionActionResult.activated
+        : SubscriptionActionResult.deactivated;
   }
 
   Future<void> signOut() async {

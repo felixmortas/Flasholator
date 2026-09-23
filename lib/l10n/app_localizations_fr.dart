@@ -186,6 +186,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get subscriptionActivated => 'Abonnement activé.';
 
   @override
+  String get subscriptionRestored => 'Abonnement restauré.';
+
+  @override
+  String get restorePurchases => 'Restaurer les achats';
+
+  @override
+  String get noPurchasesToRestore => 'Aucun abonnement actif trouvé.';
+
+  @override
+  String get subscriptionCheckFailed =>
+      'Impossible de vérifier l\'abonnement. Réessayez.';
+
+  @override
+  String get subscriptionPending =>
+      'En attente de confirmation de l\'achat. L\'abonnement sera mis à jour à votre retour dans l\'application.';
+
+  @override
   String get confirmCancelSubscription =>
       'Souhaitez-vous résilier votre abonnement ? Vous garderez l\'accès jusqu\'à la fin de la période.';
 
