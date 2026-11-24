@@ -65,3 +65,5 @@ _bmad
 
 # codex skills
 .agents
+# claude code local config
+.claude/
