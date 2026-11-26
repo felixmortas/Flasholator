@@ -3,46 +3,7 @@ plugins {
     // START: FlutterFire Configuration
     id 'com.google.gms.google-services'
     // END: FlutterFire Configuration
-    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-}
-
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '5'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '0.2.0'
-}
-
-def flutterMinSdkVersion = localProperties.getProperty('flutter.minSdkVersion')
-if (flutterMinSdkVersion == null) {
-    flutterMinSdkVersion = '28'
-}
-
-def flutterTargetSdkVersion = localProperties.getProperty('flutter.targetSdkVersion')
-if (flutterTargetSdkVersion == null) {
-    flutterTargetSdkVersion = '35'
-}
-
-def flutterCompileSdkVersion = localProperties.getProperty('flutter.compileSdkVersion')
-if (flutterCompileSdkVersion == null) {
-    flutterCompileSdkVersion = '35'
-}
-
-def flutterNdkVersion = localProperties.getProperty('flutter.ndkVersion')
-if (flutterNdkVersion == null) {
-    flutterNdkVersion = '26.1.10909125'
 }
 
 def keystoreProperties = new Properties()
@@ -53,28 +14,21 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.felinx18.flasholator"
-    compileSdkVersion flutterCompileSdkVersion.toInteger()
-    ndkVersion flutterNdkVersion
+    compileSdk 37 // exigé par androidx.lifecycle 2.11
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
 
     defaultConfig {
         applicationId "com.felinx18.flasholator"
-        minSdkVersion flutterMinSdkVersion.toInteger()
-        targetSdkVersion flutterTargetSdkVersion.toInteger()
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdk 28
+        targetSdk flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 
     signingConfigs {
@@ -97,6 +51,12 @@ android {
         release {
             signingConfig signingConfigs.release
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 

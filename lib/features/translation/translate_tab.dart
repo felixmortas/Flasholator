@@ -357,11 +357,11 @@ class _TranslateTabState extends ConsumerState<TranslateTab> {
                       onSharePressed: () {
                         final translatedWord = translationState.result?.text ?? '';
                         if (translatedWord.isNotEmpty) {
-                          Share.share(
-                            'Grâce à Flasholator, je vais pouvoir retenir éternellement ce mot que je viens de traduire : $translatedWord\n\n'
+                          SharePlus.instance.share(ShareParams(
+                            text: 'Grâce à Flasholator, je vais pouvoir retenir éternellement ce mot que je viens de traduire : $translatedWord\n\n'
                             '📱 Toi aussi télécharge Flasholator pour avoir une mémoire d\'éléphant !',
                             subject: 'Apprendre avec Flasholator',
-                          );
+                          ));
                         }
                       },
                     ),

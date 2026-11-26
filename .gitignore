@@ -46,6 +46,10 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android Gradle
+android/.gradle/
+android/build/
+
 # iOS build folder
 /certs/
 /provisioning/

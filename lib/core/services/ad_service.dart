@@ -125,7 +125,7 @@ class AdService {
   Future<BannerAd?> loadBanner(double width) async {
     if (!_shouldShowBanner()) return null;
 
-    final size = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+    final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(
       width.truncate(),
     );
 

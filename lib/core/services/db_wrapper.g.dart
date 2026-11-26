@@ -928,7 +928,11 @@ class $$FlashcardsTableTableManager extends RootTableManager<
             nextReviewDate: nextReviewDate,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable<$FlashcardsTable, FlashcardData>(table),
+                    BaseReferences<_$AppDatabase, $FlashcardsTable,
+                        FlashcardData>(db, table, e)
+                  ))
               .toList(),
           prefetchHooksCallback: null,
         ));

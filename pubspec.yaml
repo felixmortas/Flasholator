@@ -30,37 +30,37 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
-    sdk: flutter # Requires flutter SDK version 3.32.5
+    sdk: flutter # Requires flutter SDK version 3.47.9
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  permission_handler: ^11.3.1
+  cupertino_icons: ^2.0.0
+  permission_handler: ^13.0.2
 
   drift: ^2.28.1
-  drift_flutter: ^0.2.5
+  drift_flutter: ^0.3.1
   http: ^1.2.2
   intl: any
   path_provider: ^2.1.5
   url_launcher: ^6.3.1
   url_launcher_ios: ^6.3.3
-  fluttertoast: ^8.2.12
+  fluttertoast: ^10.0.3
   shared_preferences: ^2.5.3          # To trigger an action from selected text in other apps
   fl_chart: ^1.0.0                    # For stats plots
   flutter_localizations:              # For multi lang UI 
     sdk: flutter
   flutter_launcher_icons: ^0.14.4     # To add app icone
-  firebase_core: ^3.15.2              # Not working with XCode <=15.2 :https://github.com/firebase/flutterfire/issues/17496
-  firebase_auth: ^5.7.0
-  cloud_firestore: ^5.6.12
-  google_mobile_ads: ^6.0.0
+  firebase_core: ^5.2.0              # Not working with XCode <=15.2 :https://github.com/firebase/flutterfire/issues/17496
+  firebase_auth: ^7.1.0
+  cloud_firestore: ^7.2.0
+  google_mobile_ads: ^9.2.0
   mocktail: ^1.0.4
   flutter_riverpod: ^2.6.1            # Variables accessibles globalement dans l'app (=providers)
-  purchases_flutter: ^9.2.0           # RevenueCat subscriptions
-  purchases_ui_flutter: ^9.2.0
-  google_fonts: ^6.3.2
-  share_plus: ^7.2.2
+  purchases_flutter: ^11.0.4           # RevenueCat subscriptions
+  purchases_ui_flutter: ^11.0.4
+  google_fonts: ^9.0.0
+  share_plus: ^13.3.1
   change_app_package_name: ^1.5.0
   app_tracking_transparency: ^2.0.6+1
 
@@ -75,8 +75,6 @@ flutter_launcher_icons:
     image_path: "assets/icon/app_icon.png"
 
 
-dependency_overrides:
-  win32: ^5.5.4
 
 dev_dependencies:
   flutter_test:
@@ -90,7 +88,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.1
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -128,7 +128,7 @@ class RevenueCatService {
 
   Future<void> purchasePackage(Package package) async {
     try {
-      await Purchases.purchasePackage(package);
+      await Purchases.purchase(PurchaseParams.package(package));
     } catch (e) {
       rethrow;
     }
